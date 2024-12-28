@@ -3,13 +3,16 @@ cmake_minimum_required(VERSION 3.16)
 project(SalesMate VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+add_subdirectory(./zxing-cpp/)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick )
 
 qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(appSalesMate
     main.cpp
+     rsources.qrc
 )
 
 qt_add_qml_module(appSalesMate
@@ -17,6 +20,20 @@ qt_add_qml_module(appSalesMate
     VERSION 1.0
     QML_FILES
         Main.qml
+        RESOURCES
+            android/AndroidManifest.xml
+            android/build.gradle android/res/values/libs.xml
+            android/res/xml/qtprovider_paths.xml
+            android/gradle/wrapper/gradle-wrapper.jar
+            android/gradle/wrapper/gradle-wrapper.properties
+            android/gradle.properties
+            android/gradlew
+            android/gradlew.bat
+            SOURCES
+                androidsystem.h
+                androidsystem.cpp
+                RESOURCES android/src/com/native/Native.java
+
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -31,8 +48,12 @@ set_target_properties(appSalesMate PROPERTIES
 )
 
 target_link_libraries(appSalesMate
-    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate
 )
+set_property(TARGET appSalesMate APPEND PROPERTY
+    QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
+)
+
 
 include(GNUInstallDirs)
 install(TARGETS appSalesMate
