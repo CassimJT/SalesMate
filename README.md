@@ -1,2 +1,2 @@
 # SalesMate
-A shoop keeper app
+SalesMate is a smartphone-based Point of Sale (POS) app designed for Android and iOS, tailored to streamline retail operations for shopkeepers and small businesses. It functions like the POS systems used in supermarkets, enabling seamless sales processing, inventory management, and real-time transaction tracking. The app also offers business-related statistics, including sales trends, revenue reports, and stock levels, empowering shopkeepers to make data-driven decisions. With its user-friendly interface and accessibility on mobile devices, SalesMate simplifies day-to-day operations, eliminates the need for bulky hardware, and helps businesses stay organized and efficient on the go.
