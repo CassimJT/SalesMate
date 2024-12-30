@@ -1,5 +1,31 @@
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
+        <file>Asserts/icons/animeted-cart.gif</file>
+        <file>Asserts/icons/animeted-menu.gif</file>
+        <file>Asserts/icons/back.png</file>
+        <file>Asserts/icons/barcode-scan.png</file>
+        <file>Asserts/icons/calender.png</file>
+        <file>Asserts/icons/cart.png</file>
+        <file>Asserts/icons/delete.png</file>
+        <file>Asserts/icons/generate.png</file>
+        <file>Asserts/icons/icons8-income-50.png</file>
+        <file>Asserts/icons/icons8-installing-updates-50.png</file>
+        <file>Asserts/icons/income.png</file>
+        <file>Asserts/icons/info.png</file>
+        <file>Asserts/icons/menu.png</file>
+        <file>Asserts/icons/menu-dote.png</file>
+        <file>Asserts/icons/menu-rec.png</file>
+        <file>Asserts/icons/minus.png</file>
+        <file>Asserts/icons/sale.png</file>
+        <file>Asserts/icons/SalesMate.png</file>
+        <file>Asserts/icons/search.png</file>
+        <file>Asserts/icons/touch.png</file>
+        <file>Asserts/icons/menu-50.png</file>
+        <file>Asserts/icons/menu-48.png</file>
+        <file>Asserts/Avata/avata1.jpg</file>
+        <file>Asserts/icons/Edit.png</file>
+        <file>Asserts/icons/profile.png</file>
+        <file>Asserts/icons/add.png</file>
     </qresource>
 </RCC>

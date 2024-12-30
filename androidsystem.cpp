@@ -3,8 +3,10 @@
 AndroidSystem::AndroidSystem(QObject *parent)
     : QObject{parent}
 {
-    //constractor
+//constractor
+#if defined(Q_OS_ANDROID)
     setAnAndroidSystemBarColor();
+#endif
 }
 /**
  * @brief AndroidSystem::setAnAndroidSystemBarColor
@@ -26,7 +28,7 @@ void AndroidSystem::setAnAndroidSystemBarColor()
         }
         window.callMethod<void>("addFlags","(I)V",0x80000000);
         window.callMethod<void>("clearFlags","(I)V",0x04000000);
-        window.callMethod<void>("setStatusBarColor","(I)V",0xFF2196F3); //lightBlue
+        window.callMethod<void>("setStatusBarColor","(I)V",0xFF4CAF50); //0xFF4CAF50 = #4CAF50 //green
         return QVariant(true);
     }).waitForFinished();
 

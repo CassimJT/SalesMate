@@ -33,6 +33,11 @@ qt_add_qml_module(appSalesMate
                 androidsystem.h
                 androidsystem.cpp
                 RESOURCES android/src/com/native/Native.java
+                QML_FILES UI/Drawer/Profile.qml
+                QML_FILES UI/Drawer/ImageProcessor.js
+                QML_FILES UI/Drawer/DrawerMenu.qml
+                QML_FILES UI/Drawer/DrawerModel.qml
+                QML_FILES UI/Drawer/DrawerDelegate.qml
 
 )
 
@@ -48,7 +53,7 @@ set_target_properties(appSalesMate PROPERTIES
 )
 
 target_link_libraries(appSalesMate
-    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate
+    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate ZXing::ZXing
 )
 set_property(TARGET appSalesMate APPEND PROPERTY
     QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
