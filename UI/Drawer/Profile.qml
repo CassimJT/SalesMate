@@ -4,10 +4,13 @@ import QtQuick.Layouts
 import QtQuick.Effects
 import "ImageProcessor.js" as ProcessImage
 
-
 Rectangle {
     id: profile
+    width: parent.width
+    height: 140
+    clip:true
     property string imageSource: ""
+    property string defaultImageSource: "qrc:/Asserts/icons/profile.png"
 
     ColumnLayout {
         width:profile.width
@@ -31,7 +34,7 @@ Rectangle {
 
             Rectangle {
                 id: avataRect
-                width: 80
+                width: parent.width * 0.3 || 80
                 height: width
                 radius: width / 2
                 color: "transparent" //for now to be descided later
@@ -62,14 +65,13 @@ Rectangle {
                 // Offscreen QML Image to load the source
                 Image {
                     id: imageObj
-                    source: profile.imageSource || "qrc:/Asserts/icons/profile.png"
+                    source: profile.imageSource || profile.defaultImageSource
                     visible: false // Hiding it as its only needed  for Canvas
                     onStatusChanged: {
                         if (status === Image.Ready) {
                             avataCanvas.requestPaint(); // Repaint the canvas when the image is ready
                         }
                     }
-
                 }
                 //edit image
                 Image {
@@ -108,6 +110,11 @@ Rectangle {
         }
         MenuSeparator{
             Layout.fillWidth: true
+        }
+        Component.onCompleted: {
+            console.log("Profile Component Loaded:");
+            console.log("Profile size:", profile.width, profile.height);
+            console.log("Image Source:", profile.imageSource);
         }
     }
 }

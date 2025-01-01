@@ -38,6 +38,16 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Drawer/DrawerMenu.qml
                 QML_FILES UI/Drawer/DrawerModel.qml
                 QML_FILES UI/Drawer/DrawerDelegate.qml
+                QML_FILES UI/Home/Home.qml
+                QML_FILES UI/Welcome/Welcome.qml
+                QML_FILES UI/Auth/SignIn.qml
+                QML_FILES UI/Auth/SignUp.qml
+                QML_FILES UI/About/AboutApp.qml
+                QML_FILES UI/About/AboutUs.qml
+                QML_FILES UI/Stock/AddItem.qml
+                QML_FILES UI/Stock/ShowStock.qml
+                QML_FILES UI/Updates/ChechUpdate.qml
+                QML_FILES UI/Stock/AddExpense.qml
 
 )
 
