@@ -24,4 +24,8 @@ ItemDelegate {
             text: qsTr(model.name)
         }
     }
+    onClicked: {
+        mainStakView.push(model.pageSource)
+        drawer.close()
+    }
 }

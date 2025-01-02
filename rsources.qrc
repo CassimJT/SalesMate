@@ -27,5 +27,8 @@
         <file>Asserts/icons/Edit.png</file>
         <file>Asserts/icons/profile.png</file>
         <file>Asserts/icons/add.png</file>
+        <file>Asserts/icons/normal-back.png</file>
+        <file>Asserts/icons/styled-back.png</file>
+        <file>Asserts/icons/scannerRec.png</file>
     </qresource>
 </RCC>

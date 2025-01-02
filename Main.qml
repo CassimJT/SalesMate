@@ -7,12 +7,104 @@ import "./UI/Drawer"
 import "./UI/Welcome"
 
 ApplicationWindow {
-    id:mainWindow
+    id: root
     width: 300
     height: 480
     visible: true
     title: qsTr("SalesMate")
     Material.primary: Material.Green
+    property alias mainStakView: mainStakView
+    property alias drawer: drawer
+
+    WelcomePage {
+        id: welcomePage // Declare an instance
+        visible: false // Prevent it from being displayed here
+    }
+
+    header: ToolBar {
+        id: toolbar
+        visible: mainStakView.currentItem !== welcomePage // Compare with the instance
+        RowLayout {
+            anchors.fill: parent
+            //menu button
+            ToolButton {
+                Image {
+                    id: name
+                    width: 28
+                    height: width
+                    source: mainStakView.depth > 1 ? "qrc:/Asserts/icons/styled-back.png" :"qrc:/Asserts/icons/menu-48.png"
+                    fillMode: Image.PreserveAspectFit
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if(mainStakView.depth > 1) {
+                                mainStakView.pop()
+                            } else {
+                                drawer.open()
+                            }
+                        }
+                    }
+                    anchors.centerIn: parent
+                }
+            }
+            //pageTitle
+            Label {
+                text: qsTr("")
+            }
+            //current sales
+            ToolButton {
+                z:1
+                Image {
+                    id: cart
+                    width: 28
+                    height: width
+                    source: "qrc:/Asserts/icons/cart.png"
+                    fillMode: Image.PreserveAspectFit
+                    MouseArea {
+                        anchors.fill: parent
+                    }
+                    anchors.centerIn: parent
+                    Rectangle {
+                        id: contentRec
+                        color: "red"
+                        width: 14
+                        height: width
+                        radius: width
+                        anchors {
+                            right: parent.right
+                        }
+                        Text {
+                            id: contentTxt
+                            text: "0"
+                            font.pointSize: 9
+                            anchors.centerIn: parent
+                        }
+                        //MouseArea
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if(mainStakView.depth > 1) {
+                                    mainStakView.pop()
+                                }else {
+                                     mainStakView.push("./UI/Stock/ShowSalesPage.qml")
+                                }
+                            }
+                        }
+                    }
+                }
+                Layout.alignment: Qt.AlignRight
+                //click event
+                onClicked: {
+                    if(mainStakView.depth > 1) {
+                        mainStakView.pop()
+                    }else {
+                         mainStakView.push("./UI/Stock/ShowSalesPage.qml")
+                    }
+                }
+            }
+        }
+    }
+
     Drawer {
         id:drawer
         width: parent.width * 0.75
@@ -29,6 +121,7 @@ ApplicationWindow {
         }
         DrawerMenu {
             id: drawerenu
+
             anchors {
                 top: profile.bottom
                 left: parent.left
@@ -71,18 +164,19 @@ ApplicationWindow {
                     text: qsTr("Check for Update")
                 }
             }
+            //click event
+            onClicked: {
+                mainStakView.push("./UI/Updates/ChechUpdatePage.qml")
+                drawer.close()
+            }
         }
     }
     //the main stark
     StackView {
         id: mainStakView
         property bool userIsSigned: true
+        property bool isVerified: (userIsSigned && mainStakView.depth == 0)
         anchors.fill: parent
-        initialItem:(userIsSigned && mainStakView.depth == 0)? "./UI/Home/Home.qml":"./UI/Welcome/Welcome.qml"
-    }
-
-    onHeightChanged: {
-        console.log("Window height changed. Refreshing UI.");
-
+        initialItem: userIsSigned ? "./UI/Home/HomePage.qml" : welcomePage
     }
 }

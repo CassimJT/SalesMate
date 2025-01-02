@@ -34,8 +34,8 @@ Rectangle {
 
             Rectangle {
                 id: avataRect
-                width: parent.width * 0.3 || 80
-                height: width
+                Layout.preferredWidth : 80
+                Layout.preferredHeight: Layout.preferredWidth
                 radius: width / 2
                 color: "transparent" //for now to be descided later
                 clip: true
@@ -88,6 +88,8 @@ Rectangle {
                         anchors.fill: parent
                         onClicked: {
                             //code......
+                            mainStakView.push("../Profile/ProfileEditPage.qml")
+                            drawer.close()
                         }
                     }
                 }
