@@ -33,5 +33,7 @@
         <file>Asserts/icons/Salesmate-dark.png</file>
         <file>Asserts/icons/Salesmate-light.png</file>
         <file>Asserts/icons/HDPI.png</file>
+        <file>Asserts/icons/all-stock.png</file>
+        <file>Asserts/icons/icons8-add-100.png</file>
     </qresource>
 </RCC>

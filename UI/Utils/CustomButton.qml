@@ -16,12 +16,14 @@ Rectangle {
     height: btnHeight
     radius: btnRadius
     color: btnColor
+    focus: true  // Enable focus for this button
 
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         onPressed: {
             customButton.color = customButton.btnClickedColor;
+            customButton.forceActiveFocus(); // Move focus to this button
         }
         onReleased: {
             customButton.color = customButton.btnColor;

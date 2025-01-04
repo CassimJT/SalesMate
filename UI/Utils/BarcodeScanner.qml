@@ -8,6 +8,10 @@ Item {
     property color barCodAreaColor: "#B2EBF2"
     property real barcodeHight: 142
     property real barCodeWidth: parent.width * 0.9
+    property string scanneriIconSource: ""
+    property string torshIconSource: ""
+    property string searchIconSource: ""
+    property string generateIcconSource: ""
 
     implicitHeight: scannerArea.height
 
@@ -51,6 +55,10 @@ Item {
 
             ScannerTools {
                 id: scannerTools
+                scanneriIconSource: m_parent.scanneriIconSource
+                torshIconSource: m_parent.torshIconSource
+                searchIconSource: m_parent.searchIconSource
+                generateIcconSource: m_parent.generateIcconSource
                 anchors {
                     bottom: parent.bottom
                     horizontalCenter: parent.horizontalCenter
@@ -64,6 +72,9 @@ Item {
                 }
                 onSearchActivated: {
                     console.log("Search button clicked!");
+                }
+                onGenerateActivated: {
+                     console.log("Gererate button clicked!");
                 }
             }
 

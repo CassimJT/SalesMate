@@ -53,6 +53,7 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Utils/BarcodeScanner.qml
                 QML_FILES UI/Utils/ScannerTools.qml
                 QML_FILES UI/Utils/CustomButton.qml
+                QML_FILES UI/Stock/AddStock.qml
 
 
 )
