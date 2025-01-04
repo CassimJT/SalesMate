@@ -9,7 +9,7 @@ import "./UI/Welcome"
 ApplicationWindow {
     id: root
     width: 300
-    height: 480
+    height: 580
     visible: true
     title: qsTr("SalesMate")
     Material.primary: Material.Green
@@ -24,6 +24,7 @@ ApplicationWindow {
     header: ToolBar {
         id: toolbar
         visible: mainStakView.currentItem !== welcomePage // Compare with the instance
+        height: 70
         RowLayout {
             anchors.fill: parent
             //menu button
@@ -49,7 +50,8 @@ ApplicationWindow {
             }
             //pageTitle
             Label {
-                text: qsTr("")
+                text: qsTr(mainStakView.currentItem.objectName)
+                font.pointSize: 16
             }
             //current sales
             ToolButton {

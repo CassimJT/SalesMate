@@ -1,12 +1,16 @@
 import QtQuick 2.15
 import QtQuick.Controls
 import QtMultimedia
-
 Item {
     id: m_parent
+    width: parent.width
+    height: implicitHeight
     property color barCodAreaColor: "#B2EBF2"
     property real barcodeHight: 142
     property real barCodeWidth: parent.width * 0.9
+
+    implicitHeight: scannerArea.height
+
     CaptureSession {
         id: session
         camera: Camera {
@@ -17,47 +21,63 @@ Item {
             id: imagecapture
             onImageCaptured: function (imageid, preview) {
                 console.log("Image captured...");
-                //send to backend
+                // Send to backend
             }
         }
-
         videoOutput: output
     }
-    //barcode area background
+
+    // Barcode area background
     Rectangle {
         id: scannerArea
         width: m_parent.barCodeWidth
         height: m_parent.barcodeHight
-        radius: 15
+        radius: 10
         color: m_parent.barCodAreaColor
+
         BorderImage {
-            id: bacground
+            id: background
             source: "qrc:/Asserts/icons/scannerRec.png"
-            anchors.fill:parent
+            anchors {
+                fill: parent
+                margins: 8
+            }
         }
-        //VideoOutput
+
+        // VideoOutput
         VideoOutput {
             id: output
             anchors.fill: parent
+
             ScannerTools {
-                id:scannerTools
+                id: scannerTools
                 anchors {
                     bottom: parent.bottom
-                    horizontalCenter:parent.horizontalCenter
+                    horizontalCenter: parent.horizontalCenter
                     bottomMargin: 6
                 }
+                onScannerActivated: {
+                    console.log("Scanner button clicked!");
+                }
+                onTorchActivated: {
+                    console.log("Torch button clicked!");
+                }
+                onSearchActivated: {
+                    console.log("Search button clicked!");
+                }
             }
+
             Rectangle {
-                id:inidcator
+                id: indicator
                 color: "red"
-                width: 16
+                width: 12
                 height: width
                 radius: width
                 anchors {
                     top: parent.top
                     right: parent.right
-                    topMargin: 10
-                    rightMargin: 10
+                    topMargin: 20
+                    rightMargin: 20
                 }
             }
         }

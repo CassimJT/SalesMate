@@ -7,28 +7,42 @@ import "ImageProcessor.js" as ProcessImage
 Rectangle {
     id: profile
     width: parent.width
-    height: 140
+    height: 180
     clip:true
     property string imageSource: ""
     property string defaultImageSource: "qrc:/Asserts/icons/profile.png"
 
     ColumnLayout {
         width:profile.width
-        spacing: 5
+        spacing: 8
         anchors {
             left: parent.left
             right: parent.right
             leftMargin: 10
             rightMargin: 10
+            top:parent.top
+
         }
         // The Text element
-        Text {
-            id: logoText
-            text: qsTr("SaleMate")
-            font.pointSize: 19
-            font.family: "Lobster"
-            color: "#3b5998"
-            Layout.alignment: Qt.AlignCenter
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+            spacing:1
+            Image {
+                id: sales
+                Layout.preferredWidth: 36
+                Layout.preferredHeight: 36
+                source: "qrc:/Asserts/icons/HDPI.png"
+                fillMode: Image.PreserveAspectFit
+            }
+            Label {
+                id:apptitle
+                text: qsTr("SalesMate")
+                font.pointSize: 16
+            }
+        }
+
+        MenuSeparator{
+            Layout.fillWidth: true
         }
         RowLayout {
 
@@ -112,11 +126,6 @@ Rectangle {
         }
         MenuSeparator{
             Layout.fillWidth: true
-        }
-        Component.onCompleted: {
-            console.log("Profile Component Loaded:");
-            console.log("Profile size:", profile.width, profile.height);
-            console.log("Image Source:", profile.imageSource);
         }
     }
 }

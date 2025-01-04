@@ -30,5 +30,8 @@
         <file>Asserts/icons/normal-back.png</file>
         <file>Asserts/icons/styled-back.png</file>
         <file>Asserts/icons/scannerRec.png</file>
+        <file>Asserts/icons/Salesmate-dark.png</file>
+        <file>Asserts/icons/Salesmate-light.png</file>
+        <file>Asserts/icons/HDPI.png</file>
     </qresource>
 </RCC>
