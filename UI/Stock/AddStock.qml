@@ -6,7 +6,7 @@ import "../Utils"
 
 Page {
     id: homePage
-    objectName: "Home"
+    objectName: "Add Stock"
 
     property real screenWidth: Screen.width
     property real screenHeight: Screen.height

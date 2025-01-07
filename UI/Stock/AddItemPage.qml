@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 Page {
     id: addItemPage
-    objectName: "Add Stocks"
+    objectName: "Stocks"
     SwipeView{
         id: swipeView
         anchors.fill:parent

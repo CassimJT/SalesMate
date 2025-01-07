@@ -54,6 +54,16 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Utils/ScannerTools.qml
                 QML_FILES UI/Utils/CustomButton.qml
                 QML_FILES UI/Stock/AddStock.qml
+                QML_FILES UI/Stock/CurrentStockModel.qml
+                QML_FILES UI/Stock/CurrentStockDelegete.qml
+                QML_FILES UI/Stock/SearchBar.qml
+                QML_FILES UI/Stock/StockModel.qml
+                QML_FILES UI/Stock/StockDelegate.qml
+                QML_FILES UI/Notification/NotificationPage.qml
+                QML_FILES UI/Notification/NotificationModel.qml
+                QML_FILES UI/Notification/NotificationDelegate.qml
+                QML_FILES UI/Utils/Avatar.qml
+                QML_FILES UI/Profile/AvataDrawerTools.qml
 
 
 )

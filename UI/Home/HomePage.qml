@@ -151,7 +151,7 @@ Page {
             Rectangle {
                 id: contentRec
                 color: "red"
-                width: 14
+                width: 16
                 height: width
                 radius: width
                 anchors {
@@ -162,17 +162,20 @@ Page {
                     text: "0"
                     font.pointSize: 9
                     anchors.centerIn: parent
+                    color: "#ffffff"
                 }
                 //MouseArea
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        if(mainStakView.depth > 1) {
-                            mainStakView.pop()
-                        }else {
-                            mainStakView.push("../Stock/ShowSalesPage.qml")
-                        }
+                        mainStakView.push("../Stock/ShowSalesPage.qml")
                     }
+                }
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    mainStakView.push("../Stock/ShowSalesPage.qml")
                 }
             }
         }

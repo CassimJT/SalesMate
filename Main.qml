@@ -31,9 +31,9 @@ ApplicationWindow {
             ToolButton {
                 Image {
                     id: name
-                    width: 28
+                    width: 36
                     height: width
-                    source: mainStakView.depth > 1 ? "qrc:/Asserts/icons/styled-back.png" :"qrc:/Asserts/icons/menu-48.png"
+                    source: mainStakView.depth > 1 ? "qrc:/Asserts/icons/styled-back.png" :"qrc:/Asserts/icons/icons8-menu-100(1).png"
                     fillMode: Image.PreserveAspectFit
                     MouseArea {
                         anchors.fill: parent
@@ -47,6 +47,8 @@ ApplicationWindow {
                     }
                     anchors.centerIn: parent
                 }
+                 Layout.alignment: Qt.AlignLeft
+                 Layout.leftMargin: 5
             }
             //pageTitle
             Label {
@@ -55,12 +57,11 @@ ApplicationWindow {
             }
             //current sales
             ToolButton {
-                z:1
                 Image {
                     id: cart
                     width: 28
                     height: width
-                    source: "qrc:/Asserts/icons/cart.png"
+                    source: "qrc:/Asserts/icons/notification.png"
                     fillMode: Image.PreserveAspectFit
                     MouseArea {
                         anchors.fill: parent
@@ -69,7 +70,7 @@ ApplicationWindow {
                     Rectangle {
                         id: contentRec
                         color: "red"
-                        width: 14
+                        width: 16
                         height: width
                         radius: width
                         anchors {
@@ -80,29 +81,24 @@ ApplicationWindow {
                             text: "0"
                             font.pointSize: 9
                             anchors.centerIn: parent
+                            color: "#ffffff"
                         }
-                        //MouseArea
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                if(mainStakView.depth > 1) {
-                                    mainStakView.pop()
-                                }else {
-                                     mainStakView.push("./UI/Stock/ShowSalesPage.qml")
-                                }
+
+                    }
+                    //MouseArea
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if(mainStakView.depth > 1 && mainStakView.currentItem.objectName === "Notification" ) {
+                                mainStakView.pop()
+                            } else {
+                                  mainStakView.push("./UI/Notification/NotificationPage.qml")
                             }
                         }
                     }
                 }
                 Layout.alignment: Qt.AlignRight
-                //click event
-                onClicked: {
-                    if(mainStakView.depth > 1) {
-                        mainStakView.pop()
-                    }else {
-                         mainStakView.push("./UI/Stock/ShowSalesPage.qml")
-                    }
-                }
+                Layout.rightMargin: 5
             }
         }
     }

@@ -35,5 +35,17 @@
         <file>Asserts/icons/HDPI.png</file>
         <file>Asserts/icons/all-stock.png</file>
         <file>Asserts/icons/icons8-add-100.png</file>
+        <file>Asserts/icons/icons8-camera.gif</file>
+        <file>Asserts/icons/icons8-edit-100.png</file>
+        <file>Asserts/icons/icons8-search.gif</file>
+        <file>Asserts/icons/icons8-search-100.png</file>
+        <file>Asserts/icons/icons8-menu-100.png</file>
+        <file>Asserts/icons/icons8-menu-100(1).png</file>
+        <file>Asserts/icons/notification.png</file>
+        <file>Asserts/icons/icons8-camera-100.png</file>
+        <file>Asserts/icons/icons8-camera.png</file>
+        <file>Asserts/icons/icons8-camera-green.png</file>
+        <file>Asserts/icons/icons8-gallery-100.png</file>
+        <file>Asserts/icons/icons8-contact-100.png</file>
     </qresource>
 </RCC>

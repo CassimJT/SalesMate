@@ -1,27 +1,16 @@
 import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick.Controls
 
 Page {
-    id: salesPage
-    objectName: "Sales"
-
-    // Search Bar
-    SearchBar {
-        id: searchBar
-        anchors.top: parent.top
-        anchors.topMargin: 10
-    }
-
-
     // ListView
+    objectName: "Notification"
     ListView {
         id: listview
         clip: true
-        model: CurrentStockModel{}
-        delegate: CurrentStockDelegete{}
+        model: NotificationModel{}
+        delegate: NotificationDelegate {}
         anchors {
-            top: searchBar.bottom
+            top: parent.top
             right: parent.right
             left: parent.left
             bottom: parent.bottom
@@ -31,11 +20,10 @@ Page {
 
     Text {
         id: noDataText
-        text: qsTr("No current sale")
+        text: qsTr("No Notification")
         anchors.centerIn: parent
         font.pixelSize: 16
         color: "gray"
         visible: listview.model.count === 0 // Show text only when model is empty
     }
-
 }

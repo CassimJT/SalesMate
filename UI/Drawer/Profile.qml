@@ -2,7 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
-import "ImageProcessor.js" as ProcessImage
+import "../Utils"
 
 Rectangle {
     id: profile
@@ -45,69 +45,14 @@ Rectangle {
             Layout.fillWidth: true
         }
         RowLayout {
-
-            Rectangle {
-                id: avataRect
-                Layout.preferredWidth : 80
-                Layout.preferredHeight: Layout.preferredWidth
-                radius: width / 2
-                color: "transparent" //for now to be descided later
-                clip: true
-
-                Canvas {
-                    id: avataCanvas
-                    anchors.fill: parent
-
-                    onPaint: {
-                        const ctx = getContext("2d");
-                        ctx.clearRect(0, 0, width, height);
-
-                        // Drawing a circular mask
-                        ctx.beginPath();
-                        ctx.arc(width / 2, height / 2, width / 2, 0, 2 * Math.PI);
-                        ctx.clip();
-
-                        // Drawing the image onto the canvas
-                        ctx.drawImage(imageObj, 0, 0, width, height);
-                    }
-
-                    Component.onCompleted: {
-                        requestPaint(); // Trigger the canvas painting
-                    }
+            //Avatar
+            Avatar {
+                id:avata
+                iconInsidebackgroundScaleFactor: 0.85
+                onClicked: {
+                    mainStakView.push("../Profile/ProfileEditPage.qml")
+                    drawer.close()
                 }
-
-                // Offscreen QML Image to load the source
-                Image {
-                    id: imageObj
-                    source: profile.imageSource || profile.defaultImageSource
-                    visible: false // Hiding it as its only needed  for Canvas
-                    onStatusChanged: {
-                        if (status === Image.Ready) {
-                            avataCanvas.requestPaint(); // Repaint the canvas when the image is ready
-                        }
-                    }
-                }
-                //edit image
-                Image {
-                    id: edit
-                    width: 24
-                    height:width
-                    source: "qrc:/Asserts/icons/Edit.png"
-                    fillMode: Image.PreserveAspectFit
-                    anchors {
-                        bottom: parent.bottom
-                        right:parent.right
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            //code......
-                            mainStakView.push("../Profile/ProfileEditPage.qml")
-                            drawer.close()
-                        }
-                    }
-                }
-
             }
             Column {
                 Label {
