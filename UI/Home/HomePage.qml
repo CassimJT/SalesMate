@@ -80,7 +80,7 @@ Page {
                 barcodeHight: homePage.totalHeightFor3Item * 0.30
                 scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"
                 torshIconSource: "qrc:/Asserts/icons/touch.png"
-                searchIconSource: "qrc:/Asserts/icons/search.png"
+                searchIconSource: "qrc:/Asserts/icons/icons8-search-100.png"
 
             }
 
@@ -119,6 +119,8 @@ Page {
                 btnText: "Cart"
                 onBtnClicked: {
                     console.log("Clicked")
+                    barcodeScanner.output.visible = true
+
                 }
             }
             CustomButton {
@@ -139,32 +141,39 @@ Page {
         id: status
         width:parent.width
         height: 50
-        AnimatedImage {
-            id: giff
-            width: 36
-            height: width
-            anchors {
-                horizontalCenter:parent.horizontalCenter
-            }
-            source: "qrc:/Asserts/icons/animeted-cart.gif"
-            fillMode:Image.PreserveAspectFit
-            Rectangle {
-                id: contentRec
-                color: "red"
-                width: 16
+        Row {
+            anchors.centerIn: parent
+            spacing: 15
+            AnimatedImage {
+                id: giff
+                width: 36
                 height: width
-                radius: width
-                anchors {
-                    right: parent.right
+                source: "qrc:/Asserts/icons/animeted-cart.gif"
+                fillMode:Image.PreserveAspectFit
+                Rectangle {
+                    id: contentRec
+                    color: "red"
+                    width: 16
+                    height: width
+                    radius: width
+                    anchors {
+                        right: parent.right
+                    }
+                    Text {
+                        id: contentTxt
+                        text: "0"
+                        font.pointSize: 9
+                        anchors.centerIn: parent
+                        color: "#ffffff"
+                    }
+                    //MouseArea
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            mainStakView.push("../Stock/ShowSalesPage.qml")
+                        }
+                    }
                 }
-                Text {
-                    id: contentTxt
-                    text: "0"
-                    font.pointSize: 9
-                    anchors.centerIn: parent
-                    color: "#ffffff"
-                }
-                //MouseArea
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
@@ -172,11 +181,20 @@ Page {
                     }
                 }
             }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    mainStakView.push("../Stock/ShowSalesPage.qml")
-                }
+            // Scanner
+            Image {
+                id: scan
+                width: 36
+                height: width
+                source: "qrc:/Asserts/icons/barcode-scan.png"
+                fillMode: Image.PreserveAspectFit
+               MouseArea {
+                    anchors.fill:parent
+                    onClicked: {
+                        console.log("Captured")
+                        barcodeScanner.imagecapture.capture()
+                    }
+               }
             }
         }
     }

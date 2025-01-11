@@ -64,6 +64,9 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Notification/NotificationDelegate.qml
                 QML_FILES UI/Utils/Avatar.qml
                 QML_FILES UI/Profile/AvataDrawerTools.qml
+                QML_FILES UI/Utils/Utils.js
+                SOURCES barcodeengine.h barcodeengine.cpp
+
 
 
 )
@@ -80,7 +83,7 @@ set_target_properties(appSalesMate PROPERTIES
 )
 
 target_link_libraries(appSalesMate
-    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate Qt6::Multimedia
+    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate Qt6::Multimedia ZXing::ZXing
 )
 set_property(TARGET appSalesMate APPEND PROPERTY
     QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android

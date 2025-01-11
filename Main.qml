@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Window
 import QtQuick.Layouts
+import Cidociety
 import "./UI/Drawer"
 import "./UI/Welcome"
 
@@ -15,6 +16,10 @@ ApplicationWindow {
     Material.primary: Material.Green
     property alias mainStakView: mainStakView
     property alias drawer: drawer
+    property alias barcodeEngine: barcodeEngine
+    BarcodeEngine {
+        id: barcodeEngine
+    }
 
     WelcomePage {
         id: welcomePage // Declare an instance
@@ -47,8 +52,8 @@ ApplicationWindow {
                     }
                     anchors.centerIn: parent
                 }
-                 Layout.alignment: Qt.AlignLeft
-                 Layout.leftMargin: 5
+                Layout.alignment: Qt.AlignLeft
+                Layout.leftMargin: 5
             }
             //pageTitle
             Label {
@@ -92,7 +97,7 @@ ApplicationWindow {
                             if(mainStakView.depth > 1 && mainStakView.currentItem.objectName === "Notification" ) {
                                 mainStakView.pop()
                             } else {
-                                  mainStakView.push("./UI/Notification/NotificationPage.qml")
+                                mainStakView.push("./UI/Notification/NotificationPage.qml")
                             }
                         }
                     }

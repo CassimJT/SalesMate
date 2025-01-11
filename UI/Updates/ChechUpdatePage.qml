@@ -4,8 +4,28 @@ Page {
     id: cheackForUpdates
     objectName: "Updates"
     Label {
-        text: "Updates"
-        anchors.centerIn:parent
+        text: "Cureent version: 1.0"
+        font.pixelSize: 16
+        color: "gray"
+        anchors {
+            bottom: busyindicator.top
+            bottomMargin: 10
+            horizontalCenter: parent.horizontalCenter
+        }
+    }
+    BusyIndicator {
+        id: busyindicator
+        anchors.centerIn: parent
+    }
+    Label {
+        text: "Checking for Update ..."
+       // font.pixelSize: 16
+        color: "gray"
+        anchors {
+            top: busyindicator.bottom
+            bottomMargin: 10
+            horizontalCenter: parent.horizontalCenter
+        }
     }
 
 }

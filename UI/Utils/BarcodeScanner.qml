@@ -1,6 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls
 import QtMultimedia
+
+
 Item {
     id: m_parent
     width: parent.width
@@ -12,6 +14,10 @@ Item {
     property string torshIconSource: ""
     property string searchIconSource: ""
     property string generateIcconSource: ""
+    property bool startSession: false
+    property alias imagecapture: imagecapture
+    property alias  camera: camera
+    property alias output: output
 
     implicitHeight: scannerArea.height
 
@@ -19,13 +25,13 @@ Item {
         id: session
         camera: Camera {
             id: camera
-            focusMode: Camera.FocusModeAutoNear
+            focusMode: Camera.FocusModeAuto
+           // zoomFactor: 2.0
         }
         imageCapture: ImageCapture {
             id: imagecapture
-            onImageCaptured: function (imageid, preview) {
-                console.log("Image captured...");
-                // Send to backend
+            onImageCaptured: function (imageId, preview) {
+                barcodeEngine.processImage(preview)
             }
         }
         videoOutput: output
@@ -36,51 +42,58 @@ Item {
         id: scannerArea
         width: m_parent.barCodeWidth
         height: m_parent.barcodeHight
-        radius: 10
+        radius: 5
         color: m_parent.barCodAreaColor
-
-        BorderImage {
-            id: background
-            source: "qrc:/Asserts/icons/scannerRec.png"
-            anchors {
-                fill: parent
-                margins: 8
-            }
+        Label {
+            id:code
+            anchors.centerIn:parent
+            text: ""
         }
 
         // VideoOutput
         VideoOutput {
             id: output
             anchors.fill: parent
+            fillMode: VideoOutput.PreserveAspectCrop
+
+            BorderImage {
+                id: background
+                source: "qrc:/Asserts/icons/scannerRec.png"
+                anchors {
+                    fill: parent
+                    margins: 8
+                }
+            }
 
             ScannerTools {
                 id: scannerTools
-                scanneriIconSource: m_parent.scanneriIconSource
-                torshIconSource: m_parent.torshIconSource
+                scannerIconSource: m_parent.scanneriIconSource
+                torchIconSource: m_parent.torshIconSource
                 searchIconSource: m_parent.searchIconSource
-                generateIcconSource: m_parent.generateIcconSource
+                generateIconSource: m_parent.generateIcconSource
                 anchors {
                     bottom: parent.bottom
                     horizontalCenter: parent.horizontalCenter
                     bottomMargin: 6
                 }
                 onScannerActivated: {
-                    console.log("Scanner button clicked!");
+                    Android.requestCameraPeremision()
+                    if (scannerTools.scannerClicked) {
+                        camera.start();
+                        //frameCaptureTimer.start(); // Start capturing frames
+                    } else {
+                        camera.stop();
+                        //frameCaptureTimer.stop(); // Stop capturing frames
+                    }
                 }
                 onTorchActivated: {
-                    console.log("Torch button clicked!");
-                }
-                onSearchActivated: {
-                    console.log("Search button clicked!");
-                }
-                onGenerateActivated: {
-                     console.log("Gererate button clicked!");
+                    console.log("Torch button clicked! Active: " + scannerTools.torchClicked);
+                    camera.torchMode = scannerTools.torchClicked ? Camera.FlashOn : Camera.FlashOff;
                 }
             }
-
             Rectangle {
                 id: indicator
-                color: "red"
+                color: camera.active ? "green" : "red"
                 width: 12
                 height: width
                 radius: width
@@ -91,6 +104,18 @@ Item {
                     rightMargin: 20
                 }
             }
+            Component.onCompleted: {
+                 //barcodeEngine.setVideoSink(videoSink)
+            }
+        }
+    }
+    //signal
+    Connections {
+        target: barcodeEngine
+        onBarcodeChanged: function () {
+            output.visible = false;
+            code.visible = true;
+            code.text = barcodeEngine.barcode;
         }
     }
 }

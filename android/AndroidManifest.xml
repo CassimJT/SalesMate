@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.qtproject.example" android:installLocation="auto" android:versionCode="1" android:versionName="SalesMate_1.0">
     <!-- %%INSERT_PERMISSIONS -->
+    <uses-permission android:name="android.permission.CAMERA"/>
     <!-- %%INSERT_FEATURES -->
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true"/>
     <application android:theme="@style/QtAppTheme" android:name="org.qtproject.qt.android.bindings.QtApplication" android:hardwareAccelerated="true" android:label="SalesMate" android:requestLegacyExternalStorage="true" android:allowBackup="true" android:fullBackupOnly="false" android:icon="@drawable/icon">
@@ -17,4 +18,5 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/qtprovider_paths"/>
         </provider>
     </application>
+
 </manifest>

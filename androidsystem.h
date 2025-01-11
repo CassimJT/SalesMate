@@ -7,6 +7,15 @@
 #if defined(Q_OS_ANDROID)
 #include <QtCore/private/qandroidextras_p.h>
 #endif
+#include <QPermission>
+#include <QImage>
+#include <ZXingCpp.h>
+#include <ImageView.h>
+#include <Result.h>
+#include <ReadBarcode.h>
+#include <DecodeHints.h>
+#include <QCamera>
+#include <QVideoFrame>
 
 class AndroidSystem : public QObject
 {
@@ -14,10 +23,17 @@ class AndroidSystem : public QObject
 public:
     explicit AndroidSystem(QObject *parent = nullptr);
 public slots:
-
+    //
+    void requestCameraPeremision();
 signals:
+   //
+private slots:
+  //
 private:
-      void setAnAndroidSystemBarColor();
+    void setAnAndroidSystemBarColor();
+
+
+
 };
 
 #endif // ANDROIDSYSTEM_H

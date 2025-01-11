@@ -51,7 +51,6 @@ Page {
                 barcodeHight: homePage.totalHeightFor3Item * 0.30
                 scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"
                 torshIconSource: "qrc:/Asserts/icons/touch.png"
-                generateIcconSource: "qrc:/Asserts/icons/generate.png"
             }
             TextField {
                 id: itenName
