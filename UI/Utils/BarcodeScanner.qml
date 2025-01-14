@@ -18,15 +18,16 @@ Item {
     property alias imagecapture: imagecapture
     property alias  camera: camera
     property alias output: output
-
+    property alias frameTimer: frameTimer
     implicitHeight: scannerArea.height
-
     CaptureSession {
         id: session
         camera: Camera {
             id: camera
             focusMode: Camera.FocusModeAuto
            // zoomFactor: 2.0
+
+
         }
         imageCapture: ImageCapture {
             id: imagecapture
@@ -36,7 +37,6 @@ Item {
         }
         videoOutput: output
     }
-
     // Barcode area background
     Rectangle {
         id: scannerArea
@@ -49,7 +49,6 @@ Item {
             anchors.centerIn:parent
             text: ""
         }
-
         // VideoOutput
         VideoOutput {
             id: output
@@ -62,6 +61,15 @@ Item {
                 anchors {
                     fill: parent
                     margins: 8
+                }
+                MouseArea {
+                    anchors.fill:parent
+                    onClicked:{
+                        //restarting the camera
+                        camera.stop()
+                        camera.start()
+                        frameTimer.restart()
+                    }
                 }
             }
 
@@ -80,10 +88,11 @@ Item {
                     Android.requestCameraPeremision()
                     if (scannerTools.scannerClicked) {
                         camera.start();
-                        //frameCaptureTimer.start(); // Start capturing frames
+                        frameTimer.start()
                     } else {
                         camera.stop();
-                        //frameCaptureTimer.stop(); // Stop capturing frames
+                        frameTimer.stop()
+
                     }
                 }
                 onTorchActivated: {
@@ -104,18 +113,37 @@ Item {
                     rightMargin: 20
                 }
             }
-            Component.onCompleted: {
-                 //barcodeEngine.setVideoSink(videoSink)
-            }
+            /*Component.onCompleted: {
+                 barcodeEngine.setVideoSink(videoSink)
+            }*/
+
         }
+    }
+    MediaPlayer {
+        id:barcodeSound
+        source: "qrc:/Asserts/sound/store-scanner-beep.wav"
+        audioOutput: AudioOutput{}
     }
     //signal
     Connections {
         target: barcodeEngine
         onBarcodeChanged: function () {
+            frameTimer.stop();
+            camera.stop()
+            barcodeSound.play()
             output.visible = false;
             code.visible = true;
             code.text = barcodeEngine.barcode;
+            scannerTools.scannerClicked = "false"
+        }
+    }
+    Timer {
+        id:frameTimer
+        interval: 3000
+        running:true
+        repeat: true
+        onTriggered: {
+            imagecapture.capture()
         }
     }
 }

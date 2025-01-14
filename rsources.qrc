@@ -47,5 +47,7 @@
         <file>Asserts/icons/icons8-camera-green.png</file>
         <file>Asserts/icons/icons8-gallery-100.png</file>
         <file>Asserts/icons/icons8-contact-100.png</file>
+        <file>Asserts/sound/Barcode-scanner-beep-sound.wav</file>
+        <file>Asserts/sound/store-scanner-beep.wav</file>
     </qresource>
 </RCC>

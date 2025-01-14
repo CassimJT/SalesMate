@@ -14,6 +14,9 @@
 #include <Result.h>
 #include <ReadBarcode.h>
 #include <DecodeHints.h>
+#include <qimage.h>
+#include <QVideoFrameFormat>
+
 
 class BarcodeEngine : public QObject
 {
@@ -30,6 +33,7 @@ public slots:
     void setBarcode(const QString &newBarcode);
     QImage adjustBrightnessAndContrast(const QImage& img);
     QImage sharpenImage(const QImage& img);
+    QImage convertFrameToQImage(const QVideoFrame &frame);
 
 signals:
     void barcodeDetected(const QString &barcodeText);
@@ -40,6 +44,7 @@ private:
     int frameCounter = 0;
     int frameToSkip = 3;
     QString barcode;
+    QImage image;
 };
 
 #endif // BARCODEENGINE_H

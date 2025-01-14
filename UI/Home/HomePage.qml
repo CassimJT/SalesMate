@@ -108,7 +108,7 @@ Page {
                     readOnly:true
                 }
             }
-
+            //add to cart b
             CustomButton {
                 id: addToCart
                 Layout.fillWidth: true
@@ -120,9 +120,13 @@ Page {
                 onBtnClicked: {
                     console.log("Clicked")
                     barcodeScanner.output.visible = true
-
+                    if(!barcodeScanner.camera.active){
+                        barcodeScanner.camera.start()
+                        barcodeScanner.frameTimer.start()
+                    }
                 }
             }
+            //make sales btn
             CustomButton {
                 id: makeSales
                 Layout.fillWidth: true
@@ -182,7 +186,7 @@ Page {
                 }
             }
             // Scanner
-            Image {
+            /* Image {
                 id: scan
                 width: 36
                 height: width
@@ -195,7 +199,7 @@ Page {
                         barcodeScanner.imagecapture.capture()
                     }
                }
-            }
+            }*/
         }
     }
 }

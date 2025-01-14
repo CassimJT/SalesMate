@@ -4,6 +4,8 @@
 #include <qimage.h>
 #include <qlogging.h>
 #include <qmediadevices.h>
+#include <qvideoframe.h>
+#include <qvideoframeformat.h>
 #include <qvideosink.h>
 
 BarcodeEngine::BarcodeEngine(QObject *parent)
@@ -12,6 +14,7 @@ BarcodeEngine::BarcodeEngine(QObject *parent)
 
 {
     //the costractor
+    barcode = "";
 
 }
 
@@ -23,12 +26,18 @@ BarcodeEngine::BarcodeEngine(QObject *parent)
 void BarcodeEngine::processVideoFrames(const QVideoFrame &frames)
 {
     //
+    QVideoFrame video_frame = frames;
     frameCounter++;
     if(frameCounter % (frameToSkip + 1) != 0) {
         return;
     }
+    //chacking if the frames are valide
     if (frames.isValid()) {
-        qDebug() <<"frameWidth: " << frames.width() << "FrameHeight: " << frames.height() ;
+        if(video_frame.map(QVideoFrame::ReadOnly)) {
+            //convet the frma to gray scale
+
+        }
+
     } else {
         qDebug() << "Frames not Valide";
     }
@@ -190,6 +199,15 @@ QImage BarcodeEngine::sharpenImage(const QImage &img)
         }
     }
     return sharpened;
+}
+/**
+ * @brief BarcodeEngine::convertFrameToQImage
+ * @param frame
+ * @return The frame as Qimage
+ */
+QImage BarcodeEngine::convertFrameToQImage(const QVideoFrame &frame)
+{
+
 }
 
 
