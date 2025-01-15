@@ -5,7 +5,7 @@ import QtQuick.Layouts
 import "../Utils"
 
 Page {
-    id: homePage
+    id: page
     objectName: "Add Stock"
 
     property real screenWidth: Screen.width
@@ -48,7 +48,7 @@ Page {
                 id: barcodeScanner
                 Layout.fillWidth: true
                 barCodeWidth: parent.width
-                barcodeHight: homePage.totalHeightFor3Item * 0.30
+                barcodeHight: page.totalHeightFor3Item * 0.30
                 scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"
                 torshIconSource: "qrc:/Asserts/icons/touch.png"
             }
@@ -77,8 +77,8 @@ Page {
                 RoundButton {
                     id: plus
                     text: qsTr("+")
-                    Layout.preferredWidth: 40 * homePage.scalingFactor
-                    Layout.preferredHeight: 40 * homePage.scalingFactor
+                    Layout.preferredWidth: 40 * page.scalingFactor
+                    Layout.preferredHeight: 40 * page.scalingFactor
                 }
             }
             TextField {
@@ -113,7 +113,7 @@ Page {
                 Layout.fillWidth: true
                 btnColor: "#4CAF50"
                 btnRadius: 5
-                btnHeight: homePage.buttonHeight
+                btnHeight: page.buttonHeight
                 // btnIconSrc: "qrc:/Asserts/icons/cart.png"
                 btnText: "Save"
                 onBtnClicked: {
