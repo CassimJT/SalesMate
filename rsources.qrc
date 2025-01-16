@@ -49,5 +49,8 @@
         <file>Asserts/icons/icons8-contact-100.png</file>
         <file>Asserts/sound/Barcode-scanner-beep-sound.wav</file>
         <file>Asserts/sound/store-scanner-beep.wav</file>
+        <file>Asserts/icons/bar-frame.png</file>
+        <file>Asserts/icons/bar-frame-small.png</file>
+        <file>Asserts/icons/success.gif</file>
     </qresource>
 </RCC>

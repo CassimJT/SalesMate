@@ -38,6 +38,7 @@ public slots:
 signals:
     void barcodeDetected(const QString &barcodeText);
     void barcodeChanged();
+    //void stockBarcodeChanged();
 
 private:
     QVideoSink *videoSink = nullptr;

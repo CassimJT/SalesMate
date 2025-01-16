@@ -35,7 +35,6 @@ void BarcodeEngine::processVideoFrames(const QVideoFrame &frames)
     if (frames.isValid()) {
         if(video_frame.map(QVideoFrame::ReadOnly)) {
             //convet the frma to gray scale
-
         }
 
     } else {

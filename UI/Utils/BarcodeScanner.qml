@@ -19,6 +19,7 @@ Item {
     property alias  camera: camera
     property alias output: output
     property alias frameTimer: frameTimer
+    property string barcode: ""
     implicitHeight: scannerArea.height
     CaptureSession {
         id: session
@@ -47,7 +48,7 @@ Item {
         Label {
             id:code
             anchors.centerIn:parent
-            text: ""
+            text: m_parent.barcode
         }
         // VideoOutput
         VideoOutput {
@@ -57,7 +58,7 @@ Item {
 
             BorderImage {
                 id: background
-                source: "qrc:/Asserts/icons/scannerRec.png"
+                source: "qrc:/Asserts/icons/bar-frame-small.png"
                 anchors {
                     fill: parent
                     margins: 8
@@ -133,7 +134,7 @@ Item {
             barcodeSound.play()
             output.visible = false;
             code.visible = true;
-            code.text = barcodeEngine.barcode;
+            m_parent.barcode = barcodeEngine.barcode;
             scannerTools.scannerClicked = "false"
         }
     }

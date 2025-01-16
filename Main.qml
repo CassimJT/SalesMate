@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Window
 import QtQuick.Layouts
-import Cidociety
+import Cisociety
 import "./UI/Drawer"
 import "./UI/Welcome"
 

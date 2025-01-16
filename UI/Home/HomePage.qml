@@ -76,6 +76,7 @@ Page {
             BarcodeScanner {
                 id: barcodeScanner
                 Layout.fillWidth: true
+                visible: mainStakView.currentItem.objectName ? "true": false
                 barCodeWidth: parent.width
                 barcodeHight: homePage.totalHeightFor3Item * 0.30
                 scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"

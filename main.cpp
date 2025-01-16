@@ -4,6 +4,7 @@
 #include <QQmlContext>
 #include <qqml.h>
 #include "barcodeengine.h"
+#include "System/databasemanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,8 +13,10 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     BarcodeEngine barcodeEngine;
     AndroidSystem sytstem;
+    DatabaseManager databaseManager;
     engine.rootContext()->setContextProperty("Android",&sytstem);
-    qmlRegisterType <BarcodeEngine>("Cidociety",1,0,"BarcodeEngine");
+    engine.rootContext()->setContextProperty("databaseManager", &databaseManager);
+    qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,

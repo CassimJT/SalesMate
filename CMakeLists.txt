@@ -5,7 +5,7 @@ project(SalesMate VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 add_subdirectory(./zxing-cpp/)
-find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -66,6 +66,9 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Profile/AvataDrawerTools.qml
                 QML_FILES UI/Utils/Utils.js
                 SOURCES barcodeengine.h barcodeengine.cpp
+                SOURCES System/product.h System/product.cpp
+                SOURCES System/databasemanager.h System/databasemanager.cpp
+                QML_FILES UI/Utils/InfoPopup.qml
 
 
 
@@ -83,7 +86,7 @@ set_target_properties(appSalesMate PROPERTIES
 )
 
 target_link_libraries(appSalesMate
-    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate Qt6::Multimedia ZXing::ZXing
+    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate Qt6::Multimedia ZXing::ZXing Qt6::Sql
 )
 set_property(TARGET appSalesMate APPEND PROPERTY
     QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
