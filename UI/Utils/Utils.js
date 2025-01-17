@@ -5,3 +5,18 @@ function getCurrentDate() {
     const day = String(currentDate.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`; // Return the formatted date
 }
+
+//get icon source
+
+function getIconSource() {
+    if (root.mainStakView.depth > 1) {
+        return "qrc:/Asserts/icons/styled-back.png";
+    } else if (mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Stocks") {
+        return "qrc:/Asserts/icons/styled-back.png";
+    } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Notification") {
+        return "qrc:/Asserts/icons/styled-back.png";
+    }
+      else {
+        return "qrc:/Asserts/icons/icons8-menu-100(1).png";
+    }
+}

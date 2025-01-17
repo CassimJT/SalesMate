@@ -52,5 +52,9 @@
         <file>Asserts/icons/bar-frame.png</file>
         <file>Asserts/icons/bar-frame-small.png</file>
         <file>Asserts/icons/success.gif</file>
+        <file>Asserts/icons/home.png</file>
+        <file>Asserts/icons/home-48.png</file>
+        <file>Asserts/icons/icons8-home-38.png</file>
+        <file>Asserts/icons/recycle-100.png</file>
     </qresource>
 </RCC>

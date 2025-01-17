@@ -69,6 +69,7 @@ qt_add_qml_module(appSalesMate
                 SOURCES System/product.h System/product.cpp
                 SOURCES System/databasemanager.h System/databasemanager.cpp
                 QML_FILES UI/Utils/InfoPopup.qml
+                QML_FILES UI/Home/MainSatckView.qml
 
 
 

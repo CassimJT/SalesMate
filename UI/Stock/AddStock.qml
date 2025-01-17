@@ -156,12 +156,10 @@ Page {
 
                     // Add entry to the database
                     databaseManager.addProductToDatabase(name, sku, quantity, price);
-
                     // Clear fields after saving
                     reset();
                 }
             }
-
         }
     }
     function reset() {
@@ -169,7 +167,7 @@ Page {
         amountField.text = "";
         quantityField.text = "";
         dateField.text = ""
-
+        barcodeScn.showRecycle = false
         barcodeScn.camera.stop()
         barcodeScn.camera.start()
         barcodeScn.output.visible = true

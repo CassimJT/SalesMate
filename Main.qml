@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import Cisociety
 import "./UI/Drawer"
 import "./UI/Welcome"
+import "./UI/Utils/Utils.js" as Utils
 
 ApplicationWindow {
     id: root
@@ -14,9 +15,9 @@ ApplicationWindow {
     visible: true
     title: qsTr("SalesMate")
     Material.primary: Material.Green
-    property alias mainStakView: mainStakView
     property alias drawer: drawer
     property alias barcodeEngine: barcodeEngine
+    property var mainStakView
     BarcodeEngine {
         id: barcodeEngine
     }
@@ -28,7 +29,7 @@ ApplicationWindow {
 
     header: ToolBar {
         id: toolbar
-        visible: mainStakView.currentItem !== welcomePage // Compare with the instance
+        visible: root.mainStakView.currentItem !== welcomePage // Compare with the instance
         height: 70
         RowLayout {
             anchors.fill: parent
@@ -38,14 +39,18 @@ ApplicationWindow {
                     id: name
                     width: 36
                     height: width
-                    source: mainStakView.depth > 1 ? "qrc:/Asserts/icons/styled-back.png" :"qrc:/Asserts/icons/icons8-menu-100(1).png"
+                    source: Utils.getIconSource()
                     fillMode: Image.PreserveAspectFit
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            if(mainStakView.depth > 1) {
-                                mainStakView.pop()
-                            } else {
+                            if(root.mainStakView.depth > 1) {
+                                root.mainStakView.pop()
+                            } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Stocks"){
+                                mainStakViewLoader.source = "./UI/Home/MainSatckView.qml"
+                            } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Notification"){
+                                 mainStakViewLoader.source = "./UI/Stock/AddItemPage.qml"
+                            }else {
                                 drawer.open()
                             }
                         }
@@ -57,13 +62,21 @@ ApplicationWindow {
             }
             //pageTitle
             Label {
-                text: qsTr(mainStakView.currentItem.objectName)
+                text: {
+                    if (root.mainStakView.currentItem && root.mainStakView.currentItem.objectName) {
+                        return root.mainStakView.currentItem.objectName;
+                    } else if (mainStakViewLoader.item && mainStakViewLoader.item.objectName) {
+                        return mainStakViewLoader.item.objectName;
+                    } else {
+                        return ""; //show nothing
+                    }
+                }
                 font.pointSize: 16
             }
             //current sales
             ToolButton {
                 Image {
-                    id: cart
+                    id: notification
                     width: 28
                     height: width
                     source: "qrc:/Asserts/icons/notification.png"
@@ -88,17 +101,23 @@ ApplicationWindow {
                             anchors.centerIn: parent
                             color: "#ffffff"
                         }
-
                     }
                     //MouseArea
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            if(mainStakView.depth > 1 && mainStakView.currentItem.objectName === "Notification" ) {
-                                mainStakView.pop()
-                            } else {
-                                mainStakView.push("./UI/Notification/NotificationPage.qml")
+                            if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Stocks") {
+                                mainStakViewLoader.source = "./UI/Notification/NotificationPage.qml"
+
+                            }else {
+
+                                if(root.mainStakView.depth > 1 && root.mainStakView.currentItem.objectName === "Notification" ) {
+                                    root.mainStakView.pop()
+                                } else {
+                                    root.mainStakView.push("./UI/Notification/NotificationPage.qml")
+                                }
                             }
+
                         }
                     }
                 }
@@ -107,7 +126,6 @@ ApplicationWindow {
             }
         }
     }
-
     Drawer {
         id:drawer
         width: parent.width * 0.75
@@ -169,17 +187,21 @@ ApplicationWindow {
             }
             //click event
             onClicked: {
-                mainStakView.push("./UI/Updates/ChechUpdatePage.qml")
+                root.mainStakView.push("./UI/Updates/ChechUpdatePage.qml")
                 drawer.close()
             }
         }
     }
     //the main stark
-    StackView {
-        id: mainStakView
+    Loader {
+        id: mainStakViewLoader
         property bool userIsSigned: true
-        property bool isVerified: (userIsSigned && mainStakView.depth == 0)
+        property bool isVerified: (userIsSigned && root.mainStakView && root.mainStakView.depth === 0)
         anchors.fill: parent
-        initialItem: userIsSigned ? "./UI/Home/HomePage.qml" : welcomePage
+        source: userIsSigned ? "./UI/Home/MainSatckView.qml" : welcomePage
+        onLoaded: {
+            // Ensure the root.mainStakView references the loaded component
+            root.mainStakView = mainStakViewLoader.item
+        }
     }
 }

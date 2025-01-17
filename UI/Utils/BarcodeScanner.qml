@@ -13,6 +13,7 @@ Item {
     property string scanneriIconSource: ""
     property string torshIconSource: ""
     property string searchIconSource: ""
+    property bool showRecycle: false
     property string generateIcconSource: ""
     property bool startSession: false
     property alias imagecapture: imagecapture
@@ -26,7 +27,7 @@ Item {
         camera: Camera {
             id: camera
             focusMode: Camera.FocusModeAuto
-           // zoomFactor: 2.0
+            // zoomFactor: 2.0
 
 
         }
@@ -49,6 +50,7 @@ Item {
             id:code
             anchors.centerIn:parent
             text: m_parent.barcode
+            visible: false
         }
         // VideoOutput
         VideoOutput {
@@ -117,7 +119,25 @@ Item {
             /*Component.onCompleted: {
                  barcodeEngine.setVideoSink(videoSink)
             }*/
-
+        }
+        //receycling buttun
+        Image {
+            id: recycle
+            width: 36
+            height: width
+            source: "qrc:/Asserts/icons/recycle-100.png"
+            fillMode: Image.PreserveAspectFit
+            visible: m_parent.showRecycle
+            anchors {
+                bottom: parent.bottom
+                horizontalCenter: parent.horizontalCenter
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked : {
+                    reset()
+                }
+            }
         }
     }
     MediaPlayer {
@@ -134,6 +154,7 @@ Item {
             barcodeSound.play()
             output.visible = false;
             code.visible = true;
+            m_parent.showRecycle = true
             m_parent.barcode = barcodeEngine.barcode;
             scannerTools.scannerClicked = "false"
         }
@@ -146,5 +167,14 @@ Item {
         onTriggered: {
             imagecapture.capture()
         }
+    }
+
+    function reset() {
+        camera.stop()
+        camera.start()
+        output.visible = true
+        frameTimer.restart()
+        m_parent.showRecycle = false
+        output.visible = true
     }
 }

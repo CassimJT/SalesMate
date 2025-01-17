@@ -25,7 +25,14 @@ ItemDelegate {
         }
     }
     onClicked: {
-        mainStakView.push(model.pageSource)
-        drawer.close()
+        if(model.pageSource === "../Stock/AddItemPage.qml"){
+            console.log("CLicked")
+            mainStakViewLoader.source = "./UI/Stock/AddItemPage.qml"
+            drawer.close()
+        } else {
+            mainStakView.push(model.pageSource)
+            drawer.close()
+        }
+
     }
 }

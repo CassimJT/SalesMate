@@ -77,6 +77,6 @@ Page {
         anchors.centerIn: parent
         font.pixelSize: 16
         color: "gray"
-        visible: listview.model.count === 0 // Show text only when model is empty
+        visible: false // Show text only when model is empty
     }
 }
