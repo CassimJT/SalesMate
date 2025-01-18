@@ -1,10 +1,12 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
+import "../Utils"
 
 Page {
     id: salesPage
     objectName: "Sales"
+    property alias editProduct: editProduct
 
     // Search Bar
     SearchBar {
@@ -62,7 +64,9 @@ Page {
         id: listview
         clip: true
         model: databaseManager
-        delegate: StockDelegate{}
+        delegate: StockDelegate{
+            editProduct: salesPage.editProduct
+        }
         anchors {
             top: heading.bottom
             right: parent.right
@@ -78,5 +82,10 @@ Page {
         font.pixelSize: 16
         color: "gray"
         visible: false // Show text only when model is empty
+    }
+
+    ProductEditPopup {
+        id: editProduct
+
     }
 }

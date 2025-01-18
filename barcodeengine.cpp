@@ -135,8 +135,11 @@ QString BarcodeEngine::getBarcode() const
  */
 void BarcodeEngine::setBarcode(const QString &newBarcode)
 {
-    if (barcode == newBarcode)
+    if (barcode == newBarcode) {
+        emit barcodeChanged(); //emiting a signal when barcode alreday have a value = newBarcode
         return;
+    }
+
     barcode = newBarcode;
     emit barcodeChanged();
 }

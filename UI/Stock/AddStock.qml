@@ -90,6 +90,7 @@ Page {
                     Layout.preferredWidth: 40 * page.scalingFactor
                     Layout.preferredHeight: 40 * page.scalingFactor
                     onClicked :{
+                        quantityField.forceActiveFocus()
                         row.value += 1
                     }
                 }
@@ -130,7 +131,7 @@ Page {
                 btnHeight: page.buttonHeight
                 btnText: "Save"
                 onBtnClicked: {
-                   if (itemName.text === "") {
+                    if (itemName.text === "") {
                         itemName.focus = false;
                         itemName.forceActiveFocus()
                         itemName.placeholderText = "Enter item name";
@@ -157,7 +158,6 @@ Page {
                     // Add entry to the database
                     databaseManager.addProductToDatabase(name, sku, quantity, price);
                     // Clear fields after saving
-                    reset();
                 }
             }
         }
@@ -173,16 +173,37 @@ Page {
         barcodeScn.output.visible = true
         barcodeScn.frameTimer.restart()
     }
-    //information Popup
-        InfoPopup {
-            id: infor
-            visible: false // Start with popup hidden
+    //information Popup when success
+    InfoPopup {
+        id: successPopup
+        iconSource: "qrc:/Asserts/icons/success.gif"
+        message: qsTr("Stock added successfully")
+        buttonText: qsTr("Okay")
+        onClicked: {
+              reset();
+            successPopup.close();
         }
+    }
+    //popup info when the ite aready exist
+    InfoPopup {
+        id:error
+        iconSource: "qrc:/Asserts/icons/icons8-error.gif"
+        message: qsTr("Product Already Exist")
+        buttonText: qsTr("Okay")
+        onClicked: {
+             reset();
+            error.close();
+        }
+    }
     //when a new product is added succsesfuly
     Connections {
         target: databaseManager
         onNewProductAdded: function (){
-            infor.open()
+            successPopup.open()
+            barcodeScn.barcode  = ""
+        }
+        onProductExists: function () {
+            error.open()
             barcodeScn.barcode  = ""
         }
     }

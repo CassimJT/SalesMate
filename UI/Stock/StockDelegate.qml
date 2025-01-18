@@ -2,14 +2,18 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
+
 ItemDelegate {
     id: delegate
     width: parent.width
     height: 50 // Adjust height based on your requirement
-    Rectangle {
+    property var editProduct
+    background: Rectangle {
         id: background
         anchors.fill: parent
-        color: index % 2 === 0 ? "#f5f5f5":"#ffffff"
+        color: index % 2 === 0
+            ? (parent.down ? "#d3d3d3" : "#f5f5f5")
+            : (parent.down ? "#d3d3d3" : "#ffffff")
     }
 
     RowLayout {
@@ -46,6 +50,11 @@ ItemDelegate {
             Layout.preferredWidth: 70
 
         }
+    }
+
+    onClicked: {
+        delegate.editProduct.name = model.name;
+        delegate.editProduct.open()
     }
 
 }

@@ -56,5 +56,6 @@
         <file>Asserts/icons/home-48.png</file>
         <file>Asserts/icons/icons8-home-38.png</file>
         <file>Asserts/icons/recycle-100.png</file>
+        <file>Asserts/icons/icons8-error.gif</file>
     </qresource>
 </RCC>

@@ -29,7 +29,6 @@ Item {
             focusMode: Camera.FocusModeAuto
             // zoomFactor: 2.0
 
-
         }
         imageCapture: ImageCapture {
             id: imagecapture

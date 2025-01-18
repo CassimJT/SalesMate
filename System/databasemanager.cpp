@@ -105,8 +105,10 @@ void DatabaseManager::addProductToDatabase(const QString &name, const QString &s
     if (!query.exec()) {
         QSqlError error = query.lastError();
         qDebug() << "Failed to add product to database:" << error.text();
-        if (error.type() == QSqlError::StatementError && error.databaseText().contains("UNIQUE")) {
-            emit productExists(); //emit this signal when an error occur
+        qDebug() << "Database error text:" << error.databaseText();
+        if (error.databaseText().contains("UNIQUE", Qt::CaseInsensitive)) {
+            qDebug() << "UNIQUE constraint violation detected.";
+            emit productExists();
         }
         return;
     }
