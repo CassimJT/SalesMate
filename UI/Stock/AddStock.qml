@@ -69,11 +69,11 @@ Page {
             RowLayout {
                 spacing: 5
                 id: row
-                property int value: 0
+
                 TextField {
                     id: quantityField
                     placeholderText: "Quantity"
-                    text: qsTr(row.value)
+                    text: parseInt(0)
                     Layout.fillWidth: true
                     inputMethodHints: Qt.ImhDigitsOnly
                     //allowing only numbers
@@ -89,11 +89,27 @@ Page {
                     text: qsTr("+")
                     Layout.preferredWidth: 40 * page.scalingFactor
                     Layout.preferredHeight: 40 * page.scalingFactor
-                    onClicked :{
-                        quantityField.forceActiveFocus()
-                        row.value += 1
+
+                    property bool isFocused: quantityField.activeFocus
+
+                    onClicked: {
+                        // Check if the field is already focused before calling forceActiveFocus
+                        if (!isFocused) {
+                            quantityField.forceActiveFocus();
+                            isFocused = true; // Track the state of the focus manually
+                        }
+
+                        // Increment the value in the field
+                        let currentValue = parseInt(quantityField.text) || 0;  // Default to 0 if not a valid number
+                        quantityField.text = (currentValue + 1).toString();
+                    }
+
+                    // Reset the focus state when focus changes
+                    onFocusChanged: {
+                        isFocused = quantityField.activeFocus;
                     }
                 }
+
             }
 
             TextField {
@@ -180,7 +196,7 @@ Page {
         message: qsTr("Stock added successfully")
         buttonText: qsTr("Okay")
         onClicked: {
-              reset();
+            reset();
             successPopup.close();
         }
     }
@@ -191,7 +207,7 @@ Page {
         message: qsTr("Product Already Exist")
         buttonText: qsTr("Okay")
         onClicked: {
-             reset();
+            reset();
             error.close();
         }
     }

@@ -14,8 +14,10 @@ int main(int argc, char *argv[])
     BarcodeEngine barcodeEngine;
     AndroidSystem sytstem;
     DatabaseManager databaseManager;
+
     engine.rootContext()->setContextProperty("Android",&sytstem);
     engine.rootContext()->setContextProperty("databaseManager", &databaseManager);
+      engine.rootContext()->setContextProperty("productFilterModel", databaseManager.getProxyModel());
     qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
     QObject::connect(
         &engine,

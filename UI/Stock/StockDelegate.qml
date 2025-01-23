@@ -12,8 +12,8 @@ ItemDelegate {
         id: background
         anchors.fill: parent
         color: index % 2 === 0
-            ? (parent.down ? "#d3d3d3" : "#f5f5f5")
-            : (parent.down ? "#d3d3d3" : "#ffffff")
+               ? (parent.down ? "#d3d3d3" : "#f5f5f5")
+               : (parent.down ? "#d3d3d3" : "#ffffff")
     }
 
     RowLayout {
@@ -53,7 +53,12 @@ ItemDelegate {
     }
 
     onClicked: {
+
+        delegate.editProduct.title = model.name;
+        delegate.editProduct.sku = model.sku;
         delegate.editProduct.name = model.name;
+        delegate.editProduct.price = model.price;
+        delegate.editProduct.quantity = model.quantity;
         delegate.editProduct.open()
     }
 

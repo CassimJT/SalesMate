@@ -1,18 +1,25 @@
 #include "databasemanager.h"
 #include "System/product.h"
 #include <qlogging.h>
+#include <qpropertyprivate.h>
 #include <qsqldatabase.h>
 #include <qsqlerror.h>
 #include <qsqlquery.h>
 #include <qtmetamacros.h>
 
 DatabaseManager::DatabaseManager(QObject *parent)
-    : QAbstractListModel(parent)
+    : QAbstractListModel(parent),
+    proxyModel(new ProductFilterProxyModel(this))
+
 {
     //Setting up the Database
     setUpDatabase();
     //updating the View
     updateView();
+    proxyModel->setSourceModel(this);
+    proxyModel->setFilterRole(name);
+    proxyModel->setDynamicSortFilter(true);
+    proxyModel->invalidate();
 
 }
 
@@ -51,7 +58,7 @@ QVariant DatabaseManager::data(const QModelIndex &index, int role) const
     const Product &product = *products.at(index.row());
 
     switch (role) {
-    case itemname:
+    case name:
         return product.name();
     case sku:
         return product.sku();
@@ -63,14 +70,7 @@ QVariant DatabaseManager::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 }
-/**
- * @brief DatabaseManager::queryDatabase
- * @param sku
- */
-void DatabaseManager::queryDatabase(const QString &sku)
-{
-    //
-}
+
 /**
  * @brief DatabaseManager::queryPriceFromDatabase
  * @param sku
@@ -79,6 +79,21 @@ void DatabaseManager::queryDatabase(const QString &sku)
 float DatabaseManager::queryPriceFromDatabase(const QString &sku)
 {
     //
+    QSqlQuery query;
+    query.prepare("SELECT price FROM products WHERE sku = :sku");
+    query.bindValue(":sku", sku);
+
+    if (!query.exec()) {
+        qDebug() << "Failed to query price from database:" << query.lastError().text();
+        return -1.0f; // Indicate failure with a negative value
+    }
+
+    if (query.next()) {
+        return query.value(0).toFloat();
+    }
+
+    qDebug() << "No product found with SKU:" << sku;
+    return -1.0f; // Indicate no matching product found
 }
 /**
  * @brief DatabaseManager::addStock
@@ -119,11 +134,59 @@ void DatabaseManager::addProductToDatabase(const QString &name, const QString &s
     products.append(product);
     endInsertRows();
 }
+/**
+ * @brief DatabaseManager::appdateUproduct
+ * @param name
+ * @param sku
+ * @param quantity
+ * @param price
+* This function will update the existing data in the database
+ */
+void DatabaseManager::appdateUproduct(const QString &name, const QString &sku, int quantity, float price)
+{
+    QSqlQuery quary;
+    quary.prepare(R"(UPDATE products
+        SET name = :name, quantity = :quantity, price = :price
+        WHERE sku = :sku)");
+    quary.bindValue(":name",name);
+    quary.bindValue(":quantity", quantity);
+    quary.bindValue(":price",price);
+}
+/**
+ * @brief DatabaseManager::removeProduct
+ * @param sku
+ * this function delete the product by sku
+ */
+void DatabaseManager::removeProduct(const QString &sku)
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM products WHERE sku = :sku");
+    query.bindValue(":sku", sku);
+
+    if (!query.exec()) {
+        qDebug() << "Failed to remove product from database:" << query.lastError().text();
+        return;
+    }
+
+    // Remove product from the in-memory list
+    for (int i = 0; i < products.size(); ++i) {
+        if (products.at(i)->sku() == sku) {
+            beginRemoveRows(QModelIndex(), i, i);
+            delete products.takeAt(i); // Remove and delete the product
+            endRemoveRows();
+            qDebug() << "Product removed successfully:" << sku;
+            return;
+        }
+    }
+
+    qDebug() << "Product not found in memory for SKU:" << sku;
+
+}
 
 QHash<int, QByteArray> DatabaseManager::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[itemname] = "name";      // Matches model.name in QML
+    roles[name] = "name";      // Matches model.name in QML
     roles[sku] = "sku";            // Matches model.sku in QML
     roles[quantity] = "quantity";  // Matches model.quantity in QML
     roles[price] = "price";        // Matches model.price in QML
@@ -155,7 +218,7 @@ void DatabaseManager::setUpDatabase()
         )
     )";
     if(!query.exec(createTable)) {
-         qDebug() << "Faild to create table: " << db.lastError().text();
+        qDebug() << "Faild to create table: " << db.lastError().text();
         return;
     }
     qDebug() << "Table Created Succefully:";
@@ -168,25 +231,36 @@ void DatabaseManager::setUpDatabase()
  * @brief DatabaseManager::updateView
  * Populate the products list from the database and update the view
  */
-void DatabaseManager::updateView()
-{
-    QSqlQuery query;
-    if (!query.exec("SELECT name, sku, quantity, price FROM products")) {
-        qDebug() << "Failed to query products:" << query.lastError().text();
-        return;
-    }
-    beginResetModel(); // Reset the model before updating the list
-    qDeleteAll(products); // Clean up any existing items in the list
+void DatabaseManager::updateView() {
+    beginResetModel();
     products.clear();
 
+    QSqlQuery query("SELECT name, sku, quantity, price FROM products");
     while (query.next()) {
         auto product = new Product(this);
-        product->setName(query.value("name").toString());
-        product->setSku(query.value("sku").toString());
-        product->setQuantity(query.value("quantity").toInt());
-        product->setPrice(query.value("price").toFloat());
+        product->setName(query.value(0).toString());
+        product->setSku(query.value(1).toString());
+        product->setQuantity(query.value(2).toInt());
+        product->setPrice(query.value(3).toFloat());
         products.append(product);
     }
-    endResetModel(); // Notify the model that data has been updated
-    qDebug() << "View updated with products from database.";
+
+    endResetModel();
 }
+
+
+ProductFilterProxyModel *DatabaseManager::getProxyModel() const
+{
+    return proxyModel;
+}
+/**
+ * @brief DatabaseManager::queryDatabase
+ * @param sku
+ * @return product
+ * return the produnt the matches the sku from the database
+ */
+Product DatabaseManager::queryDatabase(const QString &sku)
+{
+
+}
+

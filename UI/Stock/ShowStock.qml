@@ -8,18 +8,34 @@ Page {
     objectName: "Sales"
     property alias editProduct: editProduct
 
-    // Search Bar
     SearchBar {
         id: searchBar
-        anchors.top: parent.top
-        anchors.topMargin: 10
+
+        onTextChangedSignal: {
+            productFilterModel.setFilterName(searchBar.text); // Ensure this is correct
+        }
+        onTextEditFinished: {
+            productFilterModel.setFilterName(searchBar.text); // Ensure this is correct
+        }
+
+    }
+    Label {
+        id:directionText
+        text: qsTr("Click a row to view details / edit a product")
+        color: "red"
+        anchors {
+            top: searchBar.bottom
+            topMargin:10
+            left:parent.left
+            leftMargin: 15
+        }
     }
     Rectangle {
         id: heading
         width: parent.width
         height: 50
         anchors {
-            top: searchBar.bottom
+            top: directionText.bottom
         }
         RowLayout {
             width: parent.width
@@ -63,7 +79,7 @@ Page {
     ListView {
         id: listview
         clip: true
-        model: databaseManager
+        model:productFilterModel
         delegate: StockDelegate{
             editProduct: salesPage.editProduct
         }
@@ -87,5 +103,11 @@ Page {
     ProductEditPopup {
         id: editProduct
 
+    }
+    Connections {
+        target: productFilterModel
+        onCountChanged: {
+            noDataText.visible = productFilterModel.count === 0;
+        }
     }
 }

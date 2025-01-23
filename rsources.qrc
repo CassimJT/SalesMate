@@ -57,5 +57,10 @@
         <file>Asserts/icons/icons8-home-38.png</file>
         <file>Asserts/icons/recycle-100.png</file>
         <file>Asserts/icons/icons8-error.gif</file>
+        <file>Asserts/icons/close-100.png</file>
+        <file>Asserts/icons/icons8-close.gif</file>
+        <file>Asserts/icons/close-100-red.png</file>
+        <file>Asserts/icons/upload-48.png</file>
+        <file>Asserts/icons/icons8-edit-pink.png</file>
     </qresource>
 </RCC>

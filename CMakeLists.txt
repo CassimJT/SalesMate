@@ -71,6 +71,8 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Utils/InfoPopup.qml
                 QML_FILES UI/Home/MainSatckView.qml
                 QML_FILES UI/Utils/ProductEditPopup.qml
+                SOURCES
+                SOURCES System/productfilterproxymodel.h System/productfilterproxymodel.cpp
 
 
 
