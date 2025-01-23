@@ -104,10 +104,5 @@ Page {
         id: editProduct
 
     }
-    Connections {
-        target: productFilterModel
-        onCountChanged: {
-            noDataText.visible = productFilterModel.count === 0;
-        }
-    }
+
 }

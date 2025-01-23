@@ -132,6 +132,7 @@ void DatabaseManager::addProductToDatabase(const QString &name, const QString &s
     // Update the model
     beginInsertRows(QModelIndex(), products.size(), products.size());
     products.append(product);
+    productMap.insert(sku, QSharedPointer<Product>::create(product));
     endInsertRows();
 }
 /**
@@ -142,16 +143,67 @@ void DatabaseManager::addProductToDatabase(const QString &name, const QString &s
  * @param price
 * This function will update the existing data in the database
  */
-void DatabaseManager::appdateUproduct(const QString &name, const QString &sku, int quantity, float price)
+void DatabaseManager::updateUproduct(const QString &name, const QString &sku, int quantity, float price)
 {
-    QSqlQuery quary;
-    quary.prepare(R"(UPDATE products
+    if (!productMap.contains(sku)) {
+        qDebug() << "Product with SKU" << sku << "not found.";
+        return;
+    }
+
+    QSharedPointer<Product> product = productMap[sku];
+
+    qDebug() << "Existing Data: Name =" << product->name()
+             << ", Quantity =" << product->quantity()
+             << ", Price =" << product->price();
+    qDebug() << "New Data: Name =" << name
+             << ", Quantity =" << quantity
+             << ", Price =" << price;
+
+    if (product->name().trimmed() == name.trimmed() &&
+        product->quantity() == quantity &&
+        qAbs(product->price() - price) < 1e-6) {
+        qDebug() << "No update needed. The provided data is identical to the existing product data.";
+        emit productAlreadyExist();
+        return;
+    }
+
+    qDebug() << "Updating product in database for SKU:" << sku;
+
+    QSqlQuery query;
+    query.prepare(R"(UPDATE products
         SET name = :name, quantity = :quantity, price = :price
         WHERE sku = :sku)");
-    quary.bindValue(":name",name);
-    quary.bindValue(":quantity", quantity);
-    quary.bindValue(":price",price);
+    query.bindValue(":name", name);
+    query.bindValue(":quantity", quantity);
+    query.bindValue(":price", price);
+    query.bindValue(":sku", sku);
+
+    if (!query.exec()) {
+        qDebug() << "Failed to update product in the database:" << query.lastError().text();
+        return;
+    }
+
+    for (int i = 0; i < products.size(); ++i) {
+        if (products[i]->sku() == sku) {
+            if (!products[i]) {
+                qDebug() << "Invalid product object in memory for SKU:" << sku;
+                return;
+            }
+            products[i]->setName(name);
+            products[i]->setQuantity(quantity);
+            products[i]->setPrice(price);
+
+            // Correct assignment
+            productMap[sku] = QSharedPointer<Product>(products[i]); // Wrap raw pointer
+            QModelIndex index = this->index(i);
+            emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+            return;
+        }
+    }
 }
+
+
+
 /**
  * @brief DatabaseManager::removeProduct
  * @param sku
@@ -173,6 +225,7 @@ void DatabaseManager::removeProduct(const QString &sku)
         if (products.at(i)->sku() == sku) {
             beginRemoveRows(QModelIndex(), i, i);
             delete products.takeAt(i); // Remove and delete the product
+            productMap.remove(sku); //removing the product frodunct from the Hash
             endRemoveRows();
             qDebug() << "Product removed successfully:" << sku;
             return;
@@ -243,6 +296,7 @@ void DatabaseManager::updateView() {
         product->setQuantity(query.value(2).toInt());
         product->setPrice(query.value(3).toFloat());
         products.append(product);
+        productMap.insert(product->sku(), QSharedPointer<Product>(product));
     }
 
     endResetModel();
@@ -256,11 +310,32 @@ ProductFilterProxyModel *DatabaseManager::getProxyModel() const
 /**
  * @brief DatabaseManager::queryDatabase
  * @param sku
- * @return product
- * return the produnt the matches the sku from the database
+ * @return produnt
+ * this function retunr the produt that matches the sku
  */
-Product DatabaseManager::queryDatabase(const QString &sku)
+QSharedPointer<Product> DatabaseManager::queryDatabase(const QString &sku)
 {
+    // Check the hash first
+    if (productMap.contains(sku)) {
+        return productMap.value(sku);
+    }
+    // If not in the hash, query the database
+    QSqlQuery query;
+    query.prepare("SELECT name, quantity, price FROM products WHERE sku = :sku");
+    query.bindValue(":sku", sku);
 
+    if (query.exec() && query.next()) {
+        auto product = QSharedPointer<Product>::create();
+        product->setName(query.value("name").toString());
+        product->setSku(sku);
+        product->setQuantity(query.value("quantity").toInt());
+        product->setPrice(query.value("price").toDouble());
+        productMap.insert(sku, product);
+        return product;
+    } else {
+        qDebug() << "Database error:" << query.lastError().text();
+    }
+
+    return nullptr;
 }
 

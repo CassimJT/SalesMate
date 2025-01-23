@@ -62,5 +62,6 @@
         <file>Asserts/icons/close-100-red.png</file>
         <file>Asserts/icons/upload-48.png</file>
         <file>Asserts/icons/icons8-edit-pink.png</file>
+        <file>Asserts/icons/icons8-info-100.png</file>
     </qresource>
 </RCC>

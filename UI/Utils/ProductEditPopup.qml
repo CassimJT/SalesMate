@@ -78,7 +78,7 @@ Popup {
         }
         //sku
         TextField {
-            id: sku
+            id: skuField
             placeholderText: "sku"
             readOnly: true
             Layout.preferredWidth: parent.width
@@ -94,7 +94,7 @@ Popup {
         }
         //price
         TextField {
-            id: amountField
+            id: priceField
             placeholderText: "Amount"
             Layout.preferredWidth: parent.width
             inputMethodHints: Qt.ImhDigitsOnly
@@ -110,8 +110,8 @@ Popup {
         }
         //quantity
         TextField {
-            readOnly: editProduct.isReadOnly;
             id: quantityField
+            readOnly: editProduct.isReadOnly;
             placeholderText: "Quantity"
             text: qsTr(editProduct.quantity)
             Layout.fillWidth: true
@@ -152,6 +152,38 @@ Popup {
             }
         }
     }
+    Row {
+        id: infoRow
+        width: parent.width * 0.85
+        spacing: 10
+        anchors {
+            top: mainLayout.bottom
+            topMargin: 5
+            horizontalCenter:parent.horizontalCenter
+        }
+
+        Image {
+            id: infoIcon
+            width: 16
+            height: width
+            source: "qrc:/Asserts/icons/icons8-info-100.png"
+            fillMode: Image.PreserveAspectFit
+        }
+
+        Label {
+            id: info
+            width: parent.width - infoIcon.width - editProduct.spacing
+            height: implicitHeight
+            text: qsTr("Click the pencil to switch to edit mode")
+            color: "red"
+            wrapMode: Text.Wrap
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
+        }
+    }
+
+
+
     //edit btn
     RoundButton {
         id:edit
@@ -184,6 +216,7 @@ Popup {
             }
         }
     }
+
     //
     Row{
         id:row
@@ -199,6 +232,13 @@ Popup {
                 height: width
                 source: "qrc:/Asserts/icons/upload-48.png"
                 fillMode: Image.PreserveAspectFit
+            }
+            onClicked:{
+                const name = itemName.text
+                const sku = skuField.text
+                const quantity = quantityField.text
+                const price = priceField.text
+                databaseManager.updateUproduct(name,sku,quantity,price)
             }
         }
         RoundButton {
@@ -217,6 +257,13 @@ Popup {
         anchors {
             right: edit.left
             verticalCenter: edit.verticalCenter
+        }
+    }
+
+    Connections {
+        target: databaseManager
+        onProductAlreadyExist :{
+            console.log("Product aleady exist")
         }
     }
 }
