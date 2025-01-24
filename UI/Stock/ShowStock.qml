@@ -19,15 +19,35 @@ Page {
         }
 
     }
-    Label {
-        id:directionText
-        text: qsTr("Click a row to view details / edit a product")
-        color: "red"
+    //info row
+    Row {
+        id: directionText
+        width: parent.width * 0.85
+        spacing: 10
         anchors {
             top: searchBar.bottom
             topMargin:10
             left:parent.left
             leftMargin: 15
+        }
+
+        Image {
+            id: infoIcon
+            width: 16
+            height: width
+            source: "qrc:/Asserts/icons/icons8-info-100.png"
+            fillMode: Image.PreserveAspectFit
+        }
+
+        Label {
+            id: info
+            width: parent.width - infoIcon.width - editProduct.spacing
+            height: implicitHeight
+             text: qsTr("Click a row to view details / edit a product")
+            color: "red"
+            wrapMode: Text.Wrap
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
         }
     }
     Rectangle {

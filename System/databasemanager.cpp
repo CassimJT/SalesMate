@@ -181,25 +181,13 @@ void DatabaseManager::updateUproduct(const QString &name, const QString &sku, in
     if (!query.exec()) {
         qDebug() << "Failed to update product in the database:" << query.lastError().text();
         return;
+    }else {
+        //lettign the world for the new change
+        emit productUpdated();
+        //updating the view to reflect the change
+        updateView();
     }
 
-    for (int i = 0; i < products.size(); ++i) {
-        if (products[i]->sku() == sku) {
-            if (!products[i]) {
-                qDebug() << "Invalid product object in memory for SKU:" << sku;
-                return;
-            }
-            products[i]->setName(name);
-            products[i]->setQuantity(quantity);
-            products[i]->setPrice(price);
-
-            // Correct assignment
-            productMap[sku] = QSharedPointer<Product>(products[i]); // Wrap raw pointer
-            QModelIndex index = this->index(i);
-            emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
-            return;
-        }
-    }
 }
 
 
@@ -218,22 +206,11 @@ void DatabaseManager::removeProduct(const QString &sku)
     if (!query.exec()) {
         qDebug() << "Failed to remove product from database:" << query.lastError().text();
         return;
+    } else {
+        updateView();
+        emit productRemoved();
     }
-
     // Remove product from the in-memory list
-    for (int i = 0; i < products.size(); ++i) {
-        if (products.at(i)->sku() == sku) {
-            beginRemoveRows(QModelIndex(), i, i);
-            delete products.takeAt(i); // Remove and delete the product
-            productMap.remove(sku); //removing the product frodunct from the Hash
-            endRemoveRows();
-            qDebug() << "Product removed successfully:" << sku;
-            return;
-        }
-    }
-
-    qDebug() << "Product not found in memory for SKU:" << sku;
-
 }
 
 QHash<int, QByteArray> DatabaseManager::roleNames() const
@@ -301,7 +278,6 @@ void DatabaseManager::updateView() {
 
     endResetModel();
 }
-
 
 ProductFilterProxyModel *DatabaseManager::getProxyModel() const
 {
