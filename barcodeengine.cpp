@@ -209,7 +209,7 @@ QImage BarcodeEngine::sharpenImage(const QImage &img)
  */
 QImage BarcodeEngine::convertFrameToQImage(const QVideoFrame &frame)
 {
-
+    //
 }
 
 

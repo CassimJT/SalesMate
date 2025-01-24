@@ -289,24 +289,27 @@ ProductFilterProxyModel *DatabaseManager::getProxyModel() const
  * @return produnt
  * this function retunr the produt that matches the sku
  */
-QSharedPointer<Product> DatabaseManager::queryDatabase(const QString &sku)
+Product* DatabaseManager::queryDatabase(const QString &sku)
 {
     // Check the hash first
     if (productMap.contains(sku)) {
-        return productMap.value(sku);
+        qDebug() << "return from map";
+        return productMap.value(sku).data(); // Return raw pointer
     }
+
     // If not in the hash, query the database
     QSqlQuery query;
     query.prepare("SELECT name, quantity, price FROM products WHERE sku = :sku");
     query.bindValue(":sku", sku);
 
     if (query.exec() && query.next()) {
-        auto product = QSharedPointer<Product>::create();
+        auto product = new Product(this); // Use raw pointer
         product->setName(query.value("name").toString());
         product->setSku(sku);
         product->setQuantity(query.value("quantity").toInt());
         product->setPrice(query.value("price").toDouble());
-        productMap.insert(sku, product);
+        productMap.insert(sku, QSharedPointer<Product>(product));
+        qDebug() << "return from db";
         return product;
     } else {
         qDebug() << "Database error:" << query.lastError().text();
