@@ -6,6 +6,7 @@ import "../Utils"
 Page {
     id:addOtherIncomePage
     objectName:"Add Other Income"
+
     Flickable {
         id: flickable
         width: parent.width

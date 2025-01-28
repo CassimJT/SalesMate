@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import SalesModel
 
 Page {
     id: salesPage
@@ -12,14 +13,13 @@ Page {
         anchors.top: parent.top
         anchors.topMargin: 10
     }
-
-
+    
     // ListView
     ListView {
         id: listview
         clip: true
-        model: CurrentStockModel{}
-        delegate: CurrentStockDelegete{}
+        model:SalesModel
+        delegate: CurrentSalesDelegate{}
         anchors {
             top: searchBar.bottom
             right: parent.right
@@ -28,7 +28,6 @@ Page {
             topMargin: 10
         }
     }
-
     Text {
         id: noDataText
         text: qsTr("No current sale")

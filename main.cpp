@@ -17,8 +17,9 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("Android",&sytstem);
     engine.rootContext()->setContextProperty("databaseManager", &databaseManager);
-      engine.rootContext()->setContextProperty("productFilterModel", databaseManager.getProxyModel());
+    engine.rootContext()->setContextProperty("productFilterModel", databaseManager.getProxyModel());
     qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
+    qmlRegisterSingletonType(QUrl("qrc:/UI/Stock/SalesModel.qml"), "SalesModel", 1, 0, "SalesModel");
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,
