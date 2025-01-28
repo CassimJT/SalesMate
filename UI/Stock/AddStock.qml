@@ -87,8 +87,8 @@ Page {
                 RoundButton {
                     id: plus
                     text: qsTr("+")
-                    Layout.preferredWidth: 40 * page.scalingFactor
-                    Layout.preferredHeight: 40 * page.scalingFactor
+                    Layout.preferredWidth: 50 * page.scalingFactor
+                    Layout.preferredHeight: 50 * page.scalingFactor
 
                     property bool isFocused: quantityField.activeFocus
 

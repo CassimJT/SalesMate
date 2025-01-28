@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.15
 ItemDelegate {
     id: delegate
     width: parent.width
-    height: 50 // Adjust height based on your requirement
+    height: 50
     RowLayout {
         anchors {
             left: parent.left
@@ -21,14 +21,14 @@ ItemDelegate {
             id: name
             text: qsTr(model.name)
             Layout.alignment: Qt.AlignLeft
-            Layout.preferredWidth: 100 // Set a preferred width
-            elide: Label.ElideRight // Prevent overflow
+            Layout.preferredWidth: 100
+            elide: Label.ElideRight
         }
 
         // Item quantity
         Label {
             id: quantity
-            text: qsTr(model.quantity)
+            text: model.quantity
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: 50
         }

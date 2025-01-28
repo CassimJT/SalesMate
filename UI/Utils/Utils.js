@@ -16,7 +16,24 @@ function getIconSource() {
     } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Notification") {
         return "qrc:/Asserts/icons/styled-back.png";
     }
-      else {
+    else {
         return "qrc:/Asserts/icons/icons8-menu-100(1).png";
     }
 }
+
+//reseting the feild
+function resetField() {
+    homePage.itemPrice = 0.0
+    homePage.quantity = 0
+    paymentField.text = ""
+}
+//a function to append data to a model
+function appendToModel(model, name, price, quantity) {
+    console.log("Appending to model:", { name, price, quantity });
+    if (model && typeof model.append === "function") {
+        model.append({ name: name, price: price, quantity: quantity });
+    } else {
+        console.error("Invalid model or append method missing.");
+    }
+}
+

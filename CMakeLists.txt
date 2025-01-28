@@ -54,8 +54,6 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Utils/ScannerTools.qml
                 QML_FILES UI/Utils/CustomButton.qml
                 QML_FILES UI/Stock/AddStock.qml
-                QML_FILES UI/Stock/CurrentStockModel.qml
-                QML_FILES UI/Stock/CurrentStockDelegete.qml
                 QML_FILES UI/Stock/SearchBar.qml
                 QML_FILES UI/Stock/StockModel.qml
                 QML_FILES UI/Stock/StockDelegate.qml
@@ -73,6 +71,10 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Utils/ProductEditPopup.qml
                 SOURCES
                 SOURCES System/productfilterproxymodel.h System/productfilterproxymodel.cpp
+                QML_FILES UI/Home/Home.qml
+                QML_FILES UI/Home/CurrentSales.qml
+                QML_FILES UI/Stock/CurrentSalesDelegate.qml
+                QML_FILES UI/Utils/Wanning.qml
 
 
 

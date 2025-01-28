@@ -63,5 +63,7 @@
         <file>Asserts/icons/upload-48.png</file>
         <file>Asserts/icons/icons8-edit-pink.png</file>
         <file>Asserts/icons/icons8-info-100.png</file>
+        <file>UI/Stock/SalesModel.qml</file>
+        <file>Asserts/icons/nextitem.png</file>
     </qresource>
 </RCC>
