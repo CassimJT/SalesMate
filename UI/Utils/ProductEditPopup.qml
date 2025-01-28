@@ -210,8 +210,10 @@ Popup {
             if(checked) {
                 row.visible = true
                 editProduct.isReadOnly = false
+                info.text = qsTr("Click the pencil to switch to edit mode")
             } else {
                 row.visible = false
+                info.text = qsTr("Click the pencil to switch to edit mode")
                 editProduct.isReadOnly = true
             }
         }
@@ -253,17 +255,52 @@ Popup {
                 source: "qrc:/Asserts/icons/delete.png"
                 fillMode: Image.PreserveAspectFit
             }
+            onClicked: {
+                //open the popup
+                confirmDelete.open()
+            }
         }
         anchors {
             right: edit.left
             verticalCenter: edit.verticalCenter
         }
     }
-
     Connections {
         target: databaseManager
         onProductAlreadyExist :{
             console.log("Product aleady exist")
+            info.text = "No Changes to update!!"
+        }
+        onProductUpdated: {
+            console.log("Update succes!!")
+            info.text = "Update succes!!"
+        }
+        //emited when the product is succefuly removed
+        onProductRemoved:{
+            successPopup.open()
         }
     }
+    InfoPopup {
+        id: confirmDelete
+        iconSource: "qrc:/Asserts/icons/icons8-error.gif"
+        message: qsTr("This operation will delete the Product from the system.")
+        buttonText: qsTr("Ok")
+        isCancelVisible: true
+        onClicked: {
+            confirmDelete.close();
+            const sku = skuField.text
+            databaseManager.removeProduct(sku)
+        }
+    }
+    InfoPopup {
+        id: successPopup
+        iconSource: "qrc:/Asserts/icons/success.gif"
+        message: qsTr("Stock Deleted Successfully")
+        buttonText: qsTr("Ok")
+        onClicked: {
+            successPopup.close();
+            editProduct.close()
+        }
+    }
+
 }

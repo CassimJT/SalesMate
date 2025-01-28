@@ -39,7 +39,7 @@ public:
 
 public slots:
     //
-    QSharedPointer< Product > queryDatabase(const QString &sku);
+    Product *queryDatabase(const QString &sku);
     float queryPriceFromDatabase(const QString &sku);
     void addProductToDatabase(const QString &name, const QString &sku, int quantity, float price);
     void updateUproduct(const QString &name, const QString &sku, int quantity, float price);

@@ -181,25 +181,13 @@ void DatabaseManager::updateUproduct(const QString &name, const QString &sku, in
     if (!query.exec()) {
         qDebug() << "Failed to update product in the database:" << query.lastError().text();
         return;
+    }else {
+        //lettign the world for the new change
+        emit productUpdated();
+        //updating the view to reflect the change
+        updateView();
     }
 
-    for (int i = 0; i < products.size(); ++i) {
-        if (products[i]->sku() == sku) {
-            if (!products[i]) {
-                qDebug() << "Invalid product object in memory for SKU:" << sku;
-                return;
-            }
-            products[i]->setName(name);
-            products[i]->setQuantity(quantity);
-            products[i]->setPrice(price);
-
-            // Correct assignment
-            productMap[sku] = QSharedPointer<Product>(products[i]); // Wrap raw pointer
-            QModelIndex index = this->index(i);
-            emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
-            return;
-        }
-    }
 }
 
 
@@ -218,22 +206,11 @@ void DatabaseManager::removeProduct(const QString &sku)
     if (!query.exec()) {
         qDebug() << "Failed to remove product from database:" << query.lastError().text();
         return;
+    } else {
+        updateView();
+        emit productRemoved();
     }
-
     // Remove product from the in-memory list
-    for (int i = 0; i < products.size(); ++i) {
-        if (products.at(i)->sku() == sku) {
-            beginRemoveRows(QModelIndex(), i, i);
-            delete products.takeAt(i); // Remove and delete the product
-            productMap.remove(sku); //removing the product frodunct from the Hash
-            endRemoveRows();
-            qDebug() << "Product removed successfully:" << sku;
-            return;
-        }
-    }
-
-    qDebug() << "Product not found in memory for SKU:" << sku;
-
 }
 
 QHash<int, QByteArray> DatabaseManager::roleNames() const
@@ -302,7 +279,6 @@ void DatabaseManager::updateView() {
     endResetModel();
 }
 
-
 ProductFilterProxyModel *DatabaseManager::getProxyModel() const
 {
     return proxyModel;
@@ -313,24 +289,27 @@ ProductFilterProxyModel *DatabaseManager::getProxyModel() const
  * @return produnt
  * this function retunr the produt that matches the sku
  */
-QSharedPointer<Product> DatabaseManager::queryDatabase(const QString &sku)
+Product* DatabaseManager::queryDatabase(const QString &sku)
 {
     // Check the hash first
     if (productMap.contains(sku)) {
-        return productMap.value(sku);
+        qDebug() << "return from map";
+        return productMap.value(sku).data(); // Return raw pointer
     }
+
     // If not in the hash, query the database
     QSqlQuery query;
     query.prepare("SELECT name, quantity, price FROM products WHERE sku = :sku");
     query.bindValue(":sku", sku);
 
     if (query.exec() && query.next()) {
-        auto product = QSharedPointer<Product>::create();
+        auto product = new Product(this); // Use raw pointer
         product->setName(query.value("name").toString());
         product->setSku(sku);
         product->setQuantity(query.value("quantity").toInt());
         product->setPrice(query.value("price").toDouble());
-        productMap.insert(sku, product);
+        productMap.insert(sku, QSharedPointer<Product>(product));
+        qDebug() << "return from db";
         return product;
     } else {
         qDebug() << "Database error:" << query.lastError().text();

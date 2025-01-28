@@ -22,6 +22,7 @@ Page {
     // Example adjustments for tablet vs. phone
     property bool isTablet: screenHeight > 800 || screenWidth > 600
     property real buttonHeight: isTablet ? totalHeightFor3Item * 0.07 : totalHeightFor3Item * 0.10
+    property real itemPrice: 0.0
 
     Flickable {
         id: flickable
@@ -55,6 +56,7 @@ Page {
                 placeholderText: "Amount"
                 Layout.preferredWidth: parent.width
                 inputMethodHints: Qt.ImhDigitsOnly
+                text: qsTr("MK" + homePage.itemPrice)
             }
 
             RowLayout {
@@ -186,21 +188,23 @@ Page {
                     }
                 }
             }
-            // Scanner
-            /* Image {
-                id: scan
-                width: 36
-                height: width
-                source: "qrc:/Asserts/icons/barcode-scan.png"
-                fillMode: Image.PreserveAspectFit
-               MouseArea {
-                    anchors.fill:parent
-                    onClicked: {
-                        console.log("Captured")
-                        barcodeScanner.imagecapture.capture()
-                    }
-               }
-            }*/
+
+        }
+    }
+
+    Connections {
+        target: barcodeEngine
+        onBarcodeChanged: {
+            console.log("Signal Triggered..");
+            const sku = barcodeEngine.barcode;
+            const product = databaseManager.queryDatabase(sku);
+
+            if (product) {
+                console.log("Price:", product.price);
+                homePage.itemPrice = product.price
+            } else {
+                console.log("Product not found for SKU:", sku);
+            }
         }
     }
 }
