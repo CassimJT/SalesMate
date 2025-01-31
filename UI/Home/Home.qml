@@ -33,12 +33,17 @@ Page {
     property string name : ""
     //property alias currentSalesModel: currentSalesModel
 
+    //a popup to search for a barcode if scannaer not working
+    BarcodeSearch {
+        id:searchItem
+    }
     Flickable {
         id: flickable
         width: parent.width
         height: parent.height
         contentHeight: mainLayout.height
         clip: true
+        bottomMargin: 20
 
         Component.onCompleted: {
             console.log("ScreenHeight: " + homePage.screenHeight)
@@ -67,11 +72,10 @@ Page {
                 text: Number(homePage.itemPrice).toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
                 Layout.preferredWidth: parent.width
                 inputMethodHints: Qt.ImhDigitsOnly
-
-
             }
-            Wanning {
+            DirectionalText {
                 id: warning
+                directionalText: "Quantity cannot be 0/empty"
                 visible: homePage.quantity === 0 || quantityField.text === "" ? true : false
             }
             RowLayout {
@@ -105,9 +109,7 @@ Page {
                     text: qsTr("+")
                     Layout.preferredWidth: 50 * homePage.scalingFactor
                     Layout.preferredHeight: 50 * homePage.scalingFactor
-
                     property bool isFocused: quantityField.activeFocus
-
                     onClicked: {
                         // Check if the field is already focused before calling forceActiveFocus
                         if (!isFocused) {
@@ -118,13 +120,11 @@ Page {
                         homePage.totalSale += homePage.itemPrice
                         SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice);
                     }
-
                     // Reset the focus state when focus changes
                     onFocusChanged: {
                         isFocused = quantityField.activeFocus;
                     }
                 }
-
             }
 
             BarcodeScanner {
@@ -133,10 +133,13 @@ Page {
                 //visible: mainStakView.currentItem.objectName ? "true": false
                 barCodeWidth: parent.width
                 barcodeHight: homePage.totalHeightFor3Item * 0.30
-                scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"
-                torshIconSource: "qrc:/Asserts/icons/touch.png"
-                searchIconSource: "qrc:/Asserts/icons/icons8-search-100.png"
-
+                scanneriIconSource: "qrc:/Asserts/icons/barcode-scan-green.png"
+                torshIconSource: "qrc:/Asserts/icons/touch-green.png"
+                searchIconSource: "qrc:/Asserts/icons/icons8-search-green.png"
+                onSearchBtnClciked: {
+                    console.log("Seach clicked ..")
+                    searchItem.open()
+                }
             }
 
             Label {
@@ -145,6 +148,11 @@ Page {
                 font.pointSize: 24 * homePage.scalingFactor
                 Layout.alignment: Qt.AlignHCenter
                 color: "gray"
+            }
+            DirectionalText {
+                id:  payementDiretionText
+                visible: false
+                directionalText: "Payment and total cannot be empty"
             }
 
             RowLayout {
@@ -156,8 +164,10 @@ Page {
                     Layout.fillWidth: true
                     inputMethodHints: Qt.ImhDigitsOnly
                     onTextEdited : {
-                        changeField.text = Number(homePage.totalSale - Number(paymentField.text)).toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
+                        payementDiretionText.visible = false
+                        changeField.text = ( Number(paymentField.text) - SalesModel.totalSale() ).toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
                     }
+
                 }
                 TextField {
                     id: changeField
@@ -188,7 +198,6 @@ Page {
                     }else{
                         ///
                     }
-
                 }
             }
             //make sales btn
@@ -201,12 +210,26 @@ Page {
                 btnIconSrc: "qrc:/Asserts/icons/sale.png"
                 btnText: "Make Sales"
                 onBtnClicked: {
-                    console.log("Clicked")
-                    homePage.totalSale = 0.0
-                    SalesModel.clearModel() //claering the model
-                    Utils.resetField()
-                    ////
+                    let paymentAmount = Number(paymentField.text); // Convert text to a number
+                    let totalSaleAmount = SalesModel.totalSale(); // Get total sale amount
+
+                    if (paymentField.text !== "" && totalSaleAmount > 0) {
+                        if (paymentAmount >= totalSaleAmount) {
+                            homePage.totalSale = 0.0;
+                            Utils.resetField();
+                            payementDiretionText.visible = false; // Hide error message
+                            //.....
+
+                            SalesModel.clearModel()
+                        } else {
+                            payementDiretionText.directionalText = "Payment must be greater than total";
+                            payementDiretionText.visible = true;
+                        }
+                    } else {
+                        payementDiretionText.visible = true;
+                    }
                 }
+
             }
         }
     }
@@ -216,7 +239,6 @@ Page {
             console.log("Signal Triggered..");
             const sku = barcodeEngine.barcode;
             const product = databaseManager.queryDatabase(sku);
-
             if (product) {
                 console.log("Price:", product.price);
                 homePage.itemPrice = product.price
@@ -224,7 +246,6 @@ Page {
                 homePage.quantity = 1
                 homePage.totalSale += product.price
                 SalesModel.addSale(homePage.name,homePage.itemPrice,homePage.quantity)
-
             } else {
                 console.log("Product not found for SKU:", sku);
             }

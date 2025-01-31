@@ -49,7 +49,7 @@ ApplicationWindow {
                             } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Stocks"){
                                 mainStakViewLoader.source = "./UI/Home/MainSatckView.qml"
                             } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Notification"){
-                                 mainStakViewLoader.source = "./UI/Stock/AddItemPage.qml"
+                                mainStakViewLoader.source = "./UI/Stock/AddItemPage.qml"
                             }else {
                                 drawer.open()
                             }

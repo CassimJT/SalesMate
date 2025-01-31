@@ -1,11 +1,20 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import SalesModel
 
 ItemDelegate {
     id: delegate
     width: parent.width
     height: 50
+    background: Rectangle {
+        id: background
+        anchors.fill: parent
+        color: index % 2 === 0
+               ? ("#f5f5f5")
+               : ("#ffffff")
+    }
+
     RowLayout {
         anchors {
             left: parent.left
@@ -36,24 +45,29 @@ ItemDelegate {
         // Item price
         Label {
             id: price
-            text: qsTr("MK"+model.price)
+            text: Number(model.price).toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: 80
         }
         // Delete item icon
         Image {
             id: deleteItem
-            source: "qrc:/Asserts/icons/delete.png"
+            source:  model.quantity > 1 ? "qrc:/Asserts/icons/minus.png": "qrc:/Asserts/icons/delete.png"
             Layout.preferredWidth: 24
             Layout.preferredHeight: 24
+            opacity: clicked ? 0.8 : 1
             fillMode: Image.PreserveAspectFit
             Layout.alignment: Qt.AlignRight
-        }
-    }
-    MenuSeparator {
-        width:parent.width
-        anchors {
-            bottom: parent.bottom
+            MouseArea{
+                anchors.fill: parent
+                onClicked:{
+                    if(model.quantity > 1) {
+                        SalesModel.decrementQuantity(index)
+                    }else {
+                        SalesModel.deleteSale(index);
+                    }
+                }
+            }
         }
     }
 }

@@ -3,25 +3,26 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 RowLayout {
-    id: directionText
+    id: direction
     spacing: 10
-    anchors {
-        left:parent.left
-        leftMargin: 15
-    }
+    //width: parent.width
+    property color colorTxt: "red"
+    property string directionalText: ""
+    property string directionalIcon: "qrc:/Asserts/icons/icons8-info-100.png" //defalt
 
     Image {
         id: infoIcon
         Layout.preferredWidth: 16
         Layout.preferredHeight: 16
-        source: "qrc:/Asserts/icons/icons8-info-100.png"
+        source: direction.directionalIcon
         fillMode: Image.PreserveAspectFit
     }
 
     Label {
         id: info
-        text: qsTr("Field cannot be Empty or 0")
-        color: "red"
+        //Layout.preferredWidth: parent.width
+        text: direction.directionalText
+        color: direction.colorTxt
         wrapMode: Text.Wrap
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignLeft

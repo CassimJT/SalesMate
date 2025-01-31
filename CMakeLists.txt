@@ -74,7 +74,12 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Home/Home.qml
                 QML_FILES UI/Home/CurrentSales.qml
                 QML_FILES UI/Stock/CurrentSalesDelegate.qml
-                QML_FILES UI/Utils/Wanning.qml
+                QML_FILES UI/Utils/DirectionalText.qml
+                QML_FILES UI/Utils/BarcodeSearch.qml
+                QML_FILES
+                QML_FILES UI/SearchBarcode/SearchBarcodeDelegate.qml
+                QML_FILES UI/Utils/Heading.qml
+                QML_FILES UI/Utils/PopupHeading.qml
 
 
 

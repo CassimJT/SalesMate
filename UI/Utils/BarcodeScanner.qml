@@ -21,6 +21,11 @@ Item {
     property alias output: output
     property alias frameTimer: frameTimer
     property string barcode: ""
+
+    //exposing the Scanner tool propeties
+    // Signals to expose scanner tool events
+    signal searchBtnClciked()
+
     implicitHeight: scannerArea.height
     CaptureSession {
         id: session
@@ -81,6 +86,8 @@ Item {
                 torchIconSource: m_parent.torshIconSource
                 searchIconSource: m_parent.searchIconSource
                 generateIconSource: m_parent.generateIcconSource
+
+
                 anchors {
                     bottom: parent.bottom
                     horizontalCenter: parent.horizontalCenter
@@ -94,13 +101,16 @@ Item {
                     } else {
                         camera.stop();
                         frameTimer.stop()
-
                     }
                 }
                 onTorchActivated: {
                     console.log("Torch button clicked! Active: " + scannerTools.torchClicked);
                     camera.torchMode = scannerTools.torchClicked ? Camera.FlashOn : Camera.FlashOff;
                 }
+                onSearchClicked: {
+                    m_parent.searchBtnClciked();
+                }
+
             }
             Rectangle {
                 id: indicator

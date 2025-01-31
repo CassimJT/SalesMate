@@ -2,30 +2,24 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import SalesModel
+import "../Utils"
 
 Page {
     id: salesPage
     objectName: "Sales"
-
-    // Search Bar
-    SearchBar {
-        id: searchBar
-        anchors.top: parent.top
-        anchors.topMargin: 10
-    }
-    
     // ListView
+
     ListView {
         id: listview
         clip: true
         model:SalesModel
         delegate: CurrentSalesDelegate{}
         anchors {
-            top: searchBar.bottom
+            top: parent.top
             right: parent.right
             left: parent.left
             bottom: parent.bottom
-            topMargin: 10
+           // topMargin: 5
         }
     }
     Text {

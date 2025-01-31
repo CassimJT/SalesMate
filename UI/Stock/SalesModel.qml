@@ -40,65 +40,42 @@ ListModel {
             if (get(i).name === name) {
                 // Calculate the new price
                 var newPrice = quantity * price;
-                // Update the item
                 set(i, { name: name, quantity: quantity, price: newPrice,});
-                return; // Exit after updating the matching item
-            }
-        }
-        console.log("Item with name", name, "not found.");
-    }
-
-    // Function to delete an item from the model
-    function deleteItem(name) {
-        for (var i = 0; i < count; i++) {
-            if (get(i).name === name) {
-                remove(i); // Remove the item at index `i`
-                return; // Exit after deletion
+                return;
             }
         }
         console.log("Item with name", name, "not found.");
     }
 
     // Function to decrement the quantity of an item
-    function decrementQuantity(name) {
-        for (var i = 0; i < count; i++) {
-            if (get(i).name === name) {
-                var currentQuantity = get(i).quantity;
-                if (currentQuantity > 1) { // Prevent negative quantities
-                    var updatedQuantity = currentQuantity - 1;
-                    var updatedPrice = updatedQuantity * get(i).price;
-                    set(i, {
-                            sku: sku,
-                            quantity: updatedQuantity,
-                            price: get(i).price,
-                            totalPrice: updatedPrice
-                        });
-                } else {
-                    console.log("Cannot decrement quantity below 1.");
-                }
-                return;
-            }
+    function decrementQuantity(index) {
+        var currentQuantity = get(index).quantity;
+        var itemPrice = get(index).price / currentQuantity
+        if (currentQuantity > 1) { // Prevent negative quantities
+            var updatedQuantity = currentQuantity - 1;
+            var updatedPrice = get(index).price - itemPrice;
+            set(index, {
+                    quantity: updatedQuantity,
+                    price: updatedPrice
+                });
+        } else {
+            //delete it from the model
+            deleteSale(index)
         }
-        console.log("Item with name", name, "not found.");
+        return;
     }
 
     // Function to increment the quantity of an item
-    function incrementQuantity(name) {
-        for (var i = 0; i < count; i++) {
-            if (get(i).name === name) {
-                var updatedQuantity = get(i).quantity + 1;
-                var updatedPrice = updatedQuantity * get(i).price;
-                set(i, {
-                        name: name,
-                        quantity: updatedQuantity,
-                        price: get(i).price,
-                        totalPrice: updatedPrice
-                    });
-                return;
-            }
-        }
-        console.log("Item with name", name, "not found.");
+    function incrementQuantity(index) {
+        var updatedQuantity = get(index).quantity + 1;
+        var updatedPrice = updatedQuantity * get(index).price;
+        set(index, {
+                quantity: updatedQuantity,
+                price: updatedPrice
+            });
+        return;
     }
+
     //function to return a return totla prices
     function totalSale() {
         var sum = 0;
@@ -107,6 +84,11 @@ ListModel {
             sum += rowItem.price;
         }
         return sum;
+    }
+    //Deleting an item
+    function deleteSale(index) {
+        console.log("Deleting item...")
+        remove(index)
     }
 
 }
