@@ -22,7 +22,11 @@ Page {
     property real totalHeightFor4Item: totalTextFiledHeight + total.height
     property int totalHeightFor3Item: Math.round(screenHeight) - totalHeightFor4Item
 
+
     // Example adjustments for tablet vs. phone
+
+    //adjustments for tablet vs. phone
+
     property bool isTablet: screenHeight > 800 || screenWidth > 600
     property real buttonHeight: isTablet ? totalHeightFor3Item * 0.07 : totalHeightFor3Item * 0.10
     property real itemPrice: 0.0
@@ -31,7 +35,16 @@ Page {
 
     //current sale variable
     property string name : ""
+
     //property alias currentSalesModel: currentSalesModel
+
+
+    property string sku: ""
+
+    //a popup to search for a barcode if scannaer not working
+    BarcodeSearch {
+        id:searchItem
+    }
 
     Flickable {
         id: flickable
@@ -39,7 +52,7 @@ Page {
         height: parent.height
         contentHeight: mainLayout.height
         clip: true
-
+        bottomMargin: 20
         Component.onCompleted: {
             console.log("ScreenHeight: " + homePage.screenHeight)
             console.log("ScreenWidth: " + homePage.screenWidth)
@@ -68,10 +81,10 @@ Page {
                 Layout.preferredWidth: parent.width
                 inputMethodHints: Qt.ImhDigitsOnly
 
-
             }
-            Wanning {
+            DirectionalText {
                 id: warning
+                directionalText: "Quantity cannot be 0/empty"
                 visible: homePage.quantity === 0 || quantityField.text === "" ? true : false
             }
             RowLayout {
@@ -95,7 +108,8 @@ Page {
                     onTextEdited: {
                         if (quantityField.text !== "" && homePage.quantity !== 0) {
                             homePage.quantity = Number(quantityField.text);
-                            SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice);
+
+                            SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice,homePage.sku);
                         }
                     }
                 }
@@ -106,7 +120,8 @@ Page {
                     Layout.preferredWidth: 50 * homePage.scalingFactor
                     Layout.preferredHeight: 50 * homePage.scalingFactor
 
-                    property bool isFocused: quantityField.activeFocus
+
+                  property bool isFocused: quantityField.activeFocus
 
                     onClicked: {
                         // Check if the field is already focused before calling forceActiveFocus
@@ -116,7 +131,10 @@ Page {
                         }
                         homePage.quantity += 1;
                         homePage.totalSale += homePage.itemPrice
+
                         SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice);
+                    }
+                        SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice,homePage.sku);
                     }
 
                     // Reset the focus state when focus changes
@@ -124,7 +142,6 @@ Page {
                         isFocused = quantityField.activeFocus;
                     }
                 }
-
             }
 
             BarcodeScanner {
@@ -133,10 +150,22 @@ Page {
                 //visible: mainStakView.currentItem.objectName ? "true": false
                 barCodeWidth: parent.width
                 barcodeHight: homePage.totalHeightFor3Item * 0.30
+<<<<<<< HEAD
                 scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"
                 torshIconSource: "qrc:/Asserts/icons/touch.png"
                 searchIconSource: "qrc:/Asserts/icons/icons8-search-100.png"
             }
+=======
+                scanneriIconSource: "qrc:/Asserts/icons/barcode-scan-green.png"
+                torshIconSource: "qrc:/Asserts/icons/touch-green.png"
+                searchIconSource: "qrc:/Asserts/icons/icons8-search-green.png"
+                onSearchBtnClciked: {
+                    console.log("Seach clicked ..")
+                    searchItem.open()
+                }
+            }
+
+>>>>>>> origin/main
             Label {
                 id: total
                 text: SalesModel.totalSale().toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
@@ -144,6 +173,15 @@ Page {
                 Layout.alignment: Qt.AlignHCenter
                 color: "gray"
             }
+<<<<<<< HEAD
+=======
+            DirectionalText {
+                id:  payementDiretionText
+                visible: false
+                directionalText: "Payment and total cannot be empty"
+            }
+
+>>>>>>> origin/main
             RowLayout {
                 spacing: 5
                 Layout.fillWidth: true
@@ -153,8 +191,15 @@ Page {
                     Layout.fillWidth: true
                     inputMethodHints: Qt.ImhDigitsOnly
                     onTextEdited : {
+<<<<<<< HEAD
                         changeField.text = Number(homePage.totalSale - Number(paymentField.text)).toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
                     }
+=======
+                        payementDiretionText.visible = false
+                        changeField.text = ( Number(paymentField.text) - SalesModel.totalSale() ).toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
+                    }
+
+>>>>>>> origin/main
                 }
                 TextField {
                     id: changeField
@@ -197,6 +242,7 @@ Page {
                 btnIconSrc: "qrc:/Asserts/icons/sale.png"
                 btnText: "Make Sales"
                 onBtnClicked: {
+<<<<<<< HEAD
                     console.log("Clicked")
                     homePage.totalSale = 0.0
                     SalesModel.clearModel() //claering the model
@@ -204,17 +250,43 @@ Page {
                     //getting the array of sales
                     var data = SalesModel.currentSales();
                     console.log(JSON.stringify(data))
+                    let paymentAmount = Number(paymentField.text); // Convert text to a number
+                    let totalSaleAmount = SalesModel.totalSale(); // Get total sale amount
 
+                    if (paymentField.text !== "" && totalSaleAmount > 0) {
+                        if (paymentAmount >= totalSaleAmount) {
+                            homePage.totalSale = 0.0;
+                            Utils.resetField();
+                            payementDiretionText.visible = false; // Hide error message
+                            //.....
+                            /***To do list***/
+                            // confirm sale
+                            // save the sale to Database
+                            // Subtract the itemes from the stock Database
+                            // generate an invoive if success
+                            // menthode on invoive to be decided later
+
+                            SalesModel.clearModel()
+                        } else {
+                            payementDiretionText.directionalText = "Payment must be greater than total";
+                            payementDiretionText.visible = true;
+                        }
+                    } else {
+                        payementDiretionText.visible = true;
+                    }
                 }
             }
         }
     }
+
     //
+
     Connections {
         target: barcodeEngine
         onBarcodeChanged: {
             console.log("Signal Triggered..");
             const sku = barcodeEngine.barcode;
+            homePage.sku = barcodeEngine.barcode;
             const product = databaseManager.queryDatabase(sku);
             if (product) {
                 console.log("Price:", product.price);
@@ -222,7 +294,7 @@ Page {
                 homePage.name = product.name
                 homePage.quantity = 1
                 homePage.totalSale += product.price
-                SalesModel.addSale(homePage.name,homePage.itemPrice,homePage.quantity)
+                SalesModel.addSale(homePage.name,homePage.itemPrice,homePage.quantity,homePage.sku)
             } else {
                 console.log("Product not found for SKU:", sku);
             }

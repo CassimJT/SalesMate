@@ -65,5 +65,11 @@
         <file>Asserts/icons/icons8-info-100.png</file>
         <file>UI/Stock/SalesModel.qml</file>
         <file>Asserts/icons/nextitem.png</file>
+<<<<<<< HEAD
+=======
+        <file>Asserts/icons/barcode-scan-green.png</file>
+        <file>Asserts/icons/icons8-search-green.png</file>
+        <file>Asserts/icons/touch-green.png</file>
+>>>>>>> origin/main
     </qresource>
 </RCC>

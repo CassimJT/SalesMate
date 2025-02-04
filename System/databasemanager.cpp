@@ -158,7 +158,7 @@ void DatabaseManager::updateUproduct(const QString &name, const QString &sku, in
     qDebug() << "New Data: Name =" << name
              << ", Quantity =" << quantity
              << ", Price =" << price;
-
+    // checking if no update where made
     if (product->name().trimmed() == name.trimmed() &&
         product->quantity() == quantity &&
         qAbs(product->price() - price) < 1e-6) {

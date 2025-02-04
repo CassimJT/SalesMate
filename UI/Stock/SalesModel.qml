@@ -5,7 +5,11 @@ import QtQuick.Controls 2.15
 ListModel {
     id: salesModal
     //add item to the model
+<<<<<<< HEAD
     function addSale(name, price, quantity) {
+=======
+    function addSale(name, price, quantity,sku) {
+>>>>>>> origin/main
         // Prevent adding empty or invalid data
         if (!name || name.trim() === "" || price <= 0 || quantity <= 0) {
             console.log("Invalid data: Cannot add sale with empty or invalid fields.");
@@ -14,15 +18,24 @@ ListModel {
 
         // Prevent duplicates
         for (var i = 0; i < count; i++) {
+<<<<<<< HEAD
             if (get(i).name === name) {
+=======
+            if (get(i).sku === sku) {
+>>>>>>> origin/main
                 console.log("Duplicate data: Sale with the same name already exists.");
                 return;
             }
         }
 
         // Add the new sale
+<<<<<<< HEAD
         append({ name: name, price: price, quantity: quantity });
         console.log("Sale added: ", name, price, quantity);
+=======
+        append({ name: name, price: price, quantity: quantity,sku:sku });
+        console.log("Sale added: ", name, price, quantity,sku);
+>>>>>>> origin/main
     }
 
     // Clear the model
@@ -35,6 +48,7 @@ ListModel {
     }
 
     // Function to update an item in the model
+<<<<<<< HEAD
     function updateItem(name, quantity, price) {
         for (var i = 0; i < count; i++) {
             if (get(i).name === name) {
@@ -100,6 +114,49 @@ ListModel {
         console.log("Item with name", name, "not found.");
     }
     //function to return a return totle prices
+=======
+    function updateItem(name, quantity, price,sku) {
+        for (var i = 0; i < count; i++) {
+            if (get(i).sku === sku) {
+                // Calculate the new price
+                var newPrice = quantity * price;
+                set(i, { name: name, quantity: quantity, price: newPrice, sku:sku});
+                return;
+            }
+        }
+        console.log("Item with Sku: ", sku, "not found.");
+    }
+
+    // Function to decrement the quantity of an item
+    function decrementQuantity(index) {
+        var currentQuantity = get(index).quantity;
+        var itemPrice = get(index).price / currentQuantity
+        if (currentQuantity > 1) { // Prevent negative quantities
+            var updatedQuantity = currentQuantity - 1;
+            var updatedPrice = get(index).price - itemPrice;
+            set(index, {
+                    quantity: updatedQuantity,
+                    price: updatedPrice
+                });
+        } else {
+            //delete it from the model
+            deleteSale(index)
+        }
+        return;
+    }
+    // Function to increment the quantity of an item
+    function incrementQuantity(index) {
+        var updatedQuantity = get(index).quantity + 1;
+        var updatedPrice = updatedQuantity * get(index).price;
+        set(index, {
+                quantity: updatedQuantity,
+                price: updatedPrice
+            });
+        return;
+    }
+
+    //function to return a return totla prices
+>>>>>>> origin/main
     function totalSale() {
         var sum = 0;
         for (var i = 0; i < count; i++) {
@@ -108,6 +165,7 @@ ListModel {
         }
         return sum;
     }
+<<<<<<< HEAD
 
     //this function return the arry of current mode
     function currentSales() {
@@ -119,4 +177,13 @@ ListModel {
         return sales;
     }
 
+=======
+    //Deleting an item
+    function deleteSale(index) {
+        console.log("Deleting item...")
+        remove(index)
+    }
+
+    //a function to retun the model as array
+>>>>>>> origin/main
 }
