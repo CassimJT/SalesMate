@@ -136,9 +136,7 @@ Page {
                 scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"
                 torshIconSource: "qrc:/Asserts/icons/touch.png"
                 searchIconSource: "qrc:/Asserts/icons/icons8-search-100.png"
-
             }
-
             Label {
                 id: total
                 text: SalesModel.totalSale().toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
@@ -146,7 +144,6 @@ Page {
                 Layout.alignment: Qt.AlignHCenter
                 color: "gray"
             }
-
             RowLayout {
                 spacing: 5
                 Layout.fillWidth: true
@@ -188,7 +185,6 @@ Page {
                     }else{
                         ///
                     }
-
                 }
             }
             //make sales btn
@@ -205,18 +201,21 @@ Page {
                     homePage.totalSale = 0.0
                     SalesModel.clearModel() //claering the model
                     Utils.resetField()
-                    ////
+                    //getting the array of sales
+                    var data = SalesModel.currentSales();
+                    console.log(JSON.stringify(data))
+
                 }
             }
         }
     }
+    //
     Connections {
         target: barcodeEngine
         onBarcodeChanged: {
             console.log("Signal Triggered..");
             const sku = barcodeEngine.barcode;
             const product = databaseManager.queryDatabase(sku);
-
             if (product) {
                 console.log("Price:", product.price);
                 homePage.itemPrice = product.price
@@ -224,11 +223,9 @@ Page {
                 homePage.quantity = 1
                 homePage.totalSale += product.price
                 SalesModel.addSale(homePage.name,homePage.itemPrice,homePage.quantity)
-
             } else {
                 console.log("Product not found for SKU:", sku);
             }
         }
     }
-
 }

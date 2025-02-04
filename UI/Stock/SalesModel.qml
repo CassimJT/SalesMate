@@ -99,7 +99,7 @@ ListModel {
         }
         console.log("Item with name", name, "not found.");
     }
-    //function to return a return totla prices
+    //function to return a return totle prices
     function totalSale() {
         var sum = 0;
         for (var i = 0; i < count; i++) {
@@ -107,6 +107,16 @@ ListModel {
             sum += rowItem.price;
         }
         return sum;
+    }
+
+    //this function return the arry of current mode
+    function currentSales() {
+        let sales = []
+        for(var i = 0; i < count; i++) {
+            var item = get(i);
+            sales.push({"sku": item.sku, "quantity": item.quantity})
+        }
+        return sales;
     }
 
 }
