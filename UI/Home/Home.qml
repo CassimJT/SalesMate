@@ -22,7 +22,7 @@ Page {
     property real totalHeightFor4Item: totalTextFiledHeight + total.height
     property int totalHeightFor3Item: Math.round(screenHeight) - totalHeightFor4Item
 
-    // Example adjustments for tablet vs. phone
+    //adjustments for tablet vs. phone
     property bool isTablet: screenHeight > 800 || screenWidth > 600
     property real buttonHeight: isTablet ? totalHeightFor3Item * 0.07 : totalHeightFor3Item * 0.10
     property real itemPrice: 0.0
@@ -31,7 +31,7 @@ Page {
 
     //current sale variable
     property string name : ""
-    //property alias currentSalesModel: currentSalesModel
+    property string sku: ""
 
     //a popup to search for a barcode if scannaer not working
     BarcodeSearch {
@@ -99,7 +99,7 @@ Page {
                     onTextEdited: {
                         if (quantityField.text !== "" && homePage.quantity !== 0) {
                             homePage.quantity = Number(quantityField.text);
-                            SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice);
+                            SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice,homePage.sku);
                         }
                     }
                 }
@@ -118,7 +118,7 @@ Page {
                         }
                         homePage.quantity += 1;
                         homePage.totalSale += homePage.itemPrice
-                        SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice);
+                        SalesModel.updateItem(homePage.name, homePage.quantity, homePage.itemPrice,homePage.sku);
                     }
                     // Reset the focus state when focus changes
                     onFocusChanged: {
@@ -219,6 +219,12 @@ Page {
                             Utils.resetField();
                             payementDiretionText.visible = false; // Hide error message
                             //.....
+                            /***To do list***/
+                            // confirm sale
+                            // save the sale to Database
+                            // Subtract the itemes from the stock Database
+                            // generate an invoive if success
+                            // menthode on invoive to be decided later
 
                             SalesModel.clearModel()
                         } else {
@@ -229,7 +235,6 @@ Page {
                         payementDiretionText.visible = true;
                     }
                 }
-
             }
         }
     }
@@ -237,7 +242,7 @@ Page {
         target: barcodeEngine
         onBarcodeChanged: {
             console.log("Signal Triggered..");
-            const sku = barcodeEngine.barcode;
+            homePage.sku = barcodeEngine.barcode;
             const product = databaseManager.queryDatabase(sku);
             if (product) {
                 console.log("Price:", product.price);
@@ -245,7 +250,7 @@ Page {
                 homePage.name = product.name
                 homePage.quantity = 1
                 homePage.totalSale += product.price
-                SalesModel.addSale(homePage.name,homePage.itemPrice,homePage.quantity)
+                SalesModel.addSale(homePage.name,homePage.itemPrice,homePage.quantity,homePage.sku)
             } else {
                 console.log("Product not found for SKU:", sku);
             }
