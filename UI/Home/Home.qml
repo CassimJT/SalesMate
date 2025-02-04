@@ -225,6 +225,8 @@ Page {
                             // Subtract the itemes from the stock Database
                             // generate an invoive if success
                             // menthode on invoive to be decided later
+                            var data = SalesModel.onGoingSale()
+                            console.log(JSON.stringify(data))
 
                             SalesModel.clearModel()
                         } else {

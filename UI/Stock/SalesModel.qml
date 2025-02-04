@@ -74,7 +74,6 @@ ListModel {
             });
         return;
     }
-
     //function to return a return totla prices
     function totalSale() {
         var sum = 0;
@@ -91,4 +90,12 @@ ListModel {
     }
 
     //a function to retun the model as array
+    function onGoingSale() {
+        var sales = [];
+        for(var i = 0; i < count; i++) {
+            var item = get(i);
+            sales.push({sku:item.sku,quantity: item.quantity})
+        }
+        return sales
+    }
 }
