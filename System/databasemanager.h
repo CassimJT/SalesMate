@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QHash>
 #include <QVector>
+#include <qcontainerfwd.h>
 #include <qobject.h>
 #include "product.h"
 #include <QSqlDatabase>
@@ -11,6 +12,8 @@
 #include <QSqlQuery>
 #include "productfilterproxymodel.h"
 #include <QSharedPointer>
+#include <QVariant>
+#include <QMap>
 
 class DatabaseManager : public QAbstractListModel
 {
@@ -44,6 +47,7 @@ public slots:
     void addProductToDatabase(const QString &name, const QString &sku, int quantity, float price);
     void updateUproduct(const QString &name, const QString &sku, int quantity, float price);
     void removeProduct(const QString &sku);
+    void processSales(const QVariantList &sales);
 signals:
     void newProductAdded();
     void productUpdated();

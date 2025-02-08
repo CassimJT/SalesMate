@@ -80,6 +80,10 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/SearchBarcode/SearchBarcodeDelegate.qml
                 QML_FILES UI/Utils/Heading.qml
                 QML_FILES UI/Utils/PopupHeading.qml
+                SOURCES System/incomemodel.h System/incomemodel.cpp
+                SOURCES System/expensesmodel.h System/expensesmodel.cpp
+                SOURCES System/expense.h System/expense.cpp
+                SOURCES System/income.h System/income.cpp
 
 
 

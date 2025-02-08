@@ -11,7 +11,16 @@ Page {
         AddStock {
         }
         ShowStock {
+            id: showStockPage
+
         }
+        onCurrentIndexChanged: {
+            console.log("completed....")
+            if (currentIndex === 1) {
+                showStockPage.searchBar.text = ""
+            }
+        }
+
     }
     footer: TabBar {
         currentIndex: swipeView.currentIndex
@@ -34,7 +43,7 @@ Page {
                 }
                 Label {
                     id:addStockText
-                     text:qsTr("Add Stock")
+                    text:qsTr("Add Stock")
                     Layout.alignment: Qt.AlignVCenter
                     anchors {
                         verticalCenter: addstock.verticalCenter
@@ -74,4 +83,13 @@ Page {
 
         }
     }
+    //connecting the showSock page with the a signal
+    /* Connections {
+        target: swipeView
+        onIndexChanged: {
+            if (swipeView.currentIndex === 1) {
+                showStockPage.searchBar.text = ""
+            }
+        }
+    }*/
 }

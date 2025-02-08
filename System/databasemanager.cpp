@@ -1,11 +1,13 @@
 #include "databasemanager.h"
 #include "System/product.h"
+#include <qcontainerfwd.h>
 #include <qlogging.h>
 #include <qpropertyprivate.h>
 #include <qsqldatabase.h>
 #include <qsqlerror.h>
 #include <qsqlquery.h>
 #include <qtmetamacros.h>
+
 
 DatabaseManager::DatabaseManager(QObject *parent)
     : QAbstractListModel(parent),
@@ -211,6 +213,23 @@ void DatabaseManager::removeProduct(const QString &sku)
         emit productRemoved();
     }
     // Remove product from the in-memory list
+}
+/**
+ * @brief DatabaseManager::processSales
+ * @param sales
+ *  process the sales made
+ */
+void DatabaseManager::processSales(const QVariantList &sales)
+{
+    //
+    for(const QVariant &data: sales) {
+        QVariantMap map = data.toMap();
+        QString sku = map["sku"].toString();
+        int quantity = map["quantity"].toInt();
+        qDebug()<<"sku: " << sku << "quantity: "<< quantity;
+        //processin comes here
+    }
+
 }
 
 QHash<int, QByteArray> DatabaseManager::roleNames() const

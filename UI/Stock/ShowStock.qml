@@ -7,15 +7,16 @@ Page {
     id: salesPage
     objectName: "Sales"
     property alias editProduct: editProduct
+    property alias searchBar: searchBar
 
     SearchBar {
         id: searchBar
 
         onTextChangedSignal: {
-            productFilterModel.setFilterName(searchBar.text); // Ensure this is correct
+            productFilterModel.setFilterName(searchBar.text);
         }
         onTextEditFinished: {
-            productFilterModel.setFilterName(searchBar.text); // Ensure this is correct
+            productFilterModel.setFilterName(searchBar.text);
         }
 
     }

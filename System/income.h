@@ -1,0 +1,68 @@
+#ifndef INCOME_H
+#define INCOME_H
+
+#include <QObject>
+#include <QDate>
+#include <qdatetime.h>
+#include <qobject.h>
+#include <qtypes.h>
+
+class Income : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged FINAL)
+    Q_PROPERTY(int quantity READ quantity WRITE setQuantity NOTIFY quantityChanged FINAL)
+    Q_PROPERTY(qreal unitprice READ unitprice WRITE setUnitprice NOTIFY unitpriceChanged FINAL)
+    Q_PROPERTY(qreal totalprice READ totalprice WRITE setTotalprice NOTIFY totalpriceChanged FINAL)
+    Q_PROPERTY(QString disciption READ disciption WRITE setDisciption NOTIFY disciptionChanged FINAL)
+    Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged FINAL)
+public:
+    explicit Income(QObject *parent = nullptr);
+
+    QDate date() const;
+    void setDate(const QDate &newDate);
+
+    int quantity() const;
+    void setQuantity(int newQuantity);
+
+    qreal unitprice() const;
+    void setUnitprice(qreal newUnitprice);
+
+    qreal totalprice() const;
+    void setTotalprice(qreal newTotalprice);
+
+    QString disciption() const;
+    void setDisciption(const QString &newDisciption);
+
+    QString source() const;
+    void setSource(const QString &newSource);
+
+public slots:
+              //slots
+
+
+signals:
+         //signals
+    void dateChanged();
+
+    void quantityChanged();
+
+    void unitpriceChanged();
+
+    void totalpriceChanged();
+
+    void disciptionChanged();
+
+    void sourceChanged();
+
+private:
+    QDate m_date;
+    int m_quantity;
+    qreal m_unitprice;
+    qreal m_totalprice;
+    QString m_disciption;
+    QString m_source;
+
+};
+
+#endif // INCOME_H

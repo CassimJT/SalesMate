@@ -226,7 +226,7 @@ Page {
                             // generate an invoive if success
                             // menthode on invoive to be decided later
                             var data = SalesModel.onGoingSale()
-                            console.log(JSON.stringify(data))
+                            databaseManager.processSales(data)
 
                             SalesModel.clearModel()
                         } else {
