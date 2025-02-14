@@ -14,16 +14,32 @@ int IncomeModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    // FIXME: Implement me!
+    return netIncome.count();
 }
 
 QVariant IncomeModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    if (!index.isValid() || index.row() < 0 || index.row() >= netIncome.size())
         return QVariant();
-
-    // FIXME: Implement me!
-    return QVariant();
+    const Income &income = *netIncome.at(index.row());
+    switch (role) {
+    case sku:
+        return income.sku();
+    case date:
+        return income.date();
+    case quantity:
+        return income.quantity();
+    case unitprice:
+        return income.unitprice();
+    case totalprice:
+        return income.totalprice();
+    case disciption:
+        return income.disciption();
+    case source:
+        return income.source();
+    default:
+        return QVariant();
+    }
 }
 /**
  * @brief IncomeModel::roleNames

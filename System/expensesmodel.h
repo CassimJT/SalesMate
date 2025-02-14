@@ -6,6 +6,8 @@
 #include <QHash>
 #include <qstringview.h>
 #include <QList>
+#include <QVector>
+#include "expense.h"
 
 class ExpensesModel : public QAbstractListModel
 {
@@ -31,7 +33,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 private:
-
+    QVector<QSharedPointer<Expense>> expenses;
     QHash<int, QByteArray> roleNames() const override;
 };
 

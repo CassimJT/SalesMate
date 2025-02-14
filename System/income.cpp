@@ -126,3 +126,23 @@ void Income::setSource(const QString &newSource)
     m_source = newSource;
     emit sourceChanged();
 }
+/**
+ * @brief Income::sku
+ * @return the item stock barcode
+ */
+QString Income::sku() const
+{
+    return m_sku;
+}
+/**
+ * @brief Income::setSku
+ * @param newSku
+ * set the item stock code
+ */
+void Income::setSku(const QString &newSku)
+{
+    if (m_sku == newSku)
+        return;
+    m_sku = newSku;
+    emit skuChanged();
+}

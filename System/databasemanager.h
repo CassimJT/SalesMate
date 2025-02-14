@@ -45,7 +45,7 @@ public slots:
     Product *queryDatabase(const QString &sku);
     float queryPriceFromDatabase(const QString &sku);
     void addProductToDatabase(const QString &name, const QString &sku, int quantity, float price);
-    void updateUproduct(const QString &name, const QString &sku, int quantity, float price);
+    void updateProduct(const QString &name, const QString &sku, int quantity, float price);
     void removeProduct(const QString &sku);
     void processSales(const QVariantList &sales);
 signals:
@@ -62,6 +62,7 @@ private:
     void setUpDatabase();
     void updateView();
     ProductFilterProxyModel *proxyModel;
+    int quaryQuantity(const QString &sku);
 
 };
 

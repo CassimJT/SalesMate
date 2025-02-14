@@ -145,7 +145,7 @@ void DatabaseManager::addProductToDatabase(const QString &name, const QString &s
  * @param price
 * This function will update the existing data in the database
  */
-void DatabaseManager::updateUproduct(const QString &name, const QString &sku, int quantity, float price)
+void DatabaseManager::updateProduct(const QString &name, const QString &sku, int quantity, float price)
 {
     if (!productMap.contains(sku)) {
         qDebug() << "Product with SKU" << sku << "not found.";
@@ -170,13 +170,19 @@ void DatabaseManager::updateUproduct(const QString &name, const QString &sku, in
     }
 
     qDebug() << "Updating product in database for SKU:" << sku;
+    int currentQuantity = quaryQuantity(sku); //gating the current qunatity
+    int newQunatity  = 0;
+    if(currentQuantity != -1) {
+        //checking if the current quanity is valide
+        newQunatity = currentQuantity + quantity; //calcualting new quantity
+    }
 
     QSqlQuery query;
     query.prepare(R"(UPDATE products
         SET name = :name, quantity = :quantity, price = :price
         WHERE sku = :sku)");
     query.bindValue(":name", name);
-    query.bindValue(":quantity", quantity);
+    query.bindValue(":quantity", newQunatity);
     query.bindValue(":price", price);
     query.bindValue(":sku", sku);
 
@@ -189,10 +195,7 @@ void DatabaseManager::updateUproduct(const QString &name, const QString &sku, in
         //updating the view to reflect the change
         updateView();
     }
-
 }
-
-
 
 /**
  * @brief DatabaseManager::removeProduct
@@ -296,6 +299,25 @@ void DatabaseManager::updateView() {
     }
 
     endResetModel();
+}
+/**
+ * @brief DatabaseManager::quaryQuantity
+ * @param sku
+ * @return the qunatity of a paticula item specified by the sku
+ */
+int DatabaseManager::quaryQuantity(const QString &sku)
+{
+    int curentQuantity = -1;
+    QSqlQuery query;
+    query.prepare("SELECT quantity FROM products WHERE sku = :sku");
+    query.bindValue(":sku", sku);
+    if(query.exec() && query.next()) {
+        curentQuantity = query.value("quantity").toInt();
+    } else {
+        qDebug() << "Database error:" << query.lastError().text();
+    }
+
+    return curentQuantity;
 }
 
 ProductFilterProxyModel *DatabaseManager::getProxyModel() const

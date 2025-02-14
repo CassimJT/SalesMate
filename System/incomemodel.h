@@ -4,6 +4,8 @@
 #include <QAbstractListModel>
 #include <QHash>
 #include <qstringview.h>
+#include <QVector>
+#include "income.h"
 
 class IncomeModel : public QAbstractListModel
 {
@@ -27,6 +29,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 private:
+    QVector<QSharedPointer<Income>> netIncome;
     QHash<int,QByteArray> roleNames() const override;
 };
 

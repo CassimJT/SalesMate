@@ -15,8 +15,7 @@ Page {
 
         }
         onCurrentIndexChanged: {
-            console.log("completed....")
-            if (currentIndex === 1) {
+            if (currentIndex === 0) {
                 showStockPage.searchBar.text = ""
             }
         }

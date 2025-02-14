@@ -182,7 +182,7 @@ Page {
         itemName.text = "";
         amountField.text = "";
         quantityField.text = "";
-        dateField.text = ""
+        //dateField.text = ""
         barcodeScn.showRecycle = false
         barcodeScn.camera.stop()
         barcodeScn.camera.start()

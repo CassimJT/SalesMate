@@ -240,7 +240,7 @@ Popup {
                 const sku = skuField.text
                 const quantity = quantityField.text
                 const price = priceField.text
-                databaseManager.updateUproduct(name,sku,quantity,price)
+                databaseManager.updateProduct(name,sku,quantity,price)
             }
         }
         RoundButton {

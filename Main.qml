@@ -204,4 +204,5 @@ ApplicationWindow {
             root.mainStakView = mainStakViewLoader.item
         }
     }
+
 }

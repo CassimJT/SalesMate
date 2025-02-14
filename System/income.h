@@ -37,6 +37,9 @@ public:
     QString source() const;
     void setSource(const QString &newSource);
 
+    QString sku() const;
+    void setSku(const QString &newSku);
+
 public slots:
               //slots
 
@@ -55,6 +58,8 @@ signals:
 
     void sourceChanged();
 
+    void skuChanged();
+
 private:
     QDate m_date;
     int m_quantity;
@@ -62,7 +67,9 @@ private:
     qreal m_totalprice;
     QString m_disciption;
     QString m_source;
+    QString m_sku;
 
+    Q_PROPERTY(QString sku READ sku WRITE setSku NOTIFY skuChanged FINAL)
 };
 
 #endif // INCOME_H
