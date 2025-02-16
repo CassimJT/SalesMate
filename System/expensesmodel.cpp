@@ -5,6 +5,7 @@ ExpensesModel::ExpensesModel(QObject *parent)
     : QAbstractListModel(parent)
 {
     //constractor
+    databaseManager.setUpExpenceTable();
 }
 
 QVariant ExpensesModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -55,6 +56,50 @@ QVariant ExpensesModel::data(const QModelIndex &index, int role) const
     default:
         return QVariant();
     }
+}
+/**
+ * @brief ExpensesModel::addExpence
+ * @param source
+ * @param date
+ * @param cost
+ * @param discription
+ * this function adds entries(expenses) in the database
+ */
+void ExpensesModel::addExpence(const QString &source, const QDate &date, qreal cost, const QString &discription)
+{
+    //......
+    auto expence = new Expense(this);
+    expence->setSource(source);
+    expence->setDate(date);
+    expence->setCost(cost);
+    expence->setDiscription(discription);;
+
+    QSqlQuery query;
+    query.prepare(R"(INSERT INTO  expences (source,date,cost,expences)
+                    VALUES(:source,:date,:cost,:expences)
+                )");
+
+    query.bindValue(":source",source);
+    query.bindValue(":date",date);
+    query.bindValue(":cost",cost);
+    query.bindValue(":discription",discription);
+
+    if(!query.exec()) {
+        QSqlError error = query.lastError();
+        qDebug() <<"Faild to add Expense: "; error.text();
+        if(error.databaseText().contains("UNIQUE",Qt::CaseInsensitive)) {
+            qDebug() << "Unique Constraits violated";
+            emit expenseExist();
+
+            return;
+        }
+    }
+    //emit a signal
+    emit expenseAdded();
+    beginResetModel();
+    expenses.append(QSharedPointer<Expense>::create(expence));
+    endResetModel();
+
 }
 
 QHash<int, QByteArray> ExpensesModel::roleNames() const

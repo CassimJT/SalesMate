@@ -8,6 +8,9 @@
 #include <QList>
 #include <QVector>
 #include "expense.h"
+#include <QDate>
+#include "databasemanager.h"
+#include <QSqlError>
 
 class ExpensesModel : public QAbstractListModel
 {
@@ -31,10 +34,17 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+public slots:
+    void addExpence( const QString &source, const QDate &date, qreal cost, const QString &discription);
+signals:
+    void expenseAdded();
+    void expenseExist();
 
 private:
     QVector<QSharedPointer<Expense>> expenses;
     QHash<int, QByteArray> roleNames() const override;
+    DatabaseManager databaseManager;
+
 };
 
 #endif // EXPENSESMODEL_H

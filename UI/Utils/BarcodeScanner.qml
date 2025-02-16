@@ -32,7 +32,7 @@ Item {
         camera: Camera {
             id: camera
             focusMode: Camera.FocusModeAuto
-            zoomFactor: 1.2
+            zoomFactor: 1.4
 
         }
         imageCapture: ImageCapture {
@@ -170,7 +170,7 @@ Item {
     }
     Timer {
         id:frameTimer
-        interval: 3000
+        interval: 1500
         running:true
         repeat: true
         onTriggered: {

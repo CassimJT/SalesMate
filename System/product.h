@@ -48,8 +48,6 @@ private:
     float m_price;
     int m_quantity;
     QString m_sku;
-    int sample;
-
 
 };
 

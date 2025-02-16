@@ -5,6 +5,8 @@
 #include <qqml.h>
 #include "barcodeengine.h"
 #include "System/databasemanager.h"
+#include "System/expensesmodel.h"
+#include "System/incomemodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,12 +16,17 @@ int main(int argc, char *argv[])
     BarcodeEngine barcodeEngine;
     AndroidSystem sytstem;
     DatabaseManager databaseManager;
+    ExpensesModel expenseModel;
+    IncomeModel incomeModel;
 
     engine.rootContext()->setContextProperty("Android",&sytstem);
     engine.rootContext()->setContextProperty("databaseManager", &databaseManager);
     engine.rootContext()->setContextProperty("productFilterModel", databaseManager.getProxyModel());
+    engine.rootContext()->setContextProperty("expenseModel", &expenseModel);
+    engine.rootContext()->setContextProperty("incomeModel", &incomeModel);
     qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
     qmlRegisterSingletonType(QUrl("qrc:/UI/Stock/SalesModel.qml"), "SalesModel", 1, 0, "SalesModel");
+
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,

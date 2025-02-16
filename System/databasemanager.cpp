@@ -325,6 +325,73 @@ ProductFilterProxyModel *DatabaseManager::getProxyModel() const
     return proxyModel;
 }
 /**
+ * @brief DatabaseManager::setUpExpenceTable
+ * this function implement the creation of expence table
+ */
+void DatabaseManager::setUpExpenceTable()
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("salesmate.db");
+
+    if(!db.open()) {
+        qDebug() << "failed to open the database: " << db.lastError().text();
+        return;
+    }
+    qDebug() << "Database Opened Succefully:";
+    QSqlQuery query;
+
+    QString createTable = R"(
+        CREATE TABLE IF NOT EXISTS expences (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source TEXT NOT NULL,
+            date DATE UNIQUE NOT NULL,
+            cost REAL NOT NULL,
+            discription TEXT NOT NULL
+        )
+    )";
+    if(!query.exec(createTable)) {
+        qDebug() << "Faild to create table: " << db.lastError().text();
+        return;
+    }
+    qDebug() << " Expence Table Created Succefully:";
+
+}
+/**
+ * @brief DatabaseManager::setUpIncomeTable
+ * this function set up the netincome table
+ */
+void DatabaseManager::setUpIncomeTable()
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("salesmate.db");
+
+    if(!db.open()) {
+        qDebug() << "failed to open the database: " << db.lastError().text();
+        return;
+    }
+    qDebug() << "Database Opened Succefully:";
+    QSqlQuery query;
+
+    QString createTable = R"(
+        CREATE TABLE IF NOT EXISTS netincome (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sku TEXT NOT NULL,
+            source TEXT NOT NULL,
+            date DATE UNIQUE NOT NULL,
+            quantity INTEGER NOT NULL,
+            unitprice REAL NOT NULL,
+            totalprice REAL NOT NULL,
+            discription TEXT NOT NULL
+        )
+    )";
+    if(!query.exec(createTable)) {
+        qDebug() << "Faild to create table: " << db.lastError().text();
+        return;
+    }
+    qDebug() << " Netincome Table Created Succefully:";
+
+}
+/**
  * @brief DatabaseManager::queryDatabase
  * @param sku
  * @return produnt

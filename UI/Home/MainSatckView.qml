@@ -8,6 +8,11 @@ StackView {
     anchors.fill: parent
     initialItem: "HomePage.qml"
     Keys.onBackPressed: {
+        if(stackView.depth > 1) {
+            stackView.pop()
+        } else {
+            Qt.quit()
+        }
 
     }
 }

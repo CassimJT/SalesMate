@@ -40,6 +40,9 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     ProductFilterProxyModel *getProxyModel() const;
 
+    void setUpExpenceTable();
+    void setUpIncomeTable();
+
 public slots:
     //
     Product *queryDatabase(const QString &sku);

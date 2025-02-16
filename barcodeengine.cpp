@@ -61,41 +61,39 @@ void BarcodeEngine::setVideoSink(QVideoSink *sink)
  */
 void BarcodeEngine::processImage(QImage preview)
 {
-    // Define scanner area dimensions relative to the input image
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+    // Step 1: Calculate crop rectangle
     const qreal parentWidth = preview.width();
     const qreal parentHeight = preview.height();
     const qreal barCodeWidth = parentWidth * 0.9;
     const qreal barcodeHeight = 142;
 
-    // Step 1: Calculate crop rectangle
     QRect cropRect;
-
-    // Calculate crop rectangle dimensions, enforcing minimum width and height
     int cropWidth = (barCodeWidth / parentWidth * preview.width());
     int cropHeight = (barcodeHeight / parentHeight * preview.height());
-
-    // Set the crop rectangle and center it
     cropRect.setWidth(cropWidth);
     cropRect.setHeight(cropHeight);
-    cropRect.moveCenter(QPoint(preview.width() / 2, preview.height() / 2)); // Center the crop area
+    cropRect.moveCenter(QPoint(preview.width() / 2, preview.height() / 2));
+
+    qDebug() << "Crop rectangle:" << cropRect;
+
     // Step 2: Crop the image
     preview = preview.copy(cropRect);
 
-    // Step 3: Resize the image if still too small after cropping
-    /* if (preview.width() < 800 || preview.height() < 200) {
-        preview = preview.scaled(800, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    }*/
+    qDebug() << "Processing cropped image - Height:" << preview.height() << "Width:" << preview.width();
 
-    qDebug() << "Processing cropped and resized image - Height:" << preview.height() << "Width:" << preview.width();
+    // Step 3: Resize the image (optional, for performance)
+    preview = preview.scaled(640, 480, Qt::KeepAspectRatio);
 
-    // Step 4: Convert image to grayscale if not already
-    if(preview.format() != QImage::Format_Grayscale8) {
+    // Step 4: Convert image to grayscale
+    if (preview.format() != QImage::Format_Grayscale8) {
         preview = preview.convertToFormat(QImage::Format_Grayscale8);
     }
-    //preview = sharpenImage(preview);
-    //preview = adjustBrightnessAndContrast(preview);
 
-    // Step 5: Wrap QImage data into ZXing::ImageView
+    // Step 5: Apply thresholding (optional)
+   // preview = preview.convertToFormat(QImage::Format_Mono);
+    // Step 6: Wrap QImage data into ZXing::ImageView
     ZXing::ImageView imageView(
         preview.bits(),
         preview.width(),
@@ -103,10 +101,10 @@ void BarcodeEngine::processImage(QImage preview)
         ZXing::ImageFormat::Lum // Grayscale format
         );
 
-    // Step 6: Set decoding hints
+    // Step 7: Set decoding hints
     ZXing::DecodeHints hints;
-    hints.setTryHarder(true); // Maximize decoding effort
-    hints.setFormats(ZXing::BarcodeFormat::EAN13 | ZXing::BarcodeFormat::EAN8 | ZXing::BarcodeFormat::UPCA); // Focus on expected formats
+    hints.setTryHarder(false); // Disable TryHarder for faster decoding
+    hints.setFormats(ZXing::BarcodeFormat::EAN13 | ZXing::BarcodeFormat::EAN8 | ZXing::BarcodeFormat::UPCA);
 
     // Step 7: Decode the barcode
     ZXing::Result result = ZXing::ReadBarcode(imageView, hints);
@@ -119,6 +117,10 @@ void BarcodeEngine::processImage(QImage preview)
     } else {
         qDebug() << "No barcode detected.";
     }
+
+    auto endTime = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+    qDebug() << "Processing time:" << duration << "ms";
 }
 /**
  * @brief BarcodeEngine::getBarcode
