@@ -19,7 +19,7 @@ class ExpensesModel : public QAbstractListModel
         source = Qt::UserRole + 1,
         date,
         cost,
-        discription
+        description
     };
 
 public:

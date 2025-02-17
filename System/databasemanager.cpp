@@ -224,17 +224,57 @@ void DatabaseManager::removeProduct(const QString &sku)
  */
 void DatabaseManager::processSales(const QVariantList &sales)
 {
-    //
-    for(const QVariant &data: sales) {
+    // Start a transaction
+    QSqlDatabase::database().transaction();
+
+    for (const QVariant &data : sales) {
         QVariantMap map = data.toMap();
         QString sku = map["sku"].toString();
-        int quantity = map["quantity"].toInt();
-        qDebug()<<"sku: " << sku << "quantity: "<< quantity;
-        //processin comes here
+        int soldQuantity = map["quantity"].toInt();
+
+        qDebug() << "Processing SKU:" << sku << "Sold Quantity:" << soldQuantity;
+
+        // Step 1: Fetch the current quantity from the database
+        int currentQuantity = quaryQuantity(sku);
+
+        if (currentQuantity == -1) {
+            qDebug() << "SKU not found in database:" << sku;
+            continue; // Skip to the next sale if SKU is not found
+        }
+
+        // Step 2: Calculate the new quantity
+        int newQuantity = currentQuantity - soldQuantity;
+
+        if (newQuantity < 0) {
+            qDebug() << "Insufficient stock for SKU:" << sku;
+            continue; // Skip to the next sale if stock is insufficient
+        }
+
+        // Step 3: Update the database with the new quantity
+        QSqlQuery updateQuery;
+        updateQuery.prepare("UPDATE products SET quantity = :newQuantity WHERE sku = :sku");
+        updateQuery.bindValue(":newQuantity", newQuantity);
+        updateQuery.bindValue(":sku", sku);
+
+        if (!updateQuery.exec()) {
+            qDebug() << "Database update error:" << updateQuery.lastError().text();
+
+            // Rollback the transaction on error
+            QSqlDatabase::database().rollback();
+            return; // Exit the function if the update fails
+        }
+
+        qDebug() << "Updated SKU:" << sku << "New Quantity:" << newQuantity;
     }
 
+    // Commit the transaction if all updates succeed
+    if (!QSqlDatabase::database().commit()) {
+        qDebug() << "Failed to commit transaction:" << QSqlDatabase::database().lastError().text();
+        QSqlDatabase::database().rollback(); // Rollback if commit fails
+    } else {
+        qDebug() << "All sales processed successfully!";
+    }
 }
-
 QHash<int, QByteArray> DatabaseManager::roleNames() const
 {
     QHash<int, QByteArray> roles;

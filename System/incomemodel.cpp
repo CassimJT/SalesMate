@@ -34,8 +34,8 @@ QVariant IncomeModel::data(const QModelIndex &index, int role) const
         return income.unitprice();
     case totalprice:
         return income.totalprice();
-    case disciption:
-        return income.disciption();
+    case desciption:
+        return income.description();
     case source:
         return income.source();
     default:
@@ -53,38 +53,48 @@ QVariant IncomeModel::data(const QModelIndex &index, int role) const
  * @param source
  * this function add income generated to the table
  */
-void IncomeModel::addIncome(const QString &sku, const QDate &date, int quantity, qreal unitprice, qreal totalprice, const QString &discription, const QString &source)
+void IncomeModel::addIncome(const QString &sku, const QDate &date, int quantity, qreal unitprice, qreal totalprice, const QString &description, const QString &source)
 {
-    //....
-    auto m_netIncome = new Income(this);
-    m_netIncome->setSku(sku);
-    m_netIncome->setDate(date);
-    m_netIncome->setQuantity(quantity);
-    m_netIncome->setUnitprice(unitprice);
-    m_netIncome->setTotalprice(totalprice);
-    m_netIncome->setDisciption(discription);
-    m_netIncome->setSource(source);
+    auto income = QSharedPointer<Income>::create(this);
+    income->setSku(sku);
+    income->setDate(date);
+    income->setQuantity(quantity);
+    income->setUnitprice(unitprice);
+    income->setTotalprice(totalprice);
+    income->setDescription(description);
+    income->setSource(source);
 
     QSqlQuery query;
-    query.prepare(R"(INSERT INTO netincome (sku,source,date,quantity,unitprice,totalprice,disciption)
-                        VALUES(:sku,:source,:date,:quantity,:unitprice,:totalprice,:disciption)
-                    )");
+    query.prepare(R"(
+        INSERT INTO netincome (sku, source, date, quantity, unitprice, totalprice, description)
+        VALUES (:sku, :source, :date, :quantity, :unitprice, :totalprice, :description)
+    )");
 
-    if(!query.exec()) {
+    query.bindValue(":sku", sku);
+    query.bindValue(":source", source);
+    query.bindValue(":date", date);
+    query.bindValue(":quantity", quantity);
+    query.bindValue(":unitprice", unitprice);
+    query.bindValue(":totalprice", totalprice);
+    query.bindValue(":description", description);
+
+    if (!query.exec()) {
         QSqlError error = query.lastError();
-        qDebug()<<"Faild to add income: "; error.text();
-        if(error.databaseText().contains("UNIQUE",Qt::CaseInsensitive)) {
-            //...
-            qDebug() <<"Unique constain violated";
+        qDebug() << "Failed to add income:" << error.text();
+        if (error.databaseText().contains("UNIQUE", Qt::CaseInsensitive)) {
+            qDebug() << "Unique constraint violated";
             emit incomeExist();
-            return;
         }
+
+        return;
     }
-    //emit a signal if data is added suscessifuly
-    emit incomeAdded();
+
     beginResetModel();
-    netIncome.append(QSharedPointer<Income>::create(m_netIncome));
+    netIncome.append(income);
     endResetModel();
+
+    // Emit the signal after the model is updated
+    emit incomeAdded();
 }
 /**
  * @brief IncomeModel::roleNames
@@ -98,7 +108,7 @@ QHash<int, QByteArray> IncomeModel::roleNames() const
         roles[quantity] = "Quantity",
         roles[unitprice] = "UnitPrice",
         roles[totalprice] = "TotalPrice",
-        roles[disciption] = "Disciption",
+        roles[desciption] = "Desciption",
         roles[source] = "Source";
     return roles;
 }

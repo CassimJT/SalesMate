@@ -69,7 +69,7 @@ void Expense::setCost(qreal newCost)
  * @brief Expense::discription
  * @return the brief discription / resaon for the expense
  */
-QString Expense::discription() const
+QString Expense::description() const
 {
     return m_discription;
 }
@@ -78,10 +78,10 @@ QString Expense::discription() const
  * @param newDiscription
  * set the discription / reson for the expense made
  */
-void Expense::setDiscription(const QString &newDiscription)
+void Expense::setDescription(const QString &newDiscription)
 {
     if (m_discription == newDiscription)
         return;
     m_discription = newDiscription;
-    emit discriptionChanged();
+    emit descriptionChanged();
 }

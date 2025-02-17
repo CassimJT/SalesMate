@@ -12,7 +12,7 @@ class Expense : public QObject
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged FINAL)
     Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged FINAL)
     Q_PROPERTY(qreal cost READ getCost WRITE setCost NOTIFY costChanged FINAL)
-    Q_PROPERTY(QString discription READ discription WRITE setDiscription NOTIFY discriptionChanged FINAL)
+    Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged FINAL)
 public:
     explicit Expense(QObject *parent = nullptr);
     QString source() const;
@@ -24,8 +24,8 @@ public:
     qreal getCost() const;
     void setCost(qreal newCost);
 
-    QString discription() const;
-    void setDiscription(const QString &newDiscription);
+    QString description() const;
+    void setDescription(const QString &newDiscription);
 
 public slots:
     //slots
@@ -37,7 +37,7 @@ signals:
 
     void costChanged();
 
-    void discriptionChanged();
+    void descriptionChanged();
 
 private:
     QString m_source;

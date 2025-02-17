@@ -90,7 +90,7 @@ void Income::setTotalprice(qreal newTotalprice)
  * @brief Income::disciption
  * @return the description of the item sold
  */
-QString Income::disciption() const
+QString Income::description() const
 {
     return m_disciption;
 }
@@ -99,12 +99,12 @@ QString Income::disciption() const
  * @param newDisciption
  * set a simple item discription of what was sold e.g discounts
  */
-void Income::setDisciption(const QString &newDisciption)
+void Income::setDescription(const QString &newDisciption)
 {
     if (m_disciption == newDisciption)
         return;
     m_disciption = newDisciption;
-    emit disciptionChanged();
+    emit descriptionChanged();
 }
 /**
  * @brief Income::source

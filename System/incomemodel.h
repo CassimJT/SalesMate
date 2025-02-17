@@ -19,7 +19,7 @@ class IncomeModel : public QAbstractListModel
         quantity,
         unitprice,
         totalprice,
-        disciption,
+        desciption,
         source
     };
 

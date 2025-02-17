@@ -49,8 +49,8 @@ QVariant ExpensesModel::data(const QModelIndex &index, int role) const
         return expense.source();
     case cost:
         return expense.getCost();
-    case discription:
-        return expense.discription();
+    case description:
+        return expense.description();
     case date:
         return expense.date();
     default:
@@ -65,41 +65,43 @@ QVariant ExpensesModel::data(const QModelIndex &index, int role) const
  * @param discription
  * this function adds entries(expenses) in the database
  */
-void ExpensesModel::addExpence(const QString &source, const QDate &date, qreal cost, const QString &discription)
+void ExpensesModel::addExpence(const QString &source, const QDate &date, qreal cost, const QString &description)
 {
-    //......
-    auto expence = new Expense(this);
-    expence->setSource(source);
-    expence->setDate(date);
-    expence->setCost(cost);
-    expence->setDiscription(discription);;
+    // Create a new Expense object
+    auto expense = QSharedPointer<Expense>::create(this);
+    expense->setSource(source);
+    expense->setDate(date);
+    expense->setCost(cost);
+    expense->setDescription(description);
 
     QSqlQuery query;
-    query.prepare(R"(INSERT INTO  expences (source,date,cost,expences)
-                    VALUES(:source,:date,:cost,:expences)
-                )");
+    query.prepare(R"(
+        INSERT INTO expences (source, date, cost, description)
+        VALUES (:source, :date, :cost, :description)
+    )");
 
-    query.bindValue(":source",source);
-    query.bindValue(":date",date);
-    query.bindValue(":cost",cost);
-    query.bindValue(":discription",discription);
+    query.bindValue(":source", source);
+    query.bindValue(":date", date);
+    query.bindValue(":cost", cost);
+    query.bindValue(":description", description);
 
-    if(!query.exec()) {
+    if (!query.exec()) {
         QSqlError error = query.lastError();
-        qDebug() <<"Faild to add Expense: "; error.text();
-        if(error.databaseText().contains("UNIQUE",Qt::CaseInsensitive)) {
-            qDebug() << "Unique Constraits violated";
-            emit expenseExist();
+        qDebug() << "Failed to add Expense:" << error.text();
 
-            return;
+        if (error.databaseText().contains("UNIQUE", Qt::CaseInsensitive)) {
+            qDebug() << "Unique constraint violated";
+            emit expenseExist();
         }
+
+        return;
     }
-    //emit a signal
-    emit expenseAdded();
+
     beginResetModel();
-    expenses.append(QSharedPointer<Expense>::create(expence));
+    expenses.append(expense);
     endResetModel();
 
+    emit expenseAdded();
 }
 
 QHash<int, QByteArray> ExpensesModel::roleNames() const
@@ -108,6 +110,6 @@ QHash<int, QByteArray> ExpensesModel::roleNames() const
     roles[source] = "Source",
         roles[date] = "Date",
         roles[cost] = "Cost",
-        roles[discription] = "discription";
+        roles[description] = "description";
     return roles;
 }
