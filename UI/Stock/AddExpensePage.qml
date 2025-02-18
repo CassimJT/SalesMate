@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../Utils"
+import "../Utils/Utils.js" as Utils
 
 Page {
     id: addExpensesPage
@@ -32,13 +33,25 @@ Page {
                 font.pixelSize: 16
             }
             //source
+            DirectionalText{
+                id: sourceDirection
+                visible: source.currentIndex === -1
+                directionalText: "Source cannot be empty"
+            }
+
             ComboBox {
                 id: source
                 Layout.fillWidth: true
-                model: ["Transport","Electricity","Rent","City","Other"]
+                currentIndex: -1
+                popup.width: parent.width / 2
+                model: ["Transport", "Electricity", "Rent", "City", "Groceries", "Internet", "Phone", "Insurance", "Other"]
             }
-
             //Other Sources
+            DirectionalText{
+                id: otherDirection
+                visible: other.text === "" &&  source.currentText === "Other"
+                directionalText: "Other sources cannot be empty"
+            }
             TextField {
                 id: other
                 placeholderText: "Other(Please Spesify)"
@@ -47,6 +60,11 @@ Page {
             }
 
             //Amount
+            DirectionalText{
+                id: amountDirection
+                visible: amountField.text === ""
+                directionalText : "Amount cannot be empty"
+            }
             TextField {
                 id: amountField
                 placeholderText: "Amount"
@@ -54,12 +72,16 @@ Page {
                 inputMethodHints: Qt.ImhDigitsOnly
             }
 
-
+            DirectionalText{
+                id: dateDirection
+                visible: dateField.text === ""
+                directionalText: "Date cannot be empty"
+            }
             TextField {
                 id: dateField
                 placeholderText: "YYYY-MM-DD"
                 Layout.fillWidth: true
-
+                text: Utils.getCurrentDate();
                 // Limit input to numbers and dashes
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
 
@@ -81,14 +103,38 @@ Page {
                     }
                 }
             }
-            //textline for discription
+            Text {
+                id: characterCounter
+                text: "50 characters remaining"
+                font.pixelSize: 12
+                color: "gray"
+            }
+            DirectionalText{
+                id: descriptionDirection
+                visible: false
+            }
             TextArea {
                 id: descriptionField
-                placeholderText: "Description (Max: 150 characters)"
+                placeholderText: "Description"
+                property int max_length: 50
                 Layout.fillWidth: true
-                Layout.preferredHeight: parent.height * 0.4
-                wrapMode: TextArea.WordWrap
+                Layout.preferredHeight: parent.height * 0.25
+                Layout.preferredWidth: parent.width
+                wrapMode: TextArea.Wrap
                 font.pixelSize: 14
+
+                onTextChanged: {
+                    limitCharacters(descriptionField, max_length);
+                    characterCounter.text = (max_length - descriptionField.length) + " characters remaining";
+                }
+
+                function limitCharacters(textArea, maxLength) {
+                    if (textArea.length > maxLength) {
+                        var cursorPosition = textArea.cursorPosition;
+                        textArea.text = textArea.text.substring(0, maxLength);
+                        textArea.cursorPosition = Math.min(cursorPosition, maxLength);
+                    }
+                }
             }
             CustomButton {
                 id: save
@@ -98,11 +144,69 @@ Page {
                 // btnIconSrc: "qrc:/Asserts/icons/cart.png"
                 btnText: "Save"
                 onBtnClicked: {
-                    console.log("Clicked")
+                    const e_source = source.currentText;
+                    const other_source = other.text;
+                    const cost = amountField.text
+                    let date = Utils.convertToDate(dateField.text)
+                    const description = descriptionField.text
+
+                    if ( source.currentText === "Other") {
+                        if(source.currentIndex !== -1
+                                && other.text !== ""
+                                && amountField.text !== ""
+                                && dateField.text !== ""){
+                            console.log("Oky with other")
+                            //...
+                        }
+                    }else {
+                        if(source.currentIndex !== -1
+                                && amountField.text !== ""
+                                && dateField.text !== ""){
+                            console.log("Oky with no other")
+                            //...
+                        }
+                    }
                 }
             }
-
         }
+    }
+    //information: success
+    InfoPopup {
+        id: successPopup
+        iconSource: "qrc:/Asserts/icons/success.gif"
+        message: qsTr("Stock added successfully")
+        buttonText: qsTr("Okay")
+        onClicked: {
+            reset();
+            successPopup.close();
+        }
+    }
+    //information: error
+    InfoPopup {
+        id:error
+        iconSource: "qrc:/Asserts/icons/icons8-error.gif"
+        message: qsTr("Product Already Exist")
+        buttonText: qsTr("Okay")
+        onClicked: {
+            reset();
+            error.close();
+        }
+    }
 
+    function reset(){
+        source.currentIndex = -1
+        other.text = ""
+        amountField.text = ""
+        descriptionField.text = ""
+    }
+
+    Connections {
+        target: expenseModel
+        onExpenseAdded: {
+            //...
+        }
+        onExpenseExist: {
+            //...
+        }
     }
 }

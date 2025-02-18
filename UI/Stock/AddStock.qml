@@ -120,7 +120,7 @@ Page {
 
                 // Set the current date on component initialization
                 Component.onCompleted: {
-                    text = Utils.getCurrentDate(); // Use the function to set the date
+                    text = Utils.getCurrentDate();
                 }
 
                 onTextChanged: {
@@ -173,7 +173,6 @@ Page {
 
                     // Add entry to the database
                     databaseManager.addProductToDatabase(name, sku, quantity, price);
-                    // Clear fields after saving
                 }
             }
         }
@@ -207,6 +206,7 @@ Page {
         message: qsTr("Product Already Exist")
         buttonText: qsTr("Okay")
         onClicked: {
+            //clear field
             reset();
             error.close();
         }

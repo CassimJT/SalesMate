@@ -5,6 +5,17 @@ function getCurrentDate() {
     const day = String(currentDate.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`; // Return the formatted date
 }
+//conveting a string to Date
+function convertToDate(dateString) {
+    let parts = dateString.split("-");
+    let year = parseInt(parts[0], 10);
+    let month = parseInt(parts[1], 10) - 1; // Adjust for zero-based months
+    let day = parseInt(parts[2], 10);
+    let jsDate = new Date(year, month, day);
+    // Formating manually to prevent UTC shift
+    let formattedDate = `${jsDate.getFullYear()}-${String(jsDate.getMonth() + 1).padStart(2, "0")}-${String(jsDate.getDate()).padStart(2, "0")}`;
+    return formattedDate;
+}
 
 //get icon source
 

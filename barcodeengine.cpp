@@ -103,7 +103,7 @@ void BarcodeEngine::processImage(QImage preview)
 
     // Step 7: Set decoding hints
     ZXing::DecodeHints hints;
-    hints.setTryHarder(false); // Disable TryHarder for faster decoding
+    hints.setTryHarder(true); // Disable TryHarder for faster decoding
     hints.setFormats(ZXing::BarcodeFormat::EAN13 | ZXing::BarcodeFormat::EAN8 | ZXing::BarcodeFormat::UPCA);
 
     // Step 7: Decode the barcode
