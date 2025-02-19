@@ -381,14 +381,14 @@ void DatabaseManager::setUpExpenceTable()
     QSqlQuery query;
 
     QString createTable = R"(
-        CREATE TABLE IF NOT EXISTS expences (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            source TEXT NOT NULL,
-            date DATE UNIQUE NOT NULL,
-            cost REAL NOT NULL,
-            discription TEXT NOT NULL
-        )
-    )";
+    CREATE TABLE IF NOT EXISTS expences (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source TEXT NOT NULL,
+        date TEXT NOT NULL,
+        cost REAL NOT NULL,
+        description TEXT NOT NULL
+    )
+)";
     if(!query.exec(createTable)) {
         qDebug() << "Faild to create table: " << db.lastError().text();
         return;
@@ -417,11 +417,11 @@ void DatabaseManager::setUpIncomeTable()
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             sku TEXT NOT NULL,
             source TEXT NOT NULL,
-            date DATE UNIQUE NOT NULL,
+            date TEXT  NOT NULL,
             quantity INTEGER NOT NULL,
             unitprice REAL NOT NULL,
             totalprice REAL NOT NULL,
-            discription TEXT NOT NULL
+            description TEXT NOT NULL
         )
     )";
     if(!query.exec(createTable)) {

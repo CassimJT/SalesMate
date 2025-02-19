@@ -6,6 +6,7 @@ ExpensesModel::ExpensesModel(QObject *parent)
 {
     //constractor
     databaseManager.setUpExpenceTable();
+    updateView();
 }
 
 QVariant ExpensesModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -73,6 +74,9 @@ void ExpensesModel::addExpence(const QString &source, const QDate &date, qreal c
     expense->setDate(date);
     expense->setCost(cost);
     expense->setDescription(description);
+    //..
+    QString formattedDate = date.toString(Qt::ISODate); //formating Date
+
 
     QSqlQuery query;
     query.prepare(R"(
@@ -81,7 +85,7 @@ void ExpensesModel::addExpence(const QString &source, const QDate &date, qreal c
     )");
 
     query.bindValue(":source", source);
-    query.bindValue(":date", date);
+    query.bindValue(":date", formattedDate);
     query.bindValue(":cost", cost);
     query.bindValue(":description", description);
 
@@ -112,4 +116,23 @@ QHash<int, QByteArray> ExpensesModel::roleNames() const
         roles[cost] = "Cost",
         roles[description] = "description";
     return roles;
+}
+
+void ExpensesModel::updateView()
+{
+    beginResetModel();
+    expenses.clear();
+
+    QSqlQuery query("SELECT id, source, date, cost, description FROM expences");
+    while (query.next()) {
+        auto expense = QSharedPointer<Expense>::create(this);
+        expense->setSource(query.value(1).toString());
+        expense->setDate(QDate::fromString(query.value(2).toString(), "yyyy-MM-dd"));
+        expense->setCost(query.value(3).toDouble());
+        expense->setDescription(query.value(4).toString());
+
+        expenses.append(expense);
+    }
+
+    endResetModel();
 }

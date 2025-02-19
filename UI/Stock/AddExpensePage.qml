@@ -146,7 +146,7 @@ Page {
                 onBtnClicked: {
                     const e_source = source.currentText;
                     const other_source = other.text;
-                    const cost = amountField.text
+                    const cost = parseFloat(amountField.text)
                     let date = Utils.convertToDate(dateField.text)
                     const description = descriptionField.text
 
@@ -157,6 +157,7 @@ Page {
                                 && dateField.text !== ""){
                             console.log("Oky with other")
                             //...
+                            expenseModel.addExpence(other_source,date,cost,description)
                         }
                     }else {
                         if(source.currentIndex !== -1
@@ -164,6 +165,7 @@ Page {
                                 && dateField.text !== ""){
                             console.log("Oky with no other")
                             //...
+                            expenseModel.addExpence(e_source,date,cost,description)
                         }
                     }
                 }
@@ -174,7 +176,7 @@ Page {
     InfoPopup {
         id: successPopup
         iconSource: "qrc:/Asserts/icons/success.gif"
-        message: qsTr("Stock added successfully")
+        message: qsTr("Expence Saved")
         buttonText: qsTr("Okay")
         onClicked: {
             reset();
@@ -185,10 +187,9 @@ Page {
     InfoPopup {
         id:error
         iconSource: "qrc:/Asserts/icons/icons8-error.gif"
-        message: qsTr("Product Already Exist")
+        message: qsTr("Expense already saved")
         buttonText: qsTr("Okay")
         onClicked: {
-            reset();
             error.close();
         }
     }
@@ -204,9 +205,11 @@ Page {
         target: expenseModel
         onExpenseAdded: {
             //...
+            successPopup.open()
         }
         onExpenseExist: {
             //...
+            error.open()
         }
     }
 }

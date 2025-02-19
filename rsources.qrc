@@ -68,5 +68,6 @@
         <file>Asserts/icons/barcode-scan-green.png</file>
         <file>Asserts/icons/icons8-search-green.png</file>
         <file>Asserts/icons/touch-green.png</file>
+        <file>Asserts/icons/statistics-100.png</file>
     </qresource>
 </RCC>

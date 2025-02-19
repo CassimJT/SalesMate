@@ -44,6 +44,7 @@ private:
     QVector<QSharedPointer<Expense>> expenses;
     QHash<int, QByteArray> roleNames() const override;
     DatabaseManager databaseManager;
+    void updateView();
 
 };
 

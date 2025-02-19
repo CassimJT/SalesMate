@@ -84,6 +84,7 @@ qt_add_qml_module(appSalesMate
                 SOURCES System/expensesmodel.h System/expensesmodel.cpp
                 SOURCES System/expense.h System/expense.cpp
                 SOURCES System/income.h System/income.cpp
+                QML_FILES UI/Satatistics/Statistics.qml
 
 
 
