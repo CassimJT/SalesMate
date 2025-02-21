@@ -8,6 +8,12 @@ IncomeModel::IncomeModel(QObject *parent)
     databaseManager.setUpIncomeTable();
 }
 
+IncomeModel::~IncomeModel()
+{
+    //clearing memory
+    netIncome.clear();
+}
+
 int IncomeModel::rowCount(const QModelIndex &parent) const
 {
     // For list models only the root node (an invalid parent) should return the list's size. For all

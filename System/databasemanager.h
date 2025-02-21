@@ -28,6 +28,7 @@ class DatabaseManager : public QAbstractListModel
 
 public:
     explicit DatabaseManager(QObject *parent = nullptr);
+    ~DatabaseManager();
 
     // Header:
     QVariant headerData(int section,
@@ -59,7 +60,7 @@ signals:
     void productAlreadyExist();//for updating
 
 private:
-    QVector<Product*> products;
+    QVector<QSharedPointer<Product>> products;
     QHash<int,QByteArray> roleNames() const override;
     QHash<QString, QSharedPointer<Product>> productMap;
     void setUpDatabase();

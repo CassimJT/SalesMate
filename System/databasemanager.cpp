@@ -25,6 +25,25 @@ DatabaseManager::DatabaseManager(QObject *parent)
 
 }
 
+DatabaseManager::~DatabaseManager()
+{
+    qDebug() << "Closing database connection...";
+
+    // Get database connection name
+    QString connectionName = QSqlDatabase::database().connectionName();
+
+    // Close the database connection
+    QSqlDatabase::database().close();
+
+    // Remove the connection from the database pool
+    QSqlDatabase::removeDatabase(connectionName);
+
+    // Clear dynamically allocated resources
+    products.clear();
+    productMap.clear();
+    qDebug() << "Database connection closed.";
+}
+
 QVariant DatabaseManager::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
@@ -54,8 +73,9 @@ int DatabaseManager::rowCount(const QModelIndex &parent) const
 
 QVariant DatabaseManager::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= products.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= products.size()) {
         return QVariant();
+    }
 
     const Product &product = *products.at(index.row());
 
@@ -103,7 +123,7 @@ float DatabaseManager::queryPriceFromDatabase(const QString &sku)
  */
 void DatabaseManager::addProductToDatabase(const QString &name, const QString &sku, int quantity, float price)
 {
-    auto product = new Product(this);
+    auto product = QSharedPointer<Product>::create(this);
     product->setName(name);
     product->setSku(sku);
     product->setQuantity(quantity);
@@ -134,7 +154,7 @@ void DatabaseManager::addProductToDatabase(const QString &name, const QString &s
     // Update the model
     beginInsertRows(QModelIndex(), products.size(), products.size());
     products.append(product);
-    productMap.insert(sku, QSharedPointer<Product>::create(product));
+    productMap.insert(sku, product);
     endInsertRows();
 }
 /**
@@ -329,7 +349,7 @@ void DatabaseManager::updateView() {
 
     QSqlQuery query("SELECT name, sku, quantity, price FROM products");
     while (query.next()) {
-        auto product = new Product(this);
+        auto product = QSharedPointer<Product>::create(this);
         product->setName(query.value(0).toString());
         product->setSku(query.value(1).toString());
         product->setQuantity(query.value(2).toInt());

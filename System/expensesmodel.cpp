@@ -9,6 +9,12 @@ ExpensesModel::ExpensesModel(QObject *parent)
     updateView();
 }
 
+ExpensesModel::~ExpensesModel()
+{
+    //clearing memory
+    expenses.clear();
+}
+
 QVariant ExpensesModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     // FIXME: Implement me!

@@ -25,6 +25,8 @@ class IncomeModel : public QAbstractListModel
 
 public:
     explicit IncomeModel(QObject *parent = nullptr);
+    ~IncomeModel();
+
 
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;

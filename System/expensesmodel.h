@@ -24,6 +24,7 @@ class ExpensesModel : public QAbstractListModel
 
 public:
     explicit ExpensesModel(QObject *parent = nullptr);
+    ~ExpensesModel();
 
     // Header:
     QVariant headerData(int section,

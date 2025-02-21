@@ -43,7 +43,9 @@ Page {
                 id: source
                 Layout.fillWidth: true
                 currentIndex: -1
+                editable: true
                 popup.width: parent.width / 2
+                popup.x: width - popup.width
                 model: ["Transport", "Electricity", "Rent", "City", "Groceries", "Internet", "Phone", "Insurance", "Other"]
             }
             //Other Sources
