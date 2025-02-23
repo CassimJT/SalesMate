@@ -8,9 +8,24 @@ import QtCore
 Page {
     id: addOtherIncomePage
     objectName: "Other Income"
-    Settings {
-        id: settings
 
+    ListModel {
+        id: serviceModel
+        //default values
+        ListElement { name: "Printing"; sku: "p-0001"; servicePrice: "100"; itemPrice: "50" }
+        ListElement { name: "Photocopying"; sku: "p-0002"; servicePrice: "50"; itemPrice: "50" }
+        ListElement { name: "Laminating"; sku: "l-0001"; servicePrice: "200"; itemPrice: "800" }
+        ListElement { name: "Graphics"; sku: "g-0001"; servicePrice: "0"; itemPrice: "0" }
+        ListElement { name: "Binding"; sku: "b-0001"; servicePrice: "0"; itemPrice: "800" }
+        ListElement { name: "Scanning"; sku: "s-0001"; servicePrice: "400"; itemPrice: "0" }
+        ListElement { name: "Typing"; sku: "t-0001"; servicePrice: "400"; itemPrice: "0" }
+        ListElement { name: "Photo Printing"; sku: "p-0003"; servicePrice: "0"; itemPrice: "0" }
+        ListElement { name: "ID Photo Printing"; sku: "p-0004"; servicePrice: "0"; itemPrice: "0" }
+        ListElement { name: "Business Card Printing"; sku: "p-0007"; servicePrice: "0"; itemPrice: "0" }
+    }
+
+    Settings {
+        id: serviceSetting
     }
 
     Flickable {
@@ -36,88 +51,132 @@ Page {
             }
 
             Label {
-                id: sourceLabel
                 text: qsTr("Income Source")
                 font.pixelSize: 16
             }
-            //Service type
+
             ComboBox {
                 id: serviceType
                 Layout.fillWidth: true
-                popup.width: parent.width * 0.6
-                popup.x: width - popup.width
                 editable: true
                 model: serviceModel
                 textRole: "name"
                 inputMethodHints: Qt.ImhSensitiveData
 
+                popup.width: parent.width * 0.6
+                popup.x: width - popup.width
+
                 onCurrentIndexChanged: {
                     if (currentIndex >= 0) {
                         code.text = serviceModel.get(currentIndex).sku;
+                        serviceprice.text = serviceModel.get(currentIndex).servicePrice
+                        itemeprice.text = serviceModel.get(currentIndex).itemPrice
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                spacing: 10
+
+                RoundButton {
+                    id: edit
+                    Layout.preferredWidth: 50
+                    Layout.preferredHeight: 50
+                    checkable: true
+
+                    Image {
+                        anchors.centerIn: parent
+                        width: 16
+                        height: 16
+                        source: edit.checked ? "qrc:/Asserts/icons/Edit-pink.png" : "qrc:/Asserts/icons/Edit.png"
+                        fillMode: Image.PreserveAspectFit
                     }
                 }
 
-                onEditTextChanged: {
-                    var found = false;
-                    for (var i = 0; i < serviceModel.count; i++) {
-                        if (serviceModel.get(i).name === editText) {
-                            found = true;
-                            currentIndex = i;
-                            break;
-                        }
+                RoundButton {
+                    id: addservice
+                    Layout.preferredWidth: 50
+                    Layout.preferredHeight: 50
+                    visible: edit.checked
+
+                    Image {
+                        anchors.centerIn: parent
+                        width: 16
+                        height: 16
+                        source: "qrc:/Asserts/icons/icons8-add-100.png"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                }
+            }
+            Pane {
+                Layout.fillWidth: true
+                visible: edit.checked
+
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10 // Added spacing for better readability
+                    Text {
+                        text: qsTr("Edit Prices") // Change this to your preferred text
+                        font.pixelSize: 16
                     }
 
-                    if (!found) {
-                        code.text = "G-0000"; // Default code when no match is found
-                        amountField.text = "";
-                    }
-                    /*
-                    // Auto-complete logic
-                    if (editText.length === 0) {
-                        return; // Avoid filtering on empty input
+                    TextField {
+                        id: serviceprice
+                        placeholderText: "Service Price"
+                        Layout.fillWidth: true
+                        inputMethodHints: Qt.ImhDigitsOnly
                     }
 
-                    for (var i = 0; i < serviceModel.count; i++) {
-                        var item = serviceModel.get(i).name.toLowerCase();
-                        var input = editText.toLowerCase();
+                    TextField {
+                        id: itemeprice
+                        placeholderText: "Item Price"
+                        Layout.fillWidth: true
+                        inputMethodHints: Qt.ImhDigitsOnly
+                    }
 
-                        if (item.startsWith(input)) {
-                            if (editText !== serviceModel.get(i).name) {
-                                editText = serviceModel.get(i).name; // Auto-complete with first match
-                                selectAll(); // Highlight the suggested part
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        spacing: 10
+                        RoundButton {
+                            id: deleteservice
+                            Layout.preferredWidth: 50
+                            Layout.preferredHeight: 50
+                            visible: edit.checked
+
+                            Image {
+                                anchors.centerIn: parent
+                                width: 16
+                                height: 16
+                                source: "qrc:/Asserts/icons/delete.png"
+                                fillMode: Image.PreserveAspectFit
                             }
-                            break;
                         }
-                    }*/
-                }
-            }
-            Image {
-                id: edit
-                source: "qrc:/Asserts/icons/Edit.png"
-                Layout.preferredWidth: 28
-                Layout.preferredHeight: 28
-                fillMode: Image.PreserveAspectFit
-                anchors{
-                    right: parent.right
+                        Button {
+                            id: savechanges
+                            text: qsTr("Save")
+                            //Layout.alignment: Qt.AlignRight // Ensures right alignment
+                        }
+                    }
                 }
             }
 
-            // Amount field (auto-filled)
             TextField {
                 id: amountField
                 placeholderText: "Amount"
-                Layout.preferredWidth: parent.width
+                Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 readOnly: true
+                visible: !edit.checked
             }
 
-            // Date input
             TextField {
                 id: dateField
                 placeholderText: "YYYY-MM-DD"
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
                 text: Utils.getCurrentDate()
+                visible: !edit.checked
 
                 onTextChanged: {
                     const validDateRegex = /^\d{0,4}(-\d{0,2}(-\d{0,2})?)?$/;
@@ -125,21 +184,14 @@ Page {
                         text = text.slice(0, -1);
                     }
                 }
-
-                onEditingFinished: {
-                    const fullDateRegex = /^\d{4}-\d{2}-\d{2}$/;
-                    if (!fullDateRegex.test(text)) {
-                        console.log("Invalid date format! Use YYYY-MM-DD.");
-                    }
-                }
             }
 
-            // Description input
             Text {
                 id: characterCounter
                 text: "50 characters remaining"
                 font.pixelSize: 12
                 color: "gray"
+                visible: !edit.checked
             }
 
             TextArea {
@@ -147,9 +199,10 @@ Page {
                 property int max_length: 50
                 placeholderText: "Description (Max: 50 characters)"
                 Layout.fillWidth: true
-                Layout.preferredHeight: parent.height * 0.3
+                Layout.preferredHeight: parent.height * 0.15
                 wrapMode: TextArea.WordWrap
                 font.pixelSize: 14
+                visible: !edit.checked
 
                 onTextChanged: {
                     limitCharacters(descriptionField, max_length);
@@ -165,44 +218,27 @@ Page {
                 }
             }
 
-            // SKU Code (auto-filled)
             TextField {
                 id: code
-                placeholderText: "Sku"
-                Layout.preferredWidth: parent.width
+                placeholderText: "SKU"
+                Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 readOnly: true
+                visible: !edit.checked
             }
 
-            // Save button
             CustomButton {
                 id: save
                 Layout.fillWidth: true
                 btnColor: "#4CAF50"
                 btnRadius: 5
                 btnText: "Save"
+                visible: !edit.checked
+
                 onBtnClicked: {
                     console.log("Clicked")
                 }
             }
         }
-    }
-
-    ListModel {
-
-        id: serviceModel
-        ListElement { name: "Printing"; sku: "p-0001"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Photocopying";  sku: "p-0002" ; servicePrice: "";itemPrice:""}
-        ListElement { name: "Laminating"; sku: "l-0001"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Graphics"; sku: "g-0001"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Binding"; sku: "b-0001"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Scanning"; sku: "s-0001"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Faxing"; sku: "f-0001"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Typing"; sku: "t-0001"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Photo Printing"; sku: "p-0003"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "ID Photo Printing"; sku: "p-0004"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "T-Shirt Printing"; sku: "p-0005"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Poster Printing"; sku: "p-0006"; servicePrice: "";itemPrice:"" }
-        ListElement { name: "Business Card Printing"; sku: "p-0007"; servicePrice: "";itemPrice:"" }
     }
 }
