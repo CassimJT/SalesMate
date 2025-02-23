@@ -3,10 +3,15 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../Utils"
 import "../Utils/Utils.js" as Utils
+import QtCore
 
 Page {
     id: addOtherIncomePage
     objectName: "Other Income"
+    Settings {
+        id: settings
+
+    }
 
     Flickable {
         id: flickable
@@ -84,6 +89,16 @@ Page {
                             break;
                         }
                     }*/
+                }
+            }
+            Image {
+                id: edit
+                source: "qrc:/Asserts/icons/Edit.png"
+                Layout.preferredWidth: 28
+                Layout.preferredHeight: 28
+                fillMode: Image.PreserveAspectFit
+                anchors{
+                    right: parent.right
                 }
             }
 
