@@ -174,19 +174,20 @@ Page {
     }
 
     ListModel {
+
         id: serviceModel
-        ListElement { name: "Printing"; sku: "p-0001" }
-        ListElement { name: "Photocopying";  sku: "p-0002" }
-        ListElement { name: "Laminating"; sku: "l-0001" }
-        ListElement { name: "Graphics"; sku: "g-0001" }
-        ListElement { name: "Binding"; sku: "b-0001" }
-        ListElement { name: "Scanning"; sku: "s-0001" }
-        ListElement { name: "Faxing"; sku: "f-0001" }
-        ListElement { name: "Typing"; sku: "t-0001" }
-        ListElement { name: "Photo Printing"; sku: "p-0003" }
-        ListElement { name: "ID Photo Printing"; sku: "p-0004" }
-        ListElement { name: "T-Shirt Printing"; sku: "p-0005" }
-        ListElement { name: "Poster Printing"; sku: "p-0006" }
-        ListElement { name: "Business Card Printing"; sku: "p-0007" }
+        ListElement { name: "Printing"; sku: "p-0001"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Photocopying";  sku: "p-0002" ; servicePrice: "";itemPrice:""}
+        ListElement { name: "Laminating"; sku: "l-0001"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Graphics"; sku: "g-0001"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Binding"; sku: "b-0001"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Scanning"; sku: "s-0001"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Faxing"; sku: "f-0001"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Typing"; sku: "t-0001"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Photo Printing"; sku: "p-0003"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "ID Photo Printing"; sku: "p-0004"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "T-Shirt Printing"; sku: "p-0005"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Poster Printing"; sku: "p-0006"; servicePrice: "";itemPrice:"" }
+        ListElement { name: "Business Card Printing"; sku: "p-0007"; servicePrice: "";itemPrice:"" }
     }
 }

@@ -68,7 +68,7 @@ int DatabaseManager::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    return products.size();
+    return products.count();
 }
 
 QVariant DatabaseManager::data(const QModelIndex &index, int role) const
@@ -449,6 +449,38 @@ void DatabaseManager::setUpIncomeTable()
         return;
     }
     qDebug() << " Netincome Table Created Succefully:";
+
+}
+/**
+ * @brief DatabaseManager::setUpServiceTable
+ * this function create the sevice table schema
+ */
+void DatabaseManager::setUpServiceTable()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.open()) {
+        qDebug() << "failed to open the database: " << db.lastError().text();
+        return;
+    }
+    qDebug() << "Database Opened Succefully:";
+    QSqlQuery query;
+
+    QString createTable = R"(
+        CREATE TABLE IF NOT EXISTS service (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sku TEXT NOT NULL,
+            source TEXT NOT NULL,
+            date TEXT  NOT NULL,
+            unitprice REAL NOT NULL,
+            itemprice REAL ,
+            description TEXT NOT NULL
+        )
+    )";
+    if(!query.exec(createTable)) {
+        qDebug() << "Faild to create table: " << db.lastError().text();
+        return;
+    }
+    qDebug() << " Service Table Created Succefully:";
 
 }
 /**

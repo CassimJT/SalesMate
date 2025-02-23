@@ -43,6 +43,7 @@ public:
 
     void setUpExpenceTable();
     void setUpIncomeTable();
+    void setUpServiceTable();
 
 public slots:
     //

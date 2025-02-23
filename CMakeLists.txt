@@ -68,15 +68,12 @@ qt_add_qml_module(appSalesMate
                 SOURCES System/databasemanager.h System/databasemanager.cpp
                 QML_FILES UI/Utils/InfoPopup.qml
                 QML_FILES UI/Home/MainSatckView.qml
-                QML_FILES UI/Utils/ProductEditPopup.qml
-                SOURCES
                 SOURCES System/productfilterproxymodel.h System/productfilterproxymodel.cpp
                 QML_FILES UI/Home/Home.qml
                 QML_FILES UI/Home/CurrentSales.qml
                 QML_FILES UI/Stock/CurrentSalesDelegate.qml
                 QML_FILES UI/Utils/DirectionalText.qml
                 QML_FILES UI/Utils/BarcodeSearch.qml
-                QML_FILES
                 QML_FILES UI/SearchBarcode/SearchBarcodeDelegate.qml
                 QML_FILES UI/Utils/Heading.qml
                 QML_FILES UI/Utils/PopupHeading.qml
@@ -85,6 +82,11 @@ qt_add_qml_module(appSalesMate
                 SOURCES System/expense.h System/expense.cpp
                 SOURCES System/income.h System/income.cpp
                 QML_FILES UI/Satatistics/Statistics.qml
+                SOURCES System/service.h
+                SOURCES System/service.cpp
+                SOURCES
+                SOURCES System/servicemodel.h System/servicemodel.cpp
+
 
 
 
