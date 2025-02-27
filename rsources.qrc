@@ -70,5 +70,7 @@
         <file>Asserts/icons/touch-green.png</file>
         <file>Asserts/icons/statistics-100.png</file>
         <file>Asserts/icons/Edit-pink.png</file>
+        <file>Asserts/icons/save.png</file>
+        <file>Asserts/icons/icons8-add-pink.png</file>
     </qresource>
 </RCC>

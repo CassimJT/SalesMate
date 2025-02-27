@@ -19,6 +19,10 @@ int main(int argc, char *argv[])
     ExpensesModel expenseModel;
     IncomeModel incomeModel;
 
+    QCoreApplication::setOrganizationName("SalesMate");
+    QCoreApplication::setOrganizationDomain("SalesMate.com");
+    QCoreApplication::setApplicationName("SalesMate");
+
     engine.rootContext()->setContextProperty("Android",&sytstem);
     engine.rootContext()->setContextProperty("databaseManager", &databaseManager);
     engine.rootContext()->setContextProperty("productFilterModel", databaseManager.getProxyModel());

@@ -64,6 +64,28 @@ Page {
                 top: parent.top
                 topMargin: 10
             }
+            BarcodeScanner {
+                id: barcodeScanner
+                Layout.fillWidth: true
+                //visible: mainStakView.currentItem.objectName ? "true": false
+                barCodeWidth: parent.width
+                barcodeHight: homePage.totalHeightFor3Item * 0.30
+                scanneriIconSource: "qrc:/Asserts/icons/barcode-scan-green.png"
+                torshIconSource: "qrc:/Asserts/icons/touch-green.png"
+                searchIconSource: "qrc:/Asserts/icons/icons8-search-green.png"
+                onSearchBtnClciked: {
+                    console.log("Seach clicked ..")
+                    searchItem.open()
+                }
+            }
+
+            Label {
+                id: total
+                text: SalesModel.totalSale().toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
+                font.pointSize: 24 * homePage.scalingFactor
+                Layout.alignment: Qt.AlignHCenter
+                color: "gray"
+            }
 
             TextField {
                 id: amountField
@@ -127,28 +149,6 @@ Page {
                 }
             }
 
-            BarcodeScanner {
-                id: barcodeScanner
-                Layout.fillWidth: true
-                //visible: mainStakView.currentItem.objectName ? "true": false
-                barCodeWidth: parent.width
-                barcodeHight: homePage.totalHeightFor3Item * 0.30
-                scanneriIconSource: "qrc:/Asserts/icons/barcode-scan-green.png"
-                torshIconSource: "qrc:/Asserts/icons/touch-green.png"
-                searchIconSource: "qrc:/Asserts/icons/icons8-search-green.png"
-                onSearchBtnClciked: {
-                    console.log("Seach clicked ..")
-                    searchItem.open()
-                }
-            }
-
-            Label {
-                id: total
-                text: SalesModel.totalSale().toLocaleCurrencyString(Qt.locale("en-MW"), "MWK")
-                font.pointSize: 24 * homePage.scalingFactor
-                Layout.alignment: Qt.AlignHCenter
-                color: "gray"
-            }
             DirectionalText {
                 id:  payementDiretionText
                 visible: false

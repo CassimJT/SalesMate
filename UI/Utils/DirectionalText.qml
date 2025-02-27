@@ -21,6 +21,7 @@ RowLayout {
     Label {
         id: info
         //Layout.preferredWidth: parent.width
+        Layout.fillWidth: true
         text: direction.directionalText
         color: direction.colorTxt
         wrapMode: Text.Wrap

@@ -169,7 +169,7 @@ Item {
     }
     Timer {
         id:frameTimer
-        interval: 1500
+        interval: 500
         running:true
         repeat: true
         onTriggered: {
