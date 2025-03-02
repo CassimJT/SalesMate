@@ -3,24 +3,23 @@
 
 #include <QObject>
 #include <qobject.h>
+#include <QDate>
 
 class Product : public QObject
 {
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
     Q_PROPERTY(float price READ price WRITE setPrice NOTIFY priceChanged FINAL)
     Q_PROPERTY(int quantity READ quantity WRITE setQuantity NOTIFY quantityChanged FINAL)
-    Q_PROPERTY(QString sku READ sku WRITE setSku NOTIFY skuChanged FINAL) 
+    Q_PROPERTY(QString sku READ sku WRITE setSku NOTIFY skuChanged FINAL)
+    Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged FINAL)
     Q_OBJECT
 public:
     explicit Product(QObject *parent = nullptr);
-   // Product(const QString &newName,const QString &newSku,int newQuantity,float newPrice);
+    // Product(const QString &newName,const QString &newSku,int newQuantity,float newPrice);
     //normal function
 
     int getSample() const;
     void setSample(int newSample);
-
-public slots:
-    //Slotes
 
     QString name() const;
     void setName(const QString &newName);
@@ -34,6 +33,12 @@ public slots:
     QString sku() const;
     void setSku(const QString &newSku);
 
+    QDate date() const;
+    void setDate(const QDate &newDate);
+
+public slots:
+              //Slotes
+
 signals:
     void nameChanged();
 
@@ -43,11 +48,15 @@ signals:
 
     void skuChanged();
 
+    void dateChanged();
+
 private:
     QString m_name;
     float m_price;
     int m_quantity;
     QString m_sku;
+    QDate m_date;
+
 
 };
 

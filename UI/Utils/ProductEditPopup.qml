@@ -232,7 +232,7 @@ Popup {
                 anchors.centerIn: parent
                 width: 16
                 height: width
-                source: "qrc:/Asserts/icons/upload-48.png"
+                source: "qrc:/Asserts/icons/save.png"
                 fillMode: Image.PreserveAspectFit
             }
             onClicked:{

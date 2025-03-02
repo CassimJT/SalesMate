@@ -153,17 +153,20 @@ Page {
                     const description = descriptionField.text
 
                     if ( source.currentText === "Other") {
-                        if(source.currentIndex !== -1
-                                && other.text !== ""
-                                && amountField.text !== ""
+                        if(e_source !== ""
+                                && other_source !== ""
+                                && cost !== 0.0
                                 && dateField.text !== ""){
                             console.log("Oky with other")
                             //...
                             expenseModel.addExpence(other_source,date,cost,description)
+
+                        }else {
+                            console.log("One of the requird filed is 0 or empty")
                         }
                     }else {
                         if(source.currentIndex !== -1
-                                && amountField.text !== ""
+                                &&cost !== 0.0
                                 && dateField.text !== ""){
                             console.log("Oky with no other")
                             //...

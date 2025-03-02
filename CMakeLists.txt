@@ -5,7 +5,7 @@ project(SalesMate VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 add_subdirectory(./zxing-cpp/)
-find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql Charts)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -87,6 +87,8 @@ qt_add_qml_module(appSalesMate
                 SOURCES System/servicemodel.h System/servicemodel.cpp
                 QML_FILES UI/Utils/ProductEditPopup.qml
                 QML_FILES UI/Utils/AddNewService.qml
+                QML_FILES UI/Satatistics/Summary.qml
+                QML_FILES UI/Satatistics/Reports.qml
 
 
 
@@ -105,7 +107,7 @@ set_target_properties(appSalesMate PROPERTIES
 )
 
 target_link_libraries(appSalesMate
-    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate Qt6::Multimedia ZXing::ZXing Qt6::Sql
+    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate Qt6::Multimedia ZXing::ZXing Qt6::Sql Qt6::Charts
 )
 set_property(TARGET appSalesMate APPEND PROPERTY
     QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android

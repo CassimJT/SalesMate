@@ -90,8 +90,9 @@ Page {
                 id: price
                 text: qsTr("Unit Price")
                 Layout.alignment: Qt.AlignRight
+                Layout.rightMargin: 10
                 font.bold: true
-                Layout.preferredWidth: 70
+                Layout.preferredWidth: 80
             }
         }
     }
@@ -118,7 +119,7 @@ Page {
         anchors.centerIn: parent
         font.pixelSize: 16
         color: "gray"
-        visible: false // Show text only when model is empty
+        visible: databaseManager.rowCount() === 0
     }
 
     ProductEditPopup {

@@ -72,5 +72,7 @@
         <file>Asserts/icons/Edit-pink.png</file>
         <file>Asserts/icons/save.png</file>
         <file>Asserts/icons/icons8-add-pink.png</file>
+        <file>Asserts/icons/reports-100.png</file>
+        <file>Asserts/icons/summary-100.png</file>
     </qresource>
 </RCC>

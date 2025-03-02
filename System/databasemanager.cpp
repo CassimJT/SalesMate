@@ -88,6 +88,8 @@ QVariant DatabaseManager::data(const QModelIndex &index, int role) const
         return product.quantity();
     case price:
         return product.price();
+    case date:
+        return product.date();
     default:
         return QVariant();
     }
@@ -121,24 +123,26 @@ float DatabaseManager::queryPriceFromDatabase(const QString &sku)
  * @brief DatabaseManager::addStock
  * @param product
  */
-void DatabaseManager::addProductToDatabase(const QString &name, const QString &sku, int quantity, float price)
+void DatabaseManager::addProduct(const QString &name, const QString &sku, int quantity, float price, const QDate &date)
 {
     auto product = QSharedPointer<Product>::create(this);
     product->setName(name);
     product->setSku(sku);
     product->setQuantity(quantity);
     product->setPrice(price);
+    product->setDate(date);
+    QString formattedDate = date.toString(Qt::ISODate); //formating Date
 
     QSqlQuery query;
     query.prepare(R"(
-        INSERT INTO products (name, sku, quantity, price)
-        VALUES (:name, :sku, :quantity, :price)
+        INSERT INTO products (name, sku, quantity, price, date)
+        VALUES (:name, :sku, :quantity, :price, :date)
     )");
     query.bindValue(":name", name);
     query.bindValue(":sku", sku);
     query.bindValue(":quantity", quantity);
     query.bindValue(":price", price);
-
+    query.bindValue(":date", formattedDate);
     if (!query.exec()) {
         QSqlError error = query.lastError();
         qDebug() << "Failed to add product to database:" << error.text();
@@ -301,7 +305,8 @@ QHash<int, QByteArray> DatabaseManager::roleNames() const
     roles[name] = "name";      // Matches model.name in QML
     roles[sku] = "sku";            // Matches model.sku in QML
     roles[quantity] = "quantity";  // Matches model.quantity in QML
-    roles[price] = "price";        // Matches model.price in QML
+    roles[price] = "price";
+    roles[date] = "date"  ;      // Matches model.price in QML
     return roles;
 }
 /**
@@ -313,12 +318,33 @@ void DatabaseManager::setUpDatabase()
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("salesmate.db");
 
-    if(!db.open()) {
-        qDebug() << "failed to open the database: " << db.lastError().text();
+    if (!db.open()) {
+        qDebug() << "Failed to open the database: " << db.lastError().text();
         return;
     }
-    qDebug() << "Database Opened Succefully:";
+    qDebug() << "Database Opened Successfully:";
+
     QSqlQuery query;
+
+    // Check if 'date' column exists
+    if (!query.exec("PRAGMA table_info(products)")) {
+        qDebug() << "Failed to check table info: " << query.lastError().text();
+        return;
+    }
+
+    bool hasDateColumn = false;
+    while (query.next()) {
+        QString columnName = query.value(1).toString();
+        if (columnName == "date") {
+            hasDateColumn = true;
+            break;
+        }
+    }
+
+    if (!hasDateColumn) {
+        qDebug() << "Dropping table because 'date' column is missing...";
+        query.exec("DROP TABLE IF EXISTS products;");
+    }
 
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS products (
@@ -326,15 +352,18 @@ void DatabaseManager::setUpDatabase()
             name TEXT NOT NULL,
             sku TEXT UNIQUE NOT NULL,
             quantity INTEGER NOT NULL,
-            price REAL NOT NULL
+            price REAL NOT NULL,
+            date TEXT NOT NULL
         )
     )";
-    if(!query.exec(createTable)) {
-        qDebug() << "Faild to create table: " << db.lastError().text();
+
+    if (!query.exec(createTable)) {
+        qDebug() << "Failed to create table: " << db.lastError().text();
         return;
     }
-    qDebug() << "Table Created Succefully:";
+    qDebug() << "Table Created Successfully:";
 }
+
 /**
  * @brief DatabaseManager::updateView
  * update the view on start up
@@ -347,13 +376,14 @@ void DatabaseManager::updateView() {
     beginResetModel();
     products.clear();
 
-    QSqlQuery query("SELECT name, sku, quantity, price FROM products");
+    QSqlQuery query("SELECT name, sku, quantity, price,date FROM products");
     while (query.next()) {
         auto product = QSharedPointer<Product>::create(this);
         product->setName(query.value(0).toString());
         product->setSku(query.value(1).toString());
         product->setQuantity(query.value(2).toInt());
         product->setPrice(query.value(3).toFloat());
+        product->setDate(query.value(4).toDate());
         products.append(product);
         productMap.insert(product->sku(), QSharedPointer<Product>(product));
     }
@@ -400,6 +430,14 @@ void DatabaseManager::setUpExpenceTable()
     qDebug() << "Database Opened Succefully:";
     QSqlQuery query;
 
+    /*if(! query.exec("DROP TABLE IF EXISTS expences;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "Table Droped ";
+    }*/
+
+
     QString createTable = R"(
     CREATE TABLE IF NOT EXISTS expences (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -430,7 +468,15 @@ void DatabaseManager::setUpIncomeTable()
         return;
     }
     qDebug() << "Database Opened Succefully:";
+
     QSqlQuery query;
+
+    /*if(! query.exec("DROP TABLE IF EXISTS netincome;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "Table Droped ";
+    }*/
 
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS netincome (
@@ -441,7 +487,8 @@ void DatabaseManager::setUpIncomeTable()
             quantity INTEGER NOT NULL,
             unitprice REAL NOT NULL,
             totalprice REAL NOT NULL,
-            description TEXT NOT NULL
+            description TEXT NOT NULL,
+            cgs REAL NOT NULL
         )
     )";
     if(!query.exec(createTable)) {

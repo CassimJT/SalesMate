@@ -170,9 +170,12 @@ Page {
                     const sku = barcodeScn.barcode;
                     const quantity = parseInt(quantityField.text);
                     const price = parseFloat(amountField.text);
+                    const date = Utils.convertToDate(dateField.text)
 
                     // Add entry to the database
-                    databaseManager.addProductToDatabase(name, sku, quantity, price);
+                    console.log("Adding Product:", name, sku, quantity, price, date);
+
+                    databaseManager.addProduct(name, sku, quantity, price,date);
                 }
             }
         }

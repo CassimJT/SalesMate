@@ -45,9 +45,10 @@ ItemDelegate {
         // Item price
         Label {
             id: price
-            text:"K"+ model.price
+            text:model.price.toLocaleCurrencyString(Qt.locale("en-MW"))
             Layout.alignment: Qt.AlignRight
-            Layout.preferredWidth: 70
+            Layout.rightMargin: 10
+            Layout.preferredWidth: 80
 
         }
     }

@@ -22,7 +22,8 @@ class DatabaseManager : public QAbstractListModel
         name = Qt::UserRole + 1,
         sku,
         quantity,
-        price
+        price,
+        date,
     };
     Q_PROPERTY(ProductFilterProxyModel* productFilterModel READ getProxyModel CONSTANT)
 
@@ -49,7 +50,7 @@ public slots:
     //
     Product *queryDatabase(const QString &sku);
     float queryPriceFromDatabase(const QString &sku);
-    void addProductToDatabase(const QString &name, const QString &sku, int quantity, float price);
+    void addProduct(const QString &name, const QString &sku, int quantity, float price, const QDate &date);
     void updateProduct(const QString &name, const QString &sku, int quantity, float price);
     void removeProduct(const QString &sku);
     void processSales(const QVariantList &sales);

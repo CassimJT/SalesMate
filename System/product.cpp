@@ -90,5 +90,25 @@ void Product::setSku(const QString &newSku)
     m_sku = newSku;
     emit skuChanged();
 }
+/**
+ * @brief Product::date
+ * @return the date the product was added
+ */
+QDate Product::date() const
+{
+    return m_date;
+}
+/**
+ * @brief Product::setDate
+ * @param newDate
+ * set the date the product was added
+ */
+void Product::setDate(const QDate &newDate)
+{
+    if (m_date == newDate)
+        return;
+    m_date = newDate;
+    emit dateChanged();
+}
 
 
