@@ -146,3 +146,23 @@ void Income::setSku(const QString &newSku)
     m_sku = newSku;
     emit skuChanged();
 }
+/**
+ * @brief Income::cogs
+ * @return the cost of goods sold
+ */
+qreal Income::cogs() const
+{
+    return m_cogs;
+}
+/**
+ * @brief Income::setCogs
+ * @param newCogs
+ * set the cogs
+ */
+void Income::setCogs(qreal newCogs)
+{
+    if (qFuzzyCompare(m_cogs, newCogs))
+        return;
+    m_cogs = newCogs;
+    emit cogsChanged();
+}

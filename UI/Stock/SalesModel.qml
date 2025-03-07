@@ -94,8 +94,30 @@ ListModel {
         var sales = [];
         for(var i = 0; i < count; i++) {
             var item = get(i);
-            sales.push({sku:item.sku,quantity: item.quantity})
+            var _itemPrice = item.price / item.quantity
+            var _totalprice = item.price
+            var _description = "Sold "+ item.quantity + " iteme(s) at " + _itemPrice + " each "
+            var _date = getCurrentDate();
+            sales.push(
+                        {
+                            sku:item.sku,
+                            name: item.name,
+                            date: _date,
+                            quantity: item.quantity,
+                            unitprice: _itemPrice,
+                            totalprice:_totalprice,
+                            description: _description,
+                            cogs:_totalprice
+                        })
         }
         return sales
+    }
+    //current date
+    function getCurrentDate() {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+        const day = String(currentDate.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`; // Return the formatted date
     }
 }

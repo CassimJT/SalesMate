@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 import QtCharts 2.8
 
-
 Page {
     Flickable {
         id: flickable
@@ -12,6 +11,7 @@ Page {
         height: parent.height
         contentHeight: mainLayout.height
         clip: true
+        bottomMargin: 20
 
         ColumnLayout {
             id: mainLayout
@@ -23,6 +23,18 @@ Page {
             }
             spacing: 20
 
+            // Day and Date Section
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+                Label {
+                    text: Qt.formatDateTime(new Date(), "dddd, MMMM d yyyy")
+                    font.bold: true
+                    font.pixelSize: 14
+                    color: "#333"
+                }
+            }
+
             // Row 1: Expenses & Total Inventory
             RowLayout {
                 Layout.fillWidth: true
@@ -32,7 +44,7 @@ Page {
                 // Expenses Card
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 120
+                    Layout.preferredHeight: 115
                     radius: 12
                     color: "#E57373" // Soft Red
                     border.color: "#D32F2F"
@@ -51,6 +63,13 @@ Page {
                             font.bold: true
                             font.pixelSize: 26
                             color: "white"
+
+                        }
+                        Text {
+                            text: expenseModel.totalCost.toLocaleCurrencyString(Qt.locale("en-MW"))
+                            font.bold: true
+                            font.pixelSize: 13
+                            color: "white"
                         }
                     }
                 }
@@ -58,7 +77,7 @@ Page {
                 // Inventory Card
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 120
+                    Layout.preferredHeight: 115
                     radius: 12
                     color: "#81C784" // Soft Green
                     border.color: "#388E3C"
@@ -76,6 +95,12 @@ Page {
                             text: databaseManager.rowCount().toString().padStart(2, '0')
                             font.bold: true
                             font.pixelSize: 26
+                            color: "white"
+                        }
+                        Text {
+                            text: databaseManager.totalInventory.toLocaleCurrencyString(Qt.locale("en-MW"));
+                            font.bold: true
+                            font.pixelSize: 13
                             color: "white"
                         }
                     }
@@ -106,9 +131,9 @@ Page {
                             Layout.alignment: Qt.AlignCenter
                         }
                         Text {
-                            text: "120,000" // Example static data
+                            text: incomeModel.totalNetIncome.toLocaleCurrencyString(Qt.locale("en-MW"))
                             font.bold: true
-                            font.pixelSize: 24
+                            font.pixelSize: 19
                             color: "#333"
                         }
                     }
@@ -135,9 +160,9 @@ Page {
                                 color: "#333"
                             }
                             Text {
-                                text: "45,000"
+                                text: serviceModel.totalService.toLocaleCurrencyString(Qt.locale("en-MW"))
                                 font.bold: true
-                                font.pixelSize: 20
+                                font.pixelSize: 14
                                 color: "#333"
                             }
                         }
@@ -154,14 +179,14 @@ Page {
                             anchors.centerIn: parent
                             spacing: 3
                             Label {
-                                text: qsTr("COGS")
+                                text: qsTr("Total COGS")
                                 font.bold: true
                                 color: "#333"
                             }
                             Text {
-                                text: "30,000"
+                                text: incomeModel.totalCostOfGoodSold.toLocaleCurrencyString(Qt.locale("en-MW"))
                                 font.bold: true
-                                font.pixelSize: 20
+                                font.pixelSize: 14
                                 color: "#333"
                             }
                         }
@@ -171,7 +196,7 @@ Page {
             // Line Graph Section (Placeholder)
             Pane {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 250
+                Layout.preferredHeight: 225
                 Material.elevation: 2
                 padding: 0
 
@@ -181,9 +206,9 @@ Page {
                     anchors.fill: parent
                     anchors.margins: 0
                     antialiasing: true
-                    backgroundColor: "transparent"
+                    backgroundRoundness: 5
                     legend.visible: false
-                    animationOptions:ChartView.AllAnimations
+                    animationOptions:ChartView.SeriesAnimations
                     dropShadowEnabled: true
 
                     BarCategoryAxis {

@@ -14,6 +14,7 @@
 #include <QSharedPointer>
 #include <QVariant>
 #include <QMap>
+class IncomeModel;
 
 class DatabaseManager : public QAbstractListModel
 {
@@ -26,6 +27,7 @@ class DatabaseManager : public QAbstractListModel
         date,
     };
     Q_PROPERTY(ProductFilterProxyModel* productFilterModel READ getProxyModel CONSTANT)
+    Q_PROPERTY(qreal totalInventory READ totalInventory NOTIFY totalInventoryChanged)
 
 public:
     explicit DatabaseManager(QObject *parent = nullptr);
@@ -45,13 +47,14 @@ public:
     void setUpExpenceTable();
     void setUpIncomeTable();
     void setUpServiceTable();
+    qreal totalInventory() const;
 
 public slots:
     //
     Product *queryDatabase(const QString &sku);
     float queryPriceFromDatabase(const QString &sku);
-    void addProduct(const QString &name, const QString &sku, int quantity, float price, const QDate &date);
-    void updateProduct(const QString &name, const QString &sku, int quantity, float price);
+    void addProduct(const QString &name, const QString &sku, int quantity, qreal price, const QDate &date);
+    void updateProduct(const QString &name, const QString &sku, int quantity, qreal price);
     void removeProduct(const QString &sku);
     void processSales(const QVariantList &sales);
 signals:
@@ -60,6 +63,7 @@ signals:
     void productRemoved();
     void productExists();
     void productAlreadyExist();//for updating
+    void totalInventoryChanged();
 
 private:
     QVector<QSharedPointer<Product>> products;
@@ -69,6 +73,8 @@ private:
     void updateView();
     ProductFilterProxyModel *proxyModel;
     int quaryQuantity(const QString &sku);
+    QSharedPointer<IncomeModel> incomeModle;
+
 
 };
 

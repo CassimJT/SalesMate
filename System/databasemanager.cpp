@@ -7,15 +7,19 @@
 #include <qsqlerror.h>
 #include <qsqlquery.h>
 #include <qtmetamacros.h>
-
+#include "incomemodel.h"
 
 DatabaseManager::DatabaseManager(QObject *parent)
     : QAbstractListModel(parent),
-    proxyModel(new ProductFilterProxyModel(this))
+    proxyModel(new ProductFilterProxyModel(this)),
+    incomeModle(QSharedPointer<IncomeModel>::create(this))
 
 {
     //Setting up the Database
     setUpDatabase();
+    setUpExpenceTable();
+    setUpIncomeTable();
+    setUpServiceTable();
     //updating the View
     updateView();
     proxyModel->setSourceModel(this);
@@ -123,7 +127,7 @@ float DatabaseManager::queryPriceFromDatabase(const QString &sku)
  * @brief DatabaseManager::addStock
  * @param product
  */
-void DatabaseManager::addProduct(const QString &name, const QString &sku, int quantity, float price, const QDate &date)
+void DatabaseManager::addProduct(const QString &name, const QString &sku, int quantity, qreal price, const QDate &date)
 {
     auto product = QSharedPointer<Product>::create(this);
     product->setName(name);
@@ -169,7 +173,7 @@ void DatabaseManager::addProduct(const QString &name, const QString &sku, int qu
  * @param price
 * This function will update the existing data in the database
  */
-void DatabaseManager::updateProduct(const QString &name, const QString &sku, int quantity, float price)
+void DatabaseManager::updateProduct(const QString &name, const QString &sku, int quantity, qreal price)
 {
     if (!productMap.contains(sku)) {
         qDebug() << "Product with SKU" << sku << "not found.";
@@ -248,33 +252,42 @@ void DatabaseManager::removeProduct(const QString &sku)
  */
 void DatabaseManager::processSales(const QVariantList &sales)
 {
-    // Start a transaction
-    QSqlDatabase::database().transaction();
+    QSqlDatabase db = QSqlDatabase::database();
 
+    // Start a transaction
+    if (!db.transaction()) {
+        qDebug() << "Failed to start transaction:" << db.lastError().text();
+        return;
+    }
+    bool success = true;
     for (const QVariant &data : sales) {
         QVariantMap map = data.toMap();
         QString sku = map["sku"].toString();
+        QString date = map["date"].toString();
         int soldQuantity = map["quantity"].toInt();
+        double unitPrice = map["unitprice"].toReal();
+        double totalPrice = map["totalprice"].toReal();
+        QString description = map["description"].toString();
+        double cogs = map["cogs"].toDouble();
+        QString source = map["name"].toString(); // Assuming the source is "Sales"
 
         qDebug() << "Processing SKU:" << sku << "Sold Quantity:" << soldQuantity;
 
         // Step 1: Fetch the current quantity from the database
         int currentQuantity = quaryQuantity(sku);
-
         if (currentQuantity == -1) {
             qDebug() << "SKU not found in database:" << sku;
-            continue; // Skip to the next sale if SKU is not found
+            continue;
         }
 
-        // Step 2: Calculate the new quantity
+        // Step 2: Calculate new quantity
         int newQuantity = currentQuantity - soldQuantity;
-
         if (newQuantity < 0) {
             qDebug() << "Insufficient stock for SKU:" << sku;
-            continue; // Skip to the next sale if stock is insufficient
+            continue;
         }
 
-        // Step 3: Update the database with the new quantity
+        // Step 3: Update the products table with the new quantity
         QSqlQuery updateQuery;
         updateQuery.prepare("UPDATE products SET quantity = :newQuantity WHERE sku = :sku");
         updateQuery.bindValue(":newQuantity", newQuantity);
@@ -282,23 +295,67 @@ void DatabaseManager::processSales(const QVariantList &sales)
 
         if (!updateQuery.exec()) {
             qDebug() << "Database update error:" << updateQuery.lastError().text();
-
-            // Rollback the transaction on error
-            QSqlDatabase::database().rollback();
-            return; // Exit the function if the update fails
+            db.rollback();
+            return;
         }
 
         qDebug() << "Updated SKU:" << sku << "New Quantity:" << newQuantity;
+
+        // Step 4: Check if an entry exists in netincome for the same SKU and date
+        QSqlQuery checkQuery;
+        checkQuery.prepare("SELECT id, quantity, totalprice FROM netincome WHERE sku = :sku AND date = :date");
+        checkQuery.bindValue(":sku", sku);
+        checkQuery.bindValue(":date", date);
+
+        if (!checkQuery.exec()) {
+            qDebug() << "Database query error (checking netincome):" << checkQuery.lastError().text();
+            db.rollback();
+            return;
+        }
+
+        if (checkQuery.next()) {
+            // Entry exists, update it
+            int existingQuantity = checkQuery.value("quantity").toInt();
+            qreal existingTotalPrice = checkQuery.value("totalprice").toReal();
+            int id = checkQuery.value("id").toInt();
+
+            int updatedQuantity = existingQuantity + soldQuantity;
+            qreal updatedTotalPrice = existingTotalPrice + totalPrice;
+
+            QSqlQuery updateIncomeQuery;
+            updateIncomeQuery.prepare("UPDATE netincome SET quantity = :quantity, totalprice = :totalprice WHERE id = :id");
+            updateIncomeQuery.bindValue(":quantity", updatedQuantity);
+            updateIncomeQuery.bindValue(":totalprice", updatedTotalPrice);
+            updateIncomeQuery.bindValue(":id", id);
+
+            if (!updateIncomeQuery.exec()) {
+                qDebug() << "Failed to update netincome:" << updateIncomeQuery.lastError().text();
+                db.rollback();
+                return;
+            }
+
+            qDebug() << "Updated netincome for SKU:" << sku << "on date:" << date;
+        } else {
+            // No entry exists, insert a new one
+            QDate _date = QDate::fromString(date, "yyyy-MM-dd");
+            incomeModle->addIncome(sku,_date,soldQuantity,unitPrice,totalPrice,description,source,cogs);
+            qDebug() << "Inserted new netincome entry for SKU:" << sku << "on date:" << date;
+        }
     }
 
-    // Commit the transaction if all updates succeed
-    if (!QSqlDatabase::database().commit()) {
-        qDebug() << "Failed to commit transaction:" << QSqlDatabase::database().lastError().text();
-        QSqlDatabase::database().rollback(); // Rollback if commit fails
+    // Commit the transaction
+    if (success) {
+        if (!db.commit()) {
+            qDebug() << "Failed to commit transaction:" << db.lastError().text();
+            db.rollback();
+        } else {
+            qDebug() << "All sales processed successfully!";
+        }
     } else {
-        qDebug() << "All sales processed successfully!";
+        db.rollback();
     }
 }
+
 QHash<int, QByteArray> DatabaseManager::roleNames() const
 {
     QHash<int, QByteArray> roles;
@@ -389,6 +446,7 @@ void DatabaseManager::updateView() {
     }
 
     endResetModel();
+    emit totalInventoryChanged(); //notifying qml
 }
 /**
  * @brief DatabaseManager::quaryQuantity
@@ -487,8 +545,8 @@ void DatabaseManager::setUpIncomeTable()
             quantity INTEGER NOT NULL,
             unitprice REAL NOT NULL,
             totalprice REAL NOT NULL,
-            description TEXT NOT NULL,
-            cgs REAL NOT NULL
+            description TEXT ,
+            cogs REAL NOT NULL
         )
     )";
     if(!query.exec(createTable)) {
@@ -511,6 +569,12 @@ void DatabaseManager::setUpServiceTable()
     }
     qDebug() << "Database Opened Succefully:";
     QSqlQuery query;
+    /*if(! query.exec("DROP TABLE IF EXISTS service;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "service Droped ";
+    }*/
 
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS service (
@@ -518,9 +582,8 @@ void DatabaseManager::setUpServiceTable()
             sku TEXT NOT NULL,
             source TEXT NOT NULL,
             date TEXT  NOT NULL,
-            unitprice REAL NOT NULL,
-            itemprice REAL ,
-            description TEXT NOT NULL
+            serviceprice REAL NOT NULL,
+            description TEXT
         )
     )";
     if(!query.exec(createTable)) {
@@ -529,6 +592,20 @@ void DatabaseManager::setUpServiceTable()
     }
     qDebug() << " Service Table Created Succefully:";
 
+}
+/**
+ * @brief DatabaseManager::totalInventory
+ * @return the total inventory
+ */
+qreal DatabaseManager::totalInventory() const
+{
+    qreal totalInventory = 0.0;
+    qreal total_itemprice = 0.0;
+    for(const auto &product:products) {
+        total_itemprice = (product->price() * product->quantity());
+        totalInventory += total_itemprice;
+    }
+    return totalInventory;
 }
 /**
  * @brief DatabaseManager::queryDatabase

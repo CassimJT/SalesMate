@@ -37,6 +37,7 @@ Item {
         imageCapture: ImageCapture {
             id: imagecapture
             onImageCaptured: function (imageId, preview) {
+
                 barcodeEngine.processImage(preview)
             }
         }
@@ -104,7 +105,8 @@ Item {
                 }
                 onTorchActivated: {
                     console.log("Torch button clicked! Active: " + scannerTools.torchClicked);
-                    camera.torchMode = scannerTools.torchClicked ? Camera.FlashOn : Camera.FlashOff;
+                    camera.torchMode = scannerTools.torchClicked ? Camera.TorchOn : Camera.TorchOff;
+
                 }
                 onSearchClicked: {
                     m_parent.searchBtnClciked();
@@ -185,4 +187,17 @@ Item {
         m_parent.showRecycle = false
         output.visible = true
     }
+
+    function reinitializeCamera() {
+        session.stop();
+        if (session) {
+            session.camera = camera;  // Reassign the camera
+            session.imageCapture = imageCapture;  // Reassign the image capture
+            session.videoOutput = output;  // Reassign the video output
+            camera.start();  // Restart the camera
+        } else {
+            console.error("Session is null or invalid");
+        }
+    }
+
 }

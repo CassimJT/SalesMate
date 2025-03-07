@@ -4,8 +4,7 @@
 ExpensesModel::ExpensesModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    //constractor
-    databaseManager.setUpExpenceTable();
+
     updateView();
 }
 
@@ -113,6 +112,18 @@ void ExpensesModel::addExpence(const QString &source, const QDate &date, qreal c
 
     emit expenseAdded();
 }
+/**
+ * @brief ExpensesModel::totalCost
+ * @return the total cos for for expences
+ */
+qreal ExpensesModel::totalCost() const
+{
+    qreal total = 0.0;
+    for(const auto &expense: expenses) {
+        total += expense->getCost();
+    }
+    return total;
+}
 
 QHash<int, QByteArray> ExpensesModel::roleNames() const
 {
@@ -139,6 +150,6 @@ void ExpensesModel::updateView()
 
         expenses.append(expense);
     }
-
     endResetModel();
+    emit totalCostChanged();
 }

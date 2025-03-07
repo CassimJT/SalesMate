@@ -8,7 +8,7 @@
 class Product : public QObject
 {
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
-    Q_PROPERTY(float price READ price WRITE setPrice NOTIFY priceChanged FINAL)
+    Q_PROPERTY(qreal price READ price WRITE setPrice NOTIFY priceChanged FINAL)
     Q_PROPERTY(int quantity READ quantity WRITE setQuantity NOTIFY quantityChanged FINAL)
     Q_PROPERTY(QString sku READ sku WRITE setSku NOTIFY skuChanged FINAL)
     Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged FINAL)
@@ -24,8 +24,8 @@ public:
     QString name() const;
     void setName(const QString &newName);
 
-    float price() const;
-    void setPrice(float newPrice);
+    qreal price() const;
+    void setPrice(qreal newPrice);
 
     int quantity() const;
     void setQuantity(int newQuantity);
@@ -52,7 +52,7 @@ signals:
 
 private:
     QString m_name;
-    float m_price;
+    qreal m_price;
     int m_quantity;
     QString m_sku;
     QDate m_date;

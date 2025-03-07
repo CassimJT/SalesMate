@@ -191,12 +191,13 @@ Page {
                     barcodeScanner.output.visible = true
                     if(!barcodeScanner.camera.active){
                         barcodeScanner.camera.start()
-                        barcodeScanner.frameTimer.start()
+                        barcodeScanner.frameTimer.restart()
                         barcodeScanner.showRecycle = false
                         //reset all filed
                         Utils.resetField()
                     }else{
                         ///
+                        barcodeScanner.frameTimer.restart() //restart the timer
                     }
                 }
             }
@@ -226,7 +227,9 @@ Page {
                             // generate an invoive if success
                             // menthode on invoive to be decided later
                             var data = SalesModel.onGoingSale()
+                            console.log(JSON.stringify(data))
                             databaseManager.processSales(data)
+
 
                             SalesModel.clearModel()
                         } else {

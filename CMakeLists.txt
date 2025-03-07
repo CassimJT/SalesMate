@@ -87,6 +87,8 @@ qt_add_qml_module(appSalesMate
                 SOURCES System/servicemodel.h System/servicemodel.cpp
                 QML_FILES UI/Utils/ProductEditPopup.qml
                 QML_FILES UI/Utils/AddNewService.qml
+                QML_FILES UI/Satatistics/Summary.qml
+                QML_FILES UI/Satatistics/Reports.qml
 
 
 

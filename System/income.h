@@ -16,6 +16,7 @@ class Income : public QObject
     Q_PROPERTY(qreal totalprice READ totalprice WRITE setTotalprice NOTIFY totalpriceChanged FINAL)
     Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged FINAL)
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged FINAL)
+    Q_PROPERTY(QString sku READ sku WRITE setSku NOTIFY skuChanged FINAL)
 public:
     explicit Income(QObject *parent = nullptr);
 
@@ -40,6 +41,9 @@ public:
     QString sku() const;
     void setSku(const QString &newSku);
 
+    qreal cogs() const;
+    void setCogs(qreal newCogs);
+
 public slots:
               //slots
 
@@ -60,6 +64,8 @@ signals:
 
     void skuChanged();
 
+    void cogsChanged();
+
 private:
     QDate m_date;
     int m_quantity;
@@ -68,8 +74,10 @@ private:
     QString m_disciption;
     QString m_source;
     QString m_sku;
+    qreal m_cogs;
 
-    Q_PROPERTY(QString sku READ sku WRITE setSku NOTIFY skuChanged FINAL)
+
+    Q_PROPERTY(qreal cogs READ cogs WRITE setCogs NOTIFY cogsChanged FINAL)
 };
 
 #endif // INCOME_H

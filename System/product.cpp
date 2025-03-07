@@ -34,7 +34,7 @@ void Product::setName(const QString &newName)
  * @brief Product::price
  * @return the price of the item
  */
-float Product::price() const
+qreal Product::price() const
 {
     return m_price;
 }
@@ -43,7 +43,7 @@ float Product::price() const
  * @param newPrice
  * set the price of the item
  */
-void Product::setPrice(float newPrice)
+void Product::setPrice(qreal newPrice)
 {
     if (qFuzzyCompare(m_price, newPrice))
         return;
