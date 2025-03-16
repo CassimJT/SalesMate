@@ -13,6 +13,20 @@ Page {
     Settings {
         id: serviceSetting
     }
+    BarcodeSearch {
+        id:barcode_Search
+        property string selectedSku: ""
+        property string _itemPrice: ""
+        onClosed: {
+            if(selectedSku === "" ) {
+                itemsku.text = serviceModel.get(currentIndex).sku
+                itemeprice.text = serviceModel.get(currentIndex).itemprice
+            }else {
+                itemsku.text = selectedSku
+                itemeprice.text = _itemPrice
+            }
+        }
+    }
 
     Flickable {
         id: flickable
@@ -63,6 +77,7 @@ Page {
                         code.text = serviceModel.get(currentIndex).sku;
                         serviceprice.text = serviceModel.get(currentIndex).servicePrice
                         itemeprice.text = serviceModel.get(currentIndex).itemPrice
+                        itemsku.text = serviceModel.get(currentIndex).sku
                     }
                 }
             }
@@ -92,6 +107,7 @@ Page {
                 }
 
             }
+            //the edit pane
             Pane {
                 Layout.fillWidth: true
                 visible: edit.checked
@@ -119,10 +135,48 @@ Page {
                         inputMethodHints: Qt.ImhDigitsOnly
                     }
                     DirectionalText {
+                        id: sku_direction
+                        directionalText: "The SKU must match the stock. Use the search button to check."
+                        visible: itemeprice.text > 0
+                    }
+
+                    RowLayout {
+                        spacing: 8
+                        visible: itemeprice.text > 0
+
+                        TextField {
+                            id: itemsku
+                            placeholderText: "Item SKU"
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter
+                            inputMethodHints: Qt.ImhDigitsOnly
+                        }
+
+                        RoundButton {
+                            id: search
+                            Layout.alignment: Qt.AlignVCenter
+
+                            Image {
+                                anchors.centerIn: parent
+                                width: 20
+                                height: 20
+                                source: "qrc:/Asserts/icons/search.png"
+                                fillMode: Image.PreserveAspectFit
+                            }
+
+                            onClicked: {
+                                // Search logic here
+                                barcode_Search.open()
+                            }
+                        }
+                    }
+
+                    DirectionalText {
                         id: direction
                         visible: false
                         directionalText: "Changes Applied Successifuly"
                     }
+
 
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
@@ -179,7 +233,7 @@ Page {
                                 fillMode: Image.PreserveAspectFit
                             }
                             onClicked: {
-                                saveServices(serviceType.currentText,serviceprice.text,itemeprice.text)
+                                saveServices(serviceType.currentText,serviceprice.text,itemeprice.text,itemsku.text)
                                 direction.visible = true
                             }
                         }
@@ -196,7 +250,6 @@ Page {
                 placeholderText: "Amount"
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                readOnly: true
                 visible: !edit.checked
             }
 
@@ -256,7 +309,7 @@ Page {
                 readOnly: true
                 visible: !edit.checked
             }
-
+            //save btn
             CustomButton {
                 id: save
                 Layout.fillWidth: true
@@ -264,25 +317,23 @@ Page {
                 btnRadius: 5
                 btnText: "Save"
                 visible: !edit.checked
-
                 onBtnClicked: {
-                    console.log("Clicked")
+                    //...
+                    const sku = code.text
+                    const date = Utils.convertToDate(dateField.text)
+                    const name = serviceType.currentText
+                    const unit_serviceprice = parseFloat(serviceModel.get(serviceType.currentIndex).servicePrice)
+                    const unit_itemprice = parseFloat(serviceModel.get(serviceType.currentIndex).itemPrice)
+                    const description = descriptionField.text
+                    const total = parseFloat(amountField.text)
+                    console.log(total,name,unit_itemprice,unit_serviceprice,sku,date,description)
+                    ServiceModel.addService(sku,date,name,unit_serviceprice,unit_itemprice,description,total)
+
                 }
             }
         }
     }
-    // Saving settings
-    function saveServices(name, newserviceprice, newitemprice) {
-        for (var i = 0; i < serviceModel.count; i++) {
-            var service = serviceModel.get(i);
-            if (service && service.name === name) {
-                serviceModel.setProperty(i, "servicePrice", newserviceprice);
-                serviceModel.setProperty(i, "itemPrice", newitemprice);
-                return; // Exit loop early once found
-            }
-        }
-        console.warn("Service not found:", name);
-    }
+
     //listmodel
     ListModel {
         id: serviceModel
@@ -298,7 +349,19 @@ Page {
         ListElement { name: "ID Photo Printing"; sku: "p-0004"; servicePrice: "0"; itemPrice: "0" }
         ListElement { name: "Business Card Printing"; sku: "p-0007"; servicePrice: "0"; itemPrice: "0" }
     }
-
+    // Saving settings
+    function saveServices(name, newserviceprice, newitemprice, newsku) {
+        for (var i = 0; i < serviceModel.count; i++) {
+            var service = serviceModel.get(i);
+            if (service && service.name === name) {
+                serviceModel.setProperty(i, "servicePrice", newserviceprice);
+                serviceModel.setProperty(i, "itemPrice", newitemprice);
+                serviceModel.setProperty(i,"sku",newsku)
+                return; // Exit loop early once found
+            }
+        }
+        console.warn("Service not found:", name);
+    }
     // Persisting services
     function persistServices() {
         var dataArry = [];

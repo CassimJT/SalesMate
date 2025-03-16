@@ -82,13 +82,5 @@ Page {
 
         }
     }
-    //connecting the showSock page with the a signal
-    /* Connections {
-        target: swipeView
-        onIndexChanged: {
-            if (swipeView.currentIndex === 1) {
-                showStockPage.searchBar.text = ""
-            }
-        }
-    }*/
+
 }

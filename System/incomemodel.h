@@ -48,6 +48,7 @@ public slots:
                    QString & discription, const
                    QString & source, const
                    qreal &cogs);
+    void updateView();
 signals:
     void incomeExist();
     void incomeAdded();
@@ -58,7 +59,7 @@ private:
     QHash<int,QByteArray> roleNames() const override;
     QWeakPointer<DatabaseManager> databaseManager;
     QSharedPointer<ServiceModel> service;
-    void updateView();
+
 };
 
 #endif // INCOMEMODEL_H

@@ -8,11 +8,13 @@
 #include <qsqlquery.h>
 #include <qtmetamacros.h>
 #include "incomemodel.h"
+#include "servicemodel.h"
 
 DatabaseManager::DatabaseManager(QObject *parent)
     : QAbstractListModel(parent),
     proxyModel(new ProductFilterProxyModel(this)),
-    incomeModle(QSharedPointer<IncomeModel>::create(this))
+    incomeModel(QSharedPointer<IncomeModel>::create(this)),
+    serviceModel(QSharedPointer<ServiceModel>::create(this))
 
 {
     //Setting up the Database
@@ -254,40 +256,43 @@ void DatabaseManager::processSales(const QVariantList &sales)
 {
     QSqlDatabase db = QSqlDatabase::database();
 
-    // Start a transaction
     if (!db.transaction()) {
         qDebug() << "Failed to start transaction:" << db.lastError().text();
         return;
     }
+
     bool success = true;
+
     for (const QVariant &data : sales) {
         QVariantMap map = data.toMap();
         QString sku = map["sku"].toString();
         QString date = map["date"].toString();
         int soldQuantity = map["quantity"].toInt();
-        double unitPrice = map["unitprice"].toReal();
-        double totalPrice = map["totalprice"].toReal();
+        double unitPrice = map["unitprice"].toDouble();
+        double totalPrice = map["totalprice"].toDouble();
         QString description = map["description"].toString();
         double cogs = map["cogs"].toDouble();
-        QString source = map["name"].toString(); // Assuming the source is "Sales"
+        QString source = map["name"].toString(); // Assuming source is "Sales"
 
         qDebug() << "Processing SKU:" << sku << "Sold Quantity:" << soldQuantity;
 
-        // Step 1: Fetch the current quantity from the database
+        // Step 1: Fetch the current quantity
         int currentQuantity = quaryQuantity(sku);
         if (currentQuantity == -1) {
             qDebug() << "SKU not found in database:" << sku;
+            success = false;
             continue;
         }
 
-        // Step 2: Calculate new quantity
+        // Step 2: Validate stock availability
         int newQuantity = currentQuantity - soldQuantity;
         if (newQuantity < 0) {
             qDebug() << "Insufficient stock for SKU:" << sku;
+            success = false;
             continue;
         }
 
-        // Step 3: Update the products table with the new quantity
+        // Step 3: Update the products table
         QSqlQuery updateQuery;
         updateQuery.prepare("UPDATE products SET quantity = :newQuantity WHERE sku = :sku");
         updateQuery.bindValue(":newQuantity", newQuantity);
@@ -295,13 +300,13 @@ void DatabaseManager::processSales(const QVariantList &sales)
 
         if (!updateQuery.exec()) {
             qDebug() << "Database update error:" << updateQuery.lastError().text();
-            db.rollback();
-            return;
+            success = false;
+            continue;
         }
 
         qDebug() << "Updated SKU:" << sku << "New Quantity:" << newQuantity;
 
-        // Step 4: Check if an entry exists in netincome for the same SKU and date
+        // Step 4: Check if an entry exists in netincome
         QSqlQuery checkQuery;
         checkQuery.prepare("SELECT id, quantity, totalprice FROM netincome WHERE sku = :sku AND date = :date");
         checkQuery.bindValue(":sku", sku);
@@ -309,18 +314,18 @@ void DatabaseManager::processSales(const QVariantList &sales)
 
         if (!checkQuery.exec()) {
             qDebug() << "Database query error (checking netincome):" << checkQuery.lastError().text();
-            db.rollback();
-            return;
+            success = false;
+            continue;
         }
 
         if (checkQuery.next()) {
             // Entry exists, update it
             int existingQuantity = checkQuery.value("quantity").toInt();
-            qreal existingTotalPrice = checkQuery.value("totalprice").toReal();
+            double existingTotalPrice = checkQuery.value("totalprice").toDouble();
             int id = checkQuery.value("id").toInt();
 
             int updatedQuantity = existingQuantity + soldQuantity;
-            qreal updatedTotalPrice = existingTotalPrice + totalPrice;
+            double updatedTotalPrice = existingTotalPrice + totalPrice;
 
             QSqlQuery updateIncomeQuery;
             updateIncomeQuery.prepare("UPDATE netincome SET quantity = :quantity, totalprice = :totalprice WHERE id = :id");
@@ -330,40 +335,43 @@ void DatabaseManager::processSales(const QVariantList &sales)
 
             if (!updateIncomeQuery.exec()) {
                 qDebug() << "Failed to update netincome:" << updateIncomeQuery.lastError().text();
-                db.rollback();
-                return;
+                success = false;
+                continue;
             }
 
             qDebug() << "Updated netincome for SKU:" << sku << "on date:" << date;
         } else {
             // No entry exists, insert a new one
             QDate _date = QDate::fromString(date, "yyyy-MM-dd");
-            incomeModle->addIncome(sku,_date,soldQuantity,unitPrice,totalPrice,description,source,cogs);
+            incomeModel->addIncome(sku, _date, soldQuantity, unitPrice, totalPrice, description, source, cogs);
             qDebug() << "Inserted new netincome entry for SKU:" << sku << "on date:" << date;
         }
     }
 
-    // Commit the transaction
+    // Commit or rollback transaction
     if (success) {
         if (!db.commit()) {
             qDebug() << "Failed to commit transaction:" << db.lastError().text();
             db.rollback();
         } else {
             qDebug() << "All sales processed successfully!";
+            updateView();
         }
     } else {
         db.rollback();
+        qDebug() << "Transaction rolled back due to errors.";
     }
 }
+
 
 QHash<int, QByteArray> DatabaseManager::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[name] = "name";      // Matches model.name in QML
-    roles[sku] = "sku";            // Matches model.sku in QML
-    roles[quantity] = "quantity";  // Matches model.quantity in QML
+    roles[name] = "name";
+    roles[sku] = "sku";
+    roles[quantity] = "quantity";
     roles[price] = "price";
-    roles[date] = "date"  ;      // Matches model.price in QML
+    roles[date] = "date"  ;
     return roles;
 }
 /**
@@ -383,25 +391,12 @@ void DatabaseManager::setUpDatabase()
 
     QSqlQuery query;
 
-    // Check if 'date' column exists
-    if (!query.exec("PRAGMA table_info(products)")) {
-        qDebug() << "Failed to check table info: " << query.lastError().text();
+    /*if(! query.exec("DROP TABLE IF EXISTS products;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
         return;
-    }
-
-    bool hasDateColumn = false;
-    while (query.next()) {
-        QString columnName = query.value(1).toString();
-        if (columnName == "date") {
-            hasDateColumn = true;
-            break;
-        }
-    }
-
-    if (!hasDateColumn) {
-        qDebug() << "Dropping table because 'date' column is missing...";
-        query.exec("DROP TABLE IF EXISTS products;");
-    }
+    } else {
+        qDebug() << "Table Droped ";
+    }*/
 
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS products (

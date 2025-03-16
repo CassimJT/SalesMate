@@ -15,7 +15,7 @@
 class ExpensesModel : public QAbstractListModel
 {
     Q_OBJECT
-     Q_PROPERTY(qreal totalCost READ totalCost NOTIFY totalCostChanged)
+    Q_PROPERTY(qreal totalCost READ totalCost NOTIFY totalCostChanged)
     enum roleNames {
         source = Qt::UserRole + 1,
         date,
@@ -36,9 +36,10 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-     qreal totalCost()const;
+    qreal totalCost()const;
 public slots:
     void addExpence( const QString &source, const QDate &date, qreal cost, const QString &discription);
+    void updateView();
 
 signals:
     void expenseAdded();
@@ -49,7 +50,7 @@ private:
     QVector<QSharedPointer<Expense>> expenses;
     QHash<int, QByteArray> roleNames() const override;
     DatabaseManager databaseManager;
-    void updateView();
+
 
 };
 

@@ -36,6 +36,7 @@ Page {
     //a popup to search for a barcode if scannaer not working
     BarcodeSearch {
         id:searchItem
+        objectName: "Home"
     }
     Flickable {
         id: flickable

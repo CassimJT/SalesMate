@@ -5,8 +5,13 @@
 #include <QHash>
 #include <QVector>
 #include "service.h"
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QJsonObject>
+#include <QVariantList>
+#include <QJsonDocument>
 
-
+class DatabaseManager;
 class ServiceModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -30,7 +35,8 @@ public:
     qreal totalService() const;
     qreal getServiceTotal(const qreal& servicePrice, const qreal& itemeServicePrice, const qreal& newTatal) const;
     qreal getItemServiceTotal(const qreal& servicePrice, const qreal& itemeServicePrice,const qreal& newtotal) const;
-    int getItemServiceQuanity(const qreal& itePrice, const qreal& itemServiceQuantity) const;
+    int getItemServiceQuanity(const qreal& servicePrice, const qreal& itemeServicePrice, const qreal &newtotal) const;
+    void setDatabaseManager(const QSharedPointer<DatabaseManager>& db);
 public slots:
     //
     void addService(const QString &sku, const QDate &date,
@@ -38,12 +44,16 @@ public slots:
                     const qreal &itemeprice, const QString &description,
                     const qreal &total
                     );
+    void updateView();
+
 signals:
     void totalServiceChanged();
 private:
     QVector<QSharedPointer<Service>> services;
     QHash<int,QByteArray> roleNames() const override;
-    void updateView();
+    QWeakPointer<DatabaseManager> databaseManager;
+    QSharedPointer<DatabaseManager>sharedManager;
+
 
 };
 

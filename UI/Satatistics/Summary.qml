@@ -160,7 +160,7 @@ Page {
                                 color: "#333"
                             }
                             Text {
-                                text: serviceModel.totalService.toLocaleCurrencyString(Qt.locale("en-MW"))
+                                text: ServiceModel.totalService.toLocaleCurrencyString(Qt.locale("en-MW"))
                                 font.bold: true
                                 font.pixelSize: 14
                                 color: "#333"

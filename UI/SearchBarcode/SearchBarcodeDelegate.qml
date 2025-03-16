@@ -46,13 +46,24 @@ ItemDelegate {
         }
     }
     onClicked: {
-        console.log("Sku: "+ model.sku)
-        barcodeEngine.setBarcode(model.sku)
-        if (popupReference) {
-            console.log("Popup reference found. Closing...");
-            popupReference.close();
-        } else {
-            console.warn("Popup reference is null!");
+        if (!popupReference) {
+            console.warn("Popup reference is null! Cannot proceed.");
+            return;
         }
+
+        console.log("Sku: " + model.sku);
+
+        // Check parent objectName safely
+        if (popupReference.parent && popupReference.parent.objectName === "Home") {
+            barcodeEngine.setBarcode(model.sku);
+        } else {
+            popupReference.selectedSku = model.sku;
+            popupReference._itemPrice = model.price;
+        }
+
+        // Close popup after selection
+        console.log("Popup reference found. Closing...");
+        popupReference.close();
     }
+
 }

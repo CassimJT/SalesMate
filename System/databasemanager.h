@@ -15,6 +15,7 @@
 #include <QVariant>
 #include <QMap>
 class IncomeModel;
+class ServiceModel;
 
 class DatabaseManager : public QAbstractListModel
 {
@@ -73,7 +74,8 @@ private:
     void updateView();
     ProductFilterProxyModel *proxyModel;
     int quaryQuantity(const QString &sku);
-    QSharedPointer<IncomeModel> incomeModle;
+    QSharedPointer<IncomeModel> incomeModel;
+    QSharedPointer<ServiceModel> serviceModel;
 
 
 };

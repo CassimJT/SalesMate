@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("productFilterModel", databaseManager.getProxyModel());
     engine.rootContext()->setContextProperty("expenseModel", &expenseModel);
     engine.rootContext()->setContextProperty("incomeModel", &incomeModel);
-     engine.rootContext()->setContextProperty("serviceModel", &serviceModel);
+     engine.rootContext()->setContextProperty("ServiceModel", &serviceModel);
     qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
     qmlRegisterSingletonType(QUrl("qrc:/UI/Stock/SalesModel.qml"), "SalesModel", 1, 0, "SalesModel");
 
