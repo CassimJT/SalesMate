@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     BarcodeEngine barcodeEngine;
     AndroidSystem sytstem;
-    DatabaseManager databaseManager;
+    DatabaseManager *databaseManager = DatabaseManager::instance();
     ExpensesModel expenseModel;
     IncomeModel incomeModel;
     ServiceModel serviceModel;
@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("SalesMate");
 
     engine.rootContext()->setContextProperty("Android",&sytstem);
-    engine.rootContext()->setContextProperty("databaseManager", &databaseManager);
-    engine.rootContext()->setContextProperty("productFilterModel", databaseManager.getProxyModel());
+    engine.rootContext()->setContextProperty("databaseManager", databaseManager);
+    engine.rootContext()->setContextProperty("productFilterModel", databaseManager->getProxyModel());
     engine.rootContext()->setContextProperty("expenseModel", &expenseModel);
     engine.rootContext()->setContextProperty("incomeModel", &incomeModel);
      engine.rootContext()->setContextProperty("ServiceModel", &serviceModel);

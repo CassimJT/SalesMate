@@ -33,6 +33,7 @@ class DatabaseManager : public QAbstractListModel
 public:
     explicit DatabaseManager(QObject *parent = nullptr);
     ~DatabaseManager();
+    static DatabaseManager *instance();
 
     // Header:
     QVariant headerData(int section,
@@ -76,6 +77,7 @@ private:
     int quaryQuantity(const QString &sku);
     QSharedPointer<IncomeModel> incomeModel;
     QSharedPointer<ServiceModel> serviceModel;
+    static DatabaseManager * _instance;
 
 
 };

@@ -10,6 +10,8 @@
 #include "incomemodel.h"
 #include "servicemodel.h"
 
+DatabaseManager *DatabaseManager::_instance = nullptr;
+
 DatabaseManager::DatabaseManager(QObject *parent)
     : QAbstractListModel(parent),
     proxyModel(new ProductFilterProxyModel(this)),
@@ -48,6 +50,17 @@ DatabaseManager::~DatabaseManager()
     products.clear();
     productMap.clear();
     qDebug() << "Database connection closed.";
+}
+/**
+ * @brief DatabaseManager::instance
+ * @return the single instace of the class where ever is called
+ */
+DatabaseManager *DatabaseManager::instance()
+{
+    if(_instance == nullptr) {
+        _instance = new DatabaseManager();
+    }
+    return _instance;
 }
 
 QVariant DatabaseManager::headerData(int section, Qt::Orientation orientation, int role) const
@@ -306,6 +319,7 @@ void DatabaseManager::processSales(const QVariantList &sales)
 
         qDebug() << "Updated SKU:" << sku << "New Quantity:" << newQuantity;
 
+
         // Step 4: Check if an entry exists in netincome
         QSqlQuery checkQuery;
         checkQuery.prepare("SELECT id, quantity, totalprice FROM netincome WHERE sku = :sku AND date = :date");
@@ -340,11 +354,13 @@ void DatabaseManager::processSales(const QVariantList &sales)
             }
 
             qDebug() << "Updated netincome for SKU:" << sku << "on date:" << date;
+
         } else {
             // No entry exists, insert a new one
             QDate _date = QDate::fromString(date, "yyyy-MM-dd");
             incomeModel->addIncome(sku, _date, soldQuantity, unitPrice, totalPrice, description, source, cogs);
             qDebug() << "Inserted new netincome entry for SKU:" << sku << "on date:" << date;
+
         }
     }
 
@@ -356,6 +372,9 @@ void DatabaseManager::processSales(const QVariantList &sales)
         } else {
             qDebug() << "All sales processed successfully!";
             updateView();
+            serviceModel->updateView();
+            incomeModel->updateView();
+
         }
     } else {
         db.rollback();
@@ -442,6 +461,7 @@ void DatabaseManager::updateView() {
 
     endResetModel();
     emit totalInventoryChanged(); //notifying qml
+
 }
 /**
  * @brief DatabaseManager::quaryQuantity

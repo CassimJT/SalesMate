@@ -89,6 +89,10 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Utils/AddNewService.qml
                 QML_FILES UI/Satatistics/Summary.qml
                 QML_FILES UI/Satatistics/Reports.qml
+                QML_FILES UI/Satatistics/Daily.qml
+                QML_FILES UI/Satatistics/Monthly.qml
+                QML_FILES UI/Satatistics/Yearly.qml
+
 
 
 

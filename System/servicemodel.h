@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QVariantList>
 #include <QJsonDocument>
+#include <QJsonArray>
 
 class DatabaseManager;
 class ServiceModel : public QAbstractListModel

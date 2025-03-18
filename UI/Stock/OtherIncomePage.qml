@@ -377,21 +377,21 @@ Page {
 
     // Loading services into the model
     function loadServices() {
-        let savedData = serviceSetting.value("listModel", "[]");
+        let savedData = serviceSetting.value("listModel", "[]"); // Load stored data
         let parsedData;
 
         try {
             parsedData = JSON.parse(savedData);
         } catch (error) {
             console.error("Error parsing saved services:", error);
-            parsedData = [];
+            return; // Exit early to prevent clearing default values
         }
 
-        if (Array.isArray(parsedData)) {
-            serviceModel.clear();
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+            serviceModel.clear(); // Only clear if we have new data
             parsedData.forEach(item => serviceModel.append(item));
         } else {
-            console.error("Invalid data format for serviceModel");
+            console.warn("No saved data found. Keeping default values.");
         }
     }
 

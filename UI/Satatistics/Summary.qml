@@ -131,6 +131,7 @@ Page {
                             Layout.alignment: Qt.AlignCenter
                         }
                         Text {
+                            id:netincomtxt
                             text: incomeModel.totalNetIncome.toLocaleCurrencyString(Qt.locale("en-MW"))
                             font.bold: true
                             font.pixelSize: 19
@@ -184,6 +185,7 @@ Page {
                                 color: "#333"
                             }
                             Text {
+                                id:cogstxt
                                 text: incomeModel.totalCostOfGoodSold.toLocaleCurrencyString(Qt.locale("en-MW"))
                                 font.bold: true
                                 font.pixelSize: 14
@@ -199,38 +201,36 @@ Page {
                 Layout.preferredHeight: 225
                 Material.elevation: 2
                 padding: 0
-
-                ChartView {
-                    id: chart
-                    title: "Daily Income"
+                //
+                SwipeView {
+                    id:view
                     anchors.fill: parent
-                    anchors.margins: 0
-                    antialiasing: true
-                    backgroundRoundness: 5
-                    legend.visible: false
-                    animationOptions:ChartView.SeriesAnimations
-                    dropShadowEnabled: true
+                    currentIndex: 1
+                    //DailyChart
+                    Daily{
 
-                    BarCategoryAxis {
-                        id: xAxis
-                        categories: ["Ma", "Tu", "We", "Th", "Fr", "Su", "Sa"]
-                        visible: true
                     }
+                    //Monthly Chart
+                    Monthly {
 
-                    BarSeries {
-                        id: incomeSeries
-                        axisX: xAxis
-                        barWidth: 0.17
-
-                        BarSet {
-                            label: "Income"
-                            color: "#E91E63"
-                            values: [1000, 3000, 2500, 4500, 1500, 4000, 5000]
-                        }
                     }
                 }
-            }
+                PageIndicator {
+                    id: indicator
 
+                    count: view.count
+                    currentIndex: view.currentIndex
+
+                    anchors.bottom: view.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+            }
+            Component.onCompleted: {
+                incomeModel.updateView()
+                netincomtxt.text = incomeModel.totalNetIncome.toLocaleCurrencyString(Qt.locale("en-MW"))
+                cogstxt.text = incomeModel.totalCostOfGoodSold.toLocaleCurrencyString(Qt.locale("en-MW"))
+            }
         }
     }
 }

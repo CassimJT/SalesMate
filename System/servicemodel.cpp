@@ -15,7 +15,7 @@ ServiceModel::ServiceModel(QObject *parent)
 ServiceModel::~ServiceModel()
 {
     //the distractor
-   // delete sharedManager;
+    // delete sharedManager;
     services.clear();
 }
 int ServiceModel::rowCount(const QModelIndex &parent) const
@@ -228,6 +228,8 @@ void ServiceModel::addService(const QString &sku, const QDate &date,
 
     // **Convert data to JSON**
     QJsonObject jsonObject;
+    QVariantList sales;
+
     jsonObject["sku"] = sku;
     jsonObject["name"] = name;
     jsonObject["date"] = formattedDate;
@@ -237,17 +239,15 @@ void ServiceModel::addService(const QString &sku, const QDate &date,
     jsonObject["description"] = description;
     jsonObject["cogs"] = cogs;
 
-    QVariantList sales;
-    sales.append(jsonObject.toVariantMap());
-    /*auto dbManager = DatabaseManager::instance();
+    sales.append(jsonObject);
+    auto dbManager = DatabaseManager::instance();
     if(dbManager) {
-       // dbManager->processSales(sales);
+        dbManager->processSales(sales);
     } else {
         qDebug() <<"dbManagers not exist";
     }
-    qDebug() << "Service Sale JSON Data:" << QJsonDocument(jsonObject).toJson(QJsonDocument::Compact);
     //reloading the model
-    updateView();*/
+    updateView();
     emit totalServiceChanged();
 }
 /**
