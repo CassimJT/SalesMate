@@ -5,6 +5,8 @@ import QtQuick.Layouts
 import "../Utils"
 import "../Utils/Utils.js" as Utils
 import "../Stock"
+import "../Receipt"
+
 import SalesModel
 
 Page {
@@ -212,27 +214,14 @@ Page {
                 btnIconSrc: "qrc:/Asserts/icons/sale.png"
                 btnText: "Make Sales"
                 onBtnClicked: {
+
                     let paymentAmount = Number(paymentField.text); // Convert text to a number
                     let totalSaleAmount = SalesModel.totalSale(); // Get total sale amount
 
                     if (paymentField.text !== "" && totalSaleAmount > 0) {
                         if (paymentAmount >= totalSaleAmount) {
-                            homePage.totalSale = 0.0;
-                            Utils.resetField();
-                            payementDiretionText.visible = false; // Hide error message
-                            //.....
-                            /***To do list***/
-                            // confirm sale
-                            // save the sale to Database
-                            // Subtract the itemes from the stock Database
-                            // generate an invoive if success
-                            // menthode on invoive to be decided later
-                            var data = SalesModel.onGoingSale()
-                            console.log(JSON.stringify(data))
-                            databaseManager.processSales(data)
+                            receipt.open()
 
-
-                            SalesModel.clearModel()
                         } else {
                             payementDiretionText.directionalText = "Payment must be greater than total";
                             payementDiretionText.visible = true;
@@ -244,6 +233,21 @@ Page {
             }
         }
     }
+    //receipt
+    Receipt {
+        id: receipt
+        onClicked: {
+            homePage.totalSale = 0.0;
+            Utils.resetField();
+            payementDiretionText.visible = false;
+            var data = SalesModel.onGoingSale()
+            console.log(JSON.stringify(data))
+            databaseManager.processSales(data)
+            SalesModel.clearModel()
+            receipt.close()
+        }
+    }
+
     Connections {
         target: barcodeEngine
         onBarcodeChanged: {

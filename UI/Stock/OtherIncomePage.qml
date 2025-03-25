@@ -244,6 +244,10 @@ Page {
 
                 }
             }
+            DirectionalText {
+                id: amountDirectionalText
+                visible: false
+            }
 
             TextField {
                 id: amountField
@@ -251,6 +255,10 @@ Page {
                 Layout.fillWidth: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 visible: !edit.checked
+                onTextEdited: {
+                    directionText.visible = false
+                    amountDirectionalText.visible = false
+                }
             }
 
             TextField {
@@ -290,6 +298,8 @@ Page {
                 onTextChanged: {
                     limitCharacters(descriptionField, max_length);
                     characterCounter.text = (max_length - descriptionField.length) + " characters remaining";
+                    directionText.visible = false
+                    amountDirectionalText.visible = false
                 }
 
                 function limitCharacters(textArea, maxLength) {
@@ -318,20 +328,38 @@ Page {
                 btnText: "Save"
                 visible: !edit.checked
                 onBtnClicked: {
-                    //...
-                    const sku = code.text
-                    const date = Utils.convertToDate(dateField.text)
-                    const name = serviceType.currentText
+                    const sku = code.text.trim()
+                    const date = Utils.convertToDate(dateField.text.trim())
+                    const name = serviceType.currentText.trim()
                     const unit_serviceprice = parseFloat(serviceModel.get(serviceType.currentIndex).servicePrice)
                     const unit_itemprice = parseFloat(serviceModel.get(serviceType.currentIndex).itemPrice)
-                    const description = descriptionField.text
-                    const total = parseFloat(amountField.text)
-                    console.log(total,name,unit_itemprice,unit_serviceprice,sku,date,description)
-                    ServiceModel.addService(sku,date,name,unit_serviceprice,unit_itemprice,description,total)
+                    const description = descriptionField.text.trim()
+                    const total = parseFloat(amountField.text.trim())
+                    // Check for empty fields
+                    if (total === 0.0  || isNaN(total)) {
+                        amountDirectionalText.directionalText = "Amount cannot be empty."
+                        amountDirectionalText.visible = true
+                        return
+                    } else {
+                        ServiceModel.addService(sku, date, name, unit_serviceprice, unit_itemprice, description, total)
+                    }
 
                 }
             }
+            //Derection Text
+            DirectionalText {
+                id:directionText
+                visible: false
+
+            }
+
         }
+    }
+    //reserting the field
+    function resertField() {
+        console.log("clearing...")
+        amountField.text = ""
+        descriptionField.text = ""
     }
 
     //listmodel
@@ -449,5 +477,18 @@ Page {
         id:newService
         otherIncome: otherIncome
 
+    }
+    Connections {
+        target: ServiceModel
+        onTotalServiceChanged:function () {
+            resertField() // Clearing the fields
+            directionText.directionalText = "Saved!!"
+            directionText.colorTxt = "green"
+            directionText.visible = true
+        }
+        onError:function(){
+            directionText.directionalText = "Error: Not saved!!"
+            directionText.visible = true
+        }
     }
 }

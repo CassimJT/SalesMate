@@ -7,7 +7,7 @@ set    (ZXING_WRITERS "ON" CACHE STRING "Build with old and/or new writer (encod
 option (ZXING_USE_BUNDLED_ZINT "Use the bundled libzint for barcode creation/writing" ON)
 option (ZXING_C_API "Build the C-API" OFF)
 option (ZXING_EXPERIMENTAL_API "Build with experimental API" OFF)
-option (ZXING_EXAMPLES "Build the example barcode reader/writer applications" ON)
+option (ZXING_EXAMPLES "Build the example barcode reader/writer applications" OFF)
 option (ZXING_BLACKBOX_TESTS "Build the black box reader/writer tests" OFF)
 option (ZXING_UNIT_TESTS "Build the unit tests (don't enable for production builds)" OFF)
 option (ZXING_PYTHON_MODULE "Build the python module" OFF)

@@ -25,14 +25,15 @@ public:
 public slots:
     //
     void requestCameraPeremision();
+
 signals:
    //
 private slots:
   //
 private:
     void setAnAndroidSystemBarColor();
-
-
+    void StartSchedua();
+    void requestIgnoreBatteryOptimization();
 
 };
 

@@ -48,6 +48,7 @@ Page {
             }
             onClicked: {
                 swipeView.currentIndex = 0
+                //reload()
             }
         }
         //currentSale
@@ -98,5 +99,8 @@ Page {
                 swipeView.currentIndex = 1
             }
         }
+    }
+    function reload() {
+        stackView.replace("HomePage.qml")
     }
 }

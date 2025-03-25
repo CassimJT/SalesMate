@@ -4,7 +4,11 @@ project(SalesMate VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
-add_subdirectory(./zxing-cpp/)
+#Configure ZXing properly BEFORE adding it
+set(ZXING_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(ZXING_BLACKBOX_TESTS OFF CACHE BOOL "" FORCE)
+set(ZXING_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory(zxing-cpp EXCLUDE_FROM_ALL)  # Critical change
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql Charts)
 
 qt_standard_project_setup(REQUIRES 6.5)
@@ -31,7 +35,6 @@ qt_add_qml_module(appSalesMate
             SOURCES
                 androidsystem.h
                 androidsystem.cpp
-                RESOURCES android/src/com/native/Native.java
                 QML_FILES UI/Drawer/Profile.qml
                 QML_FILES UI/Drawer/ImageProcessor.js
                 QML_FILES UI/Drawer/DrawerMenu.qml
@@ -92,16 +95,17 @@ qt_add_qml_module(appSalesMate
                 QML_FILES UI/Satatistics/Daily.qml
                 QML_FILES UI/Satatistics/Monthly.qml
                 QML_FILES UI/Satatistics/Yearly.qml
-
-
-
-
+                RESOURCES android/src/com/salesmate/BatteryOptimizationHelper.java
+                RESOURCES android/src/com/salesmate/AlarmKeepAliveService.java
+                QML_FILES UI/Receipt/Receipt.qml
+                QML_FILES UI/Receipt/ReceiptText.qml
 
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
+# Android-specific fixes
 set_target_properties(appSalesMate PROPERTIES
 #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appSalesMate
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
@@ -111,7 +115,7 @@ set_target_properties(appSalesMate PROPERTIES
 )
 
 target_link_libraries(appSalesMate
-    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate Qt6::Multimedia ZXing::ZXing Qt6::Sql Qt6::Charts
+    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate ZXing::ZXing Qt6::Multimedia  Qt6::Sql Qt6::Charts
 )
 set_property(TARGET appSalesMate APPEND PROPERTY
     QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android

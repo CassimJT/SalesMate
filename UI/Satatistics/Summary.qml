@@ -63,7 +63,6 @@ Page {
                             font.bold: true
                             font.pixelSize: 26
                             color: "white"
-
                         }
                         Text {
                             text: expenseModel.totalCost.toLocaleCurrencyString(Qt.locale("en-MW"))
@@ -205,7 +204,7 @@ Page {
                 SwipeView {
                     id:view
                     anchors.fill: parent
-                    currentIndex: 1
+                    currentIndex: 0
                     //DailyChart
                     Daily{
 

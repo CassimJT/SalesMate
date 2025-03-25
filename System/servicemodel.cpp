@@ -223,6 +223,8 @@ void ServiceModel::addService(const QString &sku, const QDate &date,
     if (!db.commit()) {
         qDebug() << "Failed to commit transaction:" << db.lastError().text();
         db.rollback();
+        //emit a signal
+        emit error();
         return;
     }
 

@@ -6,6 +6,7 @@ AndroidSystem::AndroidSystem(QObject *parent)
 //constractor
 #if defined(Q_OS_ANDROID)
     setAnAndroidSystemBarColor();
+    //StartSchedua();
 #endif
 }
 /**
@@ -52,6 +53,42 @@ void AndroidSystem::setAnAndroidSystemBarColor()
         return QVariant(true);
     }).waitForFinished();
 
+#endif
+}
+/**
+ * @brief AndroidSystem::StartSchedua
+ * start the schedual
+ */
+void AndroidSystem::StartSchedua()
+{
+#if defined(Q_OS_ANDROID)
+    qDebug()<<"Starting the Schedual";
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+    if (activity.isValid()) {
+        QJniObject::callStaticMethod<void>(
+            "com/salesmate/AlarmManagerHelper",
+            "scheduleAlarm",
+            "(Landroid/content/Context;)V",
+            activity.object<jobject>()
+            );
+    }
+#endif
+}
+
+void AndroidSystem::requestIgnoreBatteryOptimization()
+{
+#if defined(Q_OS_ANDROID)
+    qDebug() << "Requesting battery optimization exemption";
+
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+    if (activity.isValid()) {
+        QJniObject::callStaticMethod<void>(
+            "com/salesmate/BatteryOptimizationHelper",
+            "requestIgnoreBatteryOptimization",
+            "(Landroid/content/Context;)V",
+            activity.object<jobject>()
+            );
+    }
 #endif
 }
 

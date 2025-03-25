@@ -2,7 +2,6 @@ import QtQuick 2.15
 import QtQuick.Controls
 import QtMultimedia
 
-
 Item {
     id: m_parent
     width: parent.width
@@ -17,16 +16,15 @@ Item {
     property string generateIcconSource: ""
     property bool startSession: false
     property alias imagecapture: imagecapture
-    property alias  camera: camera
+    property alias camera: camera
     property alias output: output
     property alias frameTimer: frameTimer
     property string barcode: ""
 
-    //exposing the Scanner tool propeties
-    // Signals to expose scanner tool events
     signal searchBtnClciked()
 
     implicitHeight: scannerArea.height
+
     CaptureSession {
         id: session
         camera: Camera {
@@ -37,26 +35,26 @@ Item {
         imageCapture: ImageCapture {
             id: imagecapture
             onImageCaptured: function (imageId, preview) {
-
                 barcodeEngine.processImage(preview)
             }
         }
         videoOutput: output
     }
-    // Barcode area background
+
     Rectangle {
         id: scannerArea
         width: m_parent.barCodeWidth
         height: m_parent.barcodeHight
         radius: 5
         color: m_parent.barCodAreaColor
+
         Label {
-            id:code
-            anchors.centerIn:parent
+            id: code
+            anchors.centerIn: parent
             text: m_parent.barcode
             visible: false
         }
-        // VideoOutput
+
         VideoOutput {
             id: output
             anchors.fill: parent
@@ -70,12 +68,12 @@ Item {
                     margins: 8
                 }
                 MouseArea {
-                    anchors.fill:parent
-                    onClicked:{
-                        //restarting the camera
-                        camera.stop()
-                        camera.start()
-                        frameTimer.restart()
+                    anchors.fill: parent
+                    onClicked: {
+                        console.log("Restarting camera...")
+                        //reload()
+                        //reinitializeCamera();
+                        reset()
                     }
                 }
             }
@@ -87,32 +85,33 @@ Item {
                 searchIconSource: m_parent.searchIconSource
                 generateIconSource: m_parent.generateIcconSource
 
-
                 anchors {
                     bottom: parent.bottom
                     horizontalCenter: parent.horizontalCenter
                     bottomMargin: 6
                 }
+
                 onScannerActivated: {
                     Android.requestCameraPeremision()
                     if (scannerTools.scannerClicked) {
+                        console.log("Starting camera...");
                         camera.start();
-                        frameTimer.start()
+                        frameTimer.start();
                     } else {
+                        console.log("Stopping camera...");
                         camera.stop();
-                        frameTimer.stop()
+                        frameTimer.stop();
                     }
                 }
                 onTorchActivated: {
                     console.log("Torch button clicked! Active: " + scannerTools.torchClicked);
                     camera.torchMode = scannerTools.torchClicked ? Camera.TorchOn : Camera.TorchOff;
-
                 }
                 onSearchClicked: {
                     m_parent.searchBtnClciked();
                 }
-
             }
+
             Rectangle {
                 id: indicator
                 color: camera.active ? "green" : "red"
@@ -126,11 +125,8 @@ Item {
                     rightMargin: 20
                 }
             }
-            /*Component.onCompleted: {
-                 barcodeEngine.setVideoSink(videoSink)
-            }*/
         }
-        //receycling buttun
+
         Image {
             id: recycle
             width: 36
@@ -144,60 +140,82 @@ Item {
             }
             MouseArea {
                 anchors.fill: parent
-                onClicked : {
-                    reset()
+                onClicked: {
+                    reset();
                 }
             }
         }
     }
+
     MediaPlayer {
-        id:barcodeSound
+        id: barcodeSound
         source: "qrc:/Asserts/sound/store-scanner-beep.wav"
         audioOutput: AudioOutput{}
     }
-    //signal
+
     Connections {
         target: barcodeEngine
         onBarcodeChanged: function () {
             frameTimer.stop();
-            camera.stop()
-            barcodeSound.play()
+            camera.stop();
+            barcodeSound.play();
             output.visible = false;
             code.visible = true;
-            m_parent.showRecycle = true
+            m_parent.showRecycle = true;
             m_parent.barcode = barcodeEngine.barcode;
-            scannerTools.scannerClicked = "false"
+            scannerTools.scannerClicked = false;
         }
     }
+
     Timer {
-        id:frameTimer
+        id: frameTimer
         interval: 500
-        running:true
+        running: camera.active
         repeat: true
         onTriggered: {
-            imagecapture.capture()
+            if (camera.active) {
+                imagecapture.capture();
+            }
         }
     }
 
     function reset() {
-        camera.stop()
-        camera.start()
-        output.visible = true
-        frameTimer.restart()
-        m_parent.showRecycle = false
-        output.visible = true
+        console.log("Resetting camera...");
+        camera.stop();
+        camera.start();
+        output.visible = true;
+        frameTimer.restart();
+        m_parent.showRecycle = false;
+    }
+    //refreshing the camera
+    function reinitializeCamera() {
+        console.log("Reinitializing Camera...");
+
+        if (camera.active) {
+            camera.stop();
+        }
+
+        frameTimer.stop();
+
+        output.visible = false;
+
+        Qt.callLater(() => {
+                         // We can reload the camera here if needed by re-creating or setting up a new Camera object
+                         // For now, we will just restart the same camera instance
+
+                         // Ensure the camera is ready and start it again
+                         camera.start();
+
+                         // Restart the frame timer
+                         frameTimer.start();
+
+                         // Make the video output visible again
+                         output.visible = true;
+                     });
     }
 
-    function reinitializeCamera() {
-        session.stop();
-        if (session) {
-            session.camera = camera;  // Reassign the camera
-            session.imageCapture = imageCapture;  // Reassign the image capture
-            session.videoOutput = output;  // Reassign the video output
-            camera.start();  // Restart the camera
-        } else {
-            console.error("Session is null or invalid");
-        }
-    }
+
+
+
 
 }

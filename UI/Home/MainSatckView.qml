@@ -3,6 +3,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 StackView {
+    property alias stackView: stackView
     id: stackView
     objectName: "StackView"
     anchors.fill: parent

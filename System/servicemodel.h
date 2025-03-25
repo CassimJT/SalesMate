@@ -49,6 +49,7 @@ public slots:
 
 signals:
     void totalServiceChanged();
+    void error();
 private:
     QVector<QSharedPointer<Service>> services;
     QHash<int,QByteArray> roleNames() const override;
