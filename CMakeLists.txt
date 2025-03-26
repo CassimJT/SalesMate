@@ -8,7 +8,7 @@ set(CMAKE_AUTORCC ON)
 set(ZXING_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(ZXING_BLACKBOX_TESTS OFF CACHE BOOL "" FORCE)
 set(ZXING_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(zxing-cpp EXCLUDE_FROM_ALL)  # Critical change
+add_subdirectory(core/zxing-cpp EXCLUDE_FROM_ALL)  # Critical change
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql Charts)
 
 qt_standard_project_setup(REQUIRES 6.5)
@@ -21,86 +21,117 @@ qt_add_executable(appSalesMate
 qt_add_qml_module(appSalesMate
     URI SalesMate
     VERSION 1.0
+
     QML_FILES
         Main.qml
-        RESOURCES
-            android/AndroidManifest.xml
-            android/build.gradle android/res/values/libs.xml
-            android/res/xml/qtprovider_paths.xml
-            android/gradle/wrapper/gradle-wrapper.jar
-            android/gradle/wrapper/gradle-wrapper.properties
-            android/gradle.properties
-            android/gradlew
-            android/gradlew.bat
-            SOURCES
-                androidsystem.h
-                androidsystem.cpp
-                QML_FILES UI/Drawer/Profile.qml
-                QML_FILES UI/Drawer/ImageProcessor.js
-                QML_FILES UI/Drawer/DrawerMenu.qml
-                QML_FILES UI/Drawer/DrawerModel.qml
-                QML_FILES UI/Drawer/DrawerDelegate.qml
-                QML_FILES UI/Home/HomePage.qml
-                QML_FILES UI/Welcome/WelcomePage.qml
-                QML_FILES UI/Auth/SignInPage.qml
-                QML_FILES UI/Auth/SignUpPage.qml
-                QML_FILES UI/About/AboutAppPage.qml
-                QML_FILES UI/About/AboutUsPage.qml
-                QML_FILES UI/Stock/AddItemPage.qml
-                QML_FILES UI/Stock/ShowStock.qml
-                QML_FILES UI/Updates/ChechUpdatePage.qml
-                QML_FILES UI/Stock/AddExpensePage.qml
-                QML_FILES UI/Stock/OtherIncomePage.qml
-                QML_FILES UI/Stock/ShowSalesPage.qml
-                QML_FILES UI/Profile/ProfileEditPage.qml
-                QML_FILES UI/Utils/BarcodeScanner.qml
-                QML_FILES UI/Utils/ScannerTools.qml
-                QML_FILES UI/Utils/CustomButton.qml
-                QML_FILES UI/Stock/AddStock.qml
-                QML_FILES UI/Stock/SearchBar.qml
-                QML_FILES UI/Stock/StockModel.qml
-                QML_FILES UI/Stock/StockDelegate.qml
-                QML_FILES UI/Notification/NotificationPage.qml
-                QML_FILES UI/Notification/NotificationModel.qml
-                QML_FILES UI/Notification/NotificationDelegate.qml
-                QML_FILES UI/Utils/Avatar.qml
-                QML_FILES UI/Profile/AvataDrawerTools.qml
-                QML_FILES UI/Utils/Utils.js
-                SOURCES barcodeengine.h barcodeengine.cpp
-                SOURCES System/product.h System/product.cpp
-                SOURCES System/databasemanager.h System/databasemanager.cpp
-                QML_FILES UI/Utils/InfoPopup.qml
-                QML_FILES UI/Home/MainSatckView.qml
-                SOURCES System/productfilterproxymodel.h System/productfilterproxymodel.cpp
-                QML_FILES UI/Home/Home.qml
-                QML_FILES UI/Home/CurrentSales.qml
-                QML_FILES UI/Stock/CurrentSalesDelegate.qml
-                QML_FILES UI/Utils/DirectionalText.qml
-                QML_FILES UI/Utils/BarcodeSearch.qml
-                QML_FILES UI/SearchBarcode/SearchBarcodeDelegate.qml
-                QML_FILES UI/Utils/Heading.qml
-                QML_FILES UI/Utils/PopupHeading.qml
-                SOURCES System/incomemodel.h System/incomemodel.cpp
-                SOURCES System/expensesmodel.h System/expensesmodel.cpp
-                SOURCES System/expense.h System/expense.cpp
-                SOURCES System/income.h System/income.cpp
-                QML_FILES UI/Satatistics/Statistics.qml
-                SOURCES System/service.h
-                SOURCES System/service.cpp
-                SOURCES System/servicemodel.h System/servicemodel.cpp
-                QML_FILES UI/Utils/ProductEditPopup.qml
-                QML_FILES UI/Utils/AddNewService.qml
-                QML_FILES UI/Satatistics/Summary.qml
-                QML_FILES UI/Satatistics/Reports.qml
-                QML_FILES UI/Satatistics/Daily.qml
-                QML_FILES UI/Satatistics/Monthly.qml
-                QML_FILES UI/Satatistics/Yearly.qml
-                RESOURCES android/src/com/salesmate/BatteryOptimizationHelper.java
-                RESOURCES android/src/com/salesmate/AlarmKeepAliveService.java
-                QML_FILES UI/Receipt/Receipt.qml
-                QML_FILES UI/Receipt/ReceiptText.qml
 
+        # UI Components
+        UI/Drawer/Profile.qml
+        UI/Drawer/ImageProcessor.js
+        UI/Drawer/DrawerMenu.qml
+        UI/Drawer/DrawerModel.qml
+        UI/Drawer/DrawerDelegate.qml
+        UI/Home/HomePage.qml
+        UI/Home/MainSatckView.qml
+        UI/Home/Home.qml
+        UI/Home/CurrentSales.qml
+        UI/Welcome/WelcomePage.qml
+        UI/Auth/SignInPage.qml
+        UI/Auth/SignUpPage.qml
+        UI/About/AboutAppPage.qml
+        UI/About/AboutUsPage.qml
+        UI/Stock/AddItemPage.qml
+        UI/Stock/ShowStock.qml
+        UI/Stock/AddExpensePage.qml
+        UI/Stock/OtherIncomePage.qml
+        UI/Stock/ShowSalesPage.qml
+        UI/Stock/AddStock.qml
+        UI/Stock/SearchBar.qml
+        UI/Stock/StockModel.qml
+        UI/Stock/StockDelegate.qml
+        UI/Stock/CurrentSalesDelegate.qml
+        UI/Profile/ProfileEditPage.qml
+        UI/Profile/AvataDrawerTools.qml
+        UI/Notification/NotificationPage.qml
+        UI/Notification/NotificationModel.qml
+        UI/Notification/NotificationDelegate.qml
+        UI/Utils/BarcodeScanner.qml
+        UI/Utils/ScannerTools.qml
+        UI/Utils/CustomButton.qml
+        UI/Utils/Avatar.qml
+        UI/Utils/Utils.js
+        UI/Utils/InfoPopup.qml
+        UI/Utils/DirectionalText.qml
+        UI/Utils/BarcodeSearch.qml
+        UI/Utils/Heading.qml
+        UI/Utils/PopupHeading.qml
+        UI/Utils/ProductEditPopup.qml
+        UI/Utils/AddNewService.qml
+        UI/SearchBarcode/SearchBarcodeDelegate.qml
+
+        # Statistics
+        UI/Satatistics/Statistics.qml
+        UI/Satatistics/Summary.qml
+        UI/Satatistics/Reports.qml
+        UI/Satatistics/Daily.qml
+        UI/Satatistics/Monthly.qml
+        UI/Satatistics/Yearly.qml
+
+        # Updates
+        UI/Updates/ChechUpdatePage.qml
+
+        # Receipts
+        UI/Receipt/Receipt.qml
+        UI/Receipt/ReceiptText.qml
+
+    SOURCES
+        # Android System
+        androidsystem.h
+        androidsystem.cpp
+
+        # Barcode Engine
+        barcodeengine.h
+        barcodeengine.cpp
+
+        # System
+        core/sources/product.h
+        core/sources/product.cpp
+        core/sources/databasemanager.h
+        core/sources/databasemanager.cpp
+        core/sources/productfilterproxymodel.h
+        core/sources/productfilterproxymodel.cpp
+        core/sources/incomemodel.h
+        core/sources/incomemodel.cpp
+        core/sources/expensesmodel.h
+        core/sources/expensesmodel.cpp
+        core/sources/expense.h
+        core/sources/expense.cpp
+        core/sources/income.h
+        core/sources/income.cpp
+        core/sources/service.h
+        core/sources/service.cpp
+        core/sources/servicemodel.h
+        core/sources/servicemodel.cpp
+        core/sources/reportmanager.h
+        core/sources/reportmanager.cpp
+
+    RESOURCES
+        # Android Configuration
+        android/AndroidManifest.xml
+        android/build.gradle
+        android/res/values/libs.xml
+        android/res/xml/qtprovider_paths.xml
+        android/gradle/wrapper/gradle-wrapper.jar
+        android/gradle/wrapper/gradle-wrapper.properties
+        android/gradle.properties
+        android/gradlew
+        android/gradlew.bat
+
+        # Android Source Code
+        android/src/com/salesmate/BatteryOptimizationHelper.java
+        android/src/com/salesmate/AlarmKeepAliveService.java
 )
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

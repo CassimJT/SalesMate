@@ -50,6 +50,7 @@ public:
     void setUpIncomeTable();
     void setUpServiceTable();
     qreal totalInventory() const;
+    QSqlDatabase getDatabase()const;
 
 public slots:
     //
@@ -66,6 +67,7 @@ signals:
     void productExists();
     void productAlreadyExist();//for updating
     void totalInventoryChanged();
+    void salesProcessed();
 
 private:
     QVector<QSharedPointer<Product>> products;
@@ -78,6 +80,7 @@ private:
     QSharedPointer<IncomeModel> incomeModel;
     QSharedPointer<ServiceModel> serviceModel;
     static DatabaseManager * _instance;
+    QSqlDatabase db;
 
 
 };

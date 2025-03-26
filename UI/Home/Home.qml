@@ -220,7 +220,8 @@ Page {
 
                     if (paymentField.text !== "" && totalSaleAmount > 0) {
                         if (paymentAmount >= totalSaleAmount) {
-                            receipt.open()
+                            var data = SalesModel.onGoingSale()
+                            databaseManager.processSales(data) //process sales
 
                         } else {
                             payementDiretionText.directionalText = "Payment must be greater than total";
@@ -236,15 +237,26 @@ Page {
     //receipt
     Receipt {
         id: receipt
-        onClicked: {
+        onPrintClicked: {
+            //print
+        }
+        onCancelClicked: {
             homePage.totalSale = 0.0;
             Utils.resetField();
             payementDiretionText.visible = false;
-            var data = SalesModel.onGoingSale()
-            console.log(JSON.stringify(data))
-            databaseManager.processSales(data)
             SalesModel.clearModel()
+            paymentField.text = ""
+            changeField.text = ""
             receipt.close()
+        }
+        onSaveClicked: {
+            //save
+
+        }
+
+        onShareClicked: {
+            //share
+
         }
     }
 
@@ -264,6 +276,16 @@ Page {
             } else {
                 console.log("Product not found for SKU:", sku);
             }
+        }
+    }
+
+    Connections {
+        target: databaseManager
+        onSalesProcessed: function () {
+            if (stackView.currentItem && stackView.currentItem.objectName === "Home") {
+                receipt.open();
+            }
+
         }
     }
 

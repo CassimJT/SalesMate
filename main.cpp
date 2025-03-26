@@ -5,10 +5,10 @@
 #include <QQmlContext>
 #include <qqml.h>
 #include "barcodeengine.h"
-#include "System/databasemanager.h"
-#include "System/expensesmodel.h"
-#include "System/incomemodel.h"
-#include "System/servicemodel.h"
+#include "core/sources/databasemanager.h"
+#include "core/sources/expensesmodel.h"
+#include "core/sources/incomemodel.h"
+#include "core/sources/servicemodel.h"
 
 int main(int argc, char *argv[])
 {

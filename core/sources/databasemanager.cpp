@@ -1,5 +1,5 @@
 #include "databasemanager.h"
-#include "System/product.h"
+#include "core/sources/product.h"
 #include <qcontainerfwd.h>
 #include <qlogging.h>
 #include <qpropertyprivate.h>
@@ -374,7 +374,7 @@ void DatabaseManager::processSales(const QVariantList &sales)
             updateView();
             serviceModel->updateView();
             incomeModel->updateView();
-
+            emit salesProcessed();
         }
     } else {
         db.rollback();
@@ -399,7 +399,7 @@ QHash<int, QByteArray> DatabaseManager::roleNames() const
  */
 void DatabaseManager::setUpDatabase()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("salesmate.db");
 
     if (!db.open()) {
@@ -493,9 +493,7 @@ ProductFilterProxyModel *DatabaseManager::getProxyModel() const
  */
 void DatabaseManager::setUpExpenceTable()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("salesmate.db");
-
+    QSqlDatabase db = QSqlDatabase::database();
     if(!db.open()) {
         qDebug() << "failed to open the database: " << db.lastError().text();
         return;
@@ -533,9 +531,7 @@ void DatabaseManager::setUpExpenceTable()
  */
 void DatabaseManager::setUpIncomeTable()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("salesmate.db");
-
+    QSqlDatabase db = QSqlDatabase::database();
     if(!db.open()) {
         qDebug() << "failed to open the database: " << db.lastError().text();
         return;
@@ -621,6 +617,11 @@ qreal DatabaseManager::totalInventory() const
         totalInventory += total_itemprice;
     }
     return totalInventory;
+}
+
+QSqlDatabase DatabaseManager::getDatabase() const
+{
+    return db;
 }
 /**
  * @brief DatabaseManager::queryDatabase

@@ -76,5 +76,8 @@
         <file>Asserts/icons/summary-100.png</file>
         <file>Asserts/icons/icons8-cancel-100.png</file>
         <file>Asserts/icons/icons8-sale-100.png</file>
+        <file>Asserts/icons/POS.png</file>
+        <file>Asserts/icons/share.gif</file>
+        <file>Asserts/icons/print.png</file>
     </qresource>
 </RCC>

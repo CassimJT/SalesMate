@@ -28,9 +28,9 @@ Page {
                 anchors.centerIn: parent
                 Image {
                     id: addstock
-                    source: "qrc:/Asserts/icons/home.png"
-                    width: 36
-                    height: 36
+                    source: "qrc:/Asserts/icons/POS.png"
+                    width: 33
+                    height: 33
                     fillMode: Image.PreserveAspectFit
                     Layout.alignment: Qt.AlignVCenter
                     anchors {
@@ -39,7 +39,7 @@ Page {
                 }
                 Label {
                     id:addStockText
-                     text:qsTr("Home")
+                     text:qsTr("POS")
                     Layout.alignment: Qt.AlignVCenter
                     anchors {
                         verticalCenter: addstock.verticalCenter

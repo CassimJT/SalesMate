@@ -170,7 +170,7 @@ Item {
     Timer {
         id: frameTimer
         interval: 500
-        running: camera.active
+        running: true
         repeat: true
         onTriggered: {
             if (camera.active) {
@@ -182,9 +182,10 @@ Item {
     function reset() {
         console.log("Resetting camera...");
         camera.stop();
+        frameTimer.stop();
         camera.start();
         output.visible = true;
-        frameTimer.restart();
+        frameTimer.start();
         m_parent.showRecycle = false;
     }
     //refreshing the camera

@@ -10,7 +10,11 @@ Popup {
     modal: true
     anchors.centerIn: parent
     closePolicy: Popup.NoAutoClose
-    signal clicked()
+    signal printClicked()
+    signal cancelClicked()
+    signal saveClicked()
+    signal shareClicked()
+    clip: true
 
     property string storeName: "Salesmate"
     property string storePhone: "Tel: +256 883 560 759"
@@ -48,7 +52,7 @@ Popup {
         ReceiptText { text: storeAddress; horizontalAlignment: Text.AlignHCenter }
         ReceiptText { text: storePhone; horizontalAlignment: Text.AlignHCenter }
 
-        ReceiptText { text: "-----------------------------"; horizontalAlignment: Text.AlignHCenter }
+        ReceiptText { text: "------------------------------------------------"; horizontalAlignment: Text.AlignHCenter }
 
         // Transaction Info
         ReceiptText { text: "Date: " + Qt.formatDateTime(transactionDate, "yyyy-MM-dd hh:mm") }
@@ -57,11 +61,11 @@ Popup {
         // Items Table Header
         RowLayout {
             width: parent.width
-            spacing: 20  // Adjust spacing as needed
+            spacing: 20
 
             ReceiptText {
                 text: "<b>ITEM</b>"
-                Layout.fillWidth: true  // Ensures equal spacing
+                Layout.fillWidth: true
             }
             ReceiptText {
                 text: "<b>QTY</b>"
@@ -101,12 +105,12 @@ Popup {
         }
 
         // Totals
-        ReceiptText { text: "-----------------------------"; horizontalAlignment: Text.AlignHCenter }
+        ReceiptText { text: "------------------------------------------------"; horizontalAlignment: Text.AlignHCenter }
         ReceiptText {
             textFormat: Text.RichText  // Enables HTML formatting
             text: {
                 const subtotal = SalesModel.totalSale();
-                const tax = subtotal * taxRate;
+                const tax = (subtotal * taxRate);
                 const total = (subtotal + tax).toLocaleCurrencyString(Qt.locale("en-MW"));
 
                 return [
@@ -128,44 +132,71 @@ Popup {
 
         // Buttons
         RowLayout {
+            width: parent.width
             spacing: 10
-            anchors {
+            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.margins: 10
 
-                right: parent.right
-                rightMargin: 10
-            }
+            /*AnimatedImage {
+                width: 16
+                height: width
+                source: "qrc:/Asserts/icons/share.gif"
+                fillMode: Image.PreserveAspectFit
+                Layout.alignment: Qt.AlignLeft
+            }*/
 
-            RoundButton {
-                // text: "Cancel"
-                Layout.preferredWidth: 60
-                Layout.preferredHeight: 50
-                Image {
-                    anchors.centerIn: parent
-                    width: 24
-                    height: width
-                    source: "qrc:/Asserts/icons/icons8-cancel-100.png"
-                    fillMode: Image.PreserveAspectFit
+            RowLayout {
+                spacing: 5
+                Layout.alignment: Qt.AlignRight
+
+                RoundButton {
+                    Layout.preferredWidth: 50
+                    Layout.preferredHeight: 40
+                    Image {
+                        anchors.centerIn: parent
+                        width: 24
+                        height: width
+                        source: "qrc:/Asserts/icons/icons8-cancel-100.png"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                    onClicked: receipt.cancelClicked()
+                    ToolTip.text: "Cancel"
+                    ToolTip.visible: hovered
                 }
-                onClicked: receipt.close()
 
-            }
+                RoundButton {
+                    Layout.preferredWidth: 50
+                    Layout.preferredHeight: 40
+                    Image {
+                        anchors.centerIn: parent
+                        width: 20
+                        height: width
+                        source: "qrc:/Asserts/icons/save.png"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                    onClicked: receipt.saveClicked()
+                    ToolTip.text: "Save"
+                    ToolTip.visible: hovered
+                }
 
-            RoundButton {
-                // text: "OK"
-                Layout.preferredWidth: 60
-                Layout.preferredHeight: 50
-                Image {
-                    anchors.centerIn: parent
-                    width: 24
-                    height: width
-                    source: "qrc:/Asserts/icons/icons8-sale-100.png"
-                    fillMode: Image.PreserveAspectFit
+                RoundButton {
+                    Layout.preferredWidth: 50
+                    Layout.preferredHeight: 40
+                    Image {
+                        anchors.centerIn: parent
+                        width: 24
+                        height: width
+                        source: "qrc:/Asserts/icons/print.png"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                    onClicked: receipt.printClicked()
+                    ToolTip.text: "Print"
+                    ToolTip.visible: hovered
                 }
-                onClicked :{
-                    receipt.clicked()
-                }
+
 
             }
         }
+
     }
 }
