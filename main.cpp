@@ -9,6 +9,7 @@
 #include "core/sources/expensesmodel.h"
 #include "core/sources/incomemodel.h"
 #include "core/sources/servicemodel.h"
+#include "core/sources/reportmanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,6 +22,7 @@ int main(int argc, char *argv[])
     ExpensesModel expenseModel;
     IncomeModel incomeModel;
     ServiceModel serviceModel;
+    ReportManager reportManger;
 
     QCoreApplication::setOrganizationName("SalesMate");
     QCoreApplication::setOrganizationDomain("SalesMate.com");
@@ -31,7 +33,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("productFilterModel", databaseManager->getProxyModel());
     engine.rootContext()->setContextProperty("expenseModel", &expenseModel);
     engine.rootContext()->setContextProperty("incomeModel", &incomeModel);
-     engine.rootContext()->setContextProperty("ServiceModel", &serviceModel);
+    engine.rootContext()->setContextProperty("ServiceModel", &serviceModel);
+    engine.rootContext()->setContextProperty("ReportManger", &reportManger);
     qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
     qmlRegisterSingletonType(QUrl("qrc:/UI/Stock/SalesModel.qml"), "SalesModel", 1, 0, "SalesModel");
 
