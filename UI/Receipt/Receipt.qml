@@ -151,12 +151,12 @@ Popup {
 
                 RoundButton {
                     Layout.preferredWidth: 50
-                    Layout.preferredHeight: 40
+                    Layout.preferredHeight: 50
                     Image {
                         anchors.centerIn: parent
-                        width: 24
+                        width: 20
                         height: width
-                        source: "qrc:/Asserts/icons/icons8-cancel-100.png"
+                        source: "qrc:/Asserts/icons/close-100-red.png"
                         fillMode: Image.PreserveAspectFit
                     }
                     onClicked: receipt.cancelClicked()
@@ -166,7 +166,7 @@ Popup {
 
                 RoundButton {
                     Layout.preferredWidth: 50
-                    Layout.preferredHeight: 40
+                    Layout.preferredHeight: 50
                     Image {
                         anchors.centerIn: parent
                         width: 20
@@ -181,7 +181,7 @@ Popup {
 
                 RoundButton {
                     Layout.preferredWidth: 50
-                    Layout.preferredHeight: 40
+                    Layout.preferredHeight: 50
                     Image {
                         anchors.centerIn: parent
                         width: 24

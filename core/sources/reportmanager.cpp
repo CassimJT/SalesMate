@@ -19,9 +19,9 @@ ReportManager::~ReportManager()
  * @param amount
  * add the weakly report to the database
  */
-void ReportManager::addWeaklyReport()
+void ReportManager::addWeaklyReport(const qreal &total)
 {
-    qDebug() <<"Adding weakly report...";
+    qDebug() <<"Current Total: " << total;
 }
 /**
  * @brief ReportManager::addMonthlyReport

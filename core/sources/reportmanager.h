@@ -14,7 +14,7 @@ public:
     ~ReportManager();
 
 public slots:
-    void addWeaklyReport();
+    void addWeaklyReport(const qreal &total);
     void addMonthlyReport();
 
 signals:
