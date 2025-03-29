@@ -374,7 +374,10 @@ void DatabaseManager::processSales(const QVariantList &sales)
             updateView();
             serviceModel->updateView();
             incomeModel->updateView();
-            emit salesProcessed();
+            qreal currentTotal = getTotal(sales);
+            if(currentTotal != 0) {
+                emit salesProcessed(currentTotal);
+            }
         }
     } else {
         db.rollback();
@@ -481,6 +484,23 @@ int DatabaseManager::quaryQuantity(const QString &sku)
     }
 
     return curentQuantity;
+}
+/**
+ * @brief DatabaseManager::getTotal
+ * @return the total current ongoing sales
+ */
+qreal DatabaseManager::getTotal(const QVariantList &sales) const
+{
+    double totalSum = 0;
+
+    for (const QVariant &item : sales) {
+        QVariantMap sale = item.toMap();
+        if (sale.contains("totalprice")) {
+            totalSum += sale["totalprice"].toDouble();
+        }
+    }
+
+    return totalSum;
 }
 
 ProductFilterProxyModel *DatabaseManager::getProxyModel() const
