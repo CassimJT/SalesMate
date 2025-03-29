@@ -67,7 +67,7 @@ signals:
     void productExists();
     void productAlreadyExist();//for updating
     void totalInventoryChanged();
-    void salesProcessed();
+    void salesProcessed(const qreal &total);
 
 private:
     QVector<QSharedPointer<Product>> products;
@@ -81,6 +81,7 @@ private:
     QSharedPointer<ServiceModel> serviceModel;
     static DatabaseManager * _instance;
     QSqlDatabase db;
+    qreal getTotal(const QVariantList &sales)const;
 
 
 };
