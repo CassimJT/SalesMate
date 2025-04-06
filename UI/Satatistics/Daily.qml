@@ -33,4 +33,7 @@ Page {
             }
         }
     }
+    Component.onCompleted: {
+        //console.log(ReportManger.getWeeklyReportData())
+    }
 }

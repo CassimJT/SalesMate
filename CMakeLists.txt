@@ -9,7 +9,7 @@ set(ZXING_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(ZXING_BLACKBOX_TESTS OFF CACHE BOOL "" FORCE)
 set(ZXING_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(core/zxing-cpp EXCLUDE_FROM_ALL)  # Critical change
-find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql Charts)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql Charts Concurrent)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -146,7 +146,8 @@ set_target_properties(appSalesMate PROPERTIES
 )
 
 target_link_libraries(appSalesMate
-    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate ZXing::ZXing Qt6::Multimedia  Qt6::Sql Qt6::Charts
+    PRIVATE Qt6::Quick Qt6::Core Qt6::CorePrivate ZXing::ZXing
+    Qt6::Multimedia  Qt6::Sql Qt6::Charts Qt6::Concurrent
 )
 set_property(TARGET appSalesMate APPEND PROPERTY
     QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android

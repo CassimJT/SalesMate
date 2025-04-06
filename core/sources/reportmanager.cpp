@@ -5,7 +5,7 @@ ReportManager::ReportManager(QObject *parent)
 {
     //constractor
     dbManager = DatabaseManager::instance();
-    connect(dbManager,&DatabaseManager::salesProcessed, this, &ReportManager::addWeaklyReport);
+    connect(dbManager,&DatabaseManager::salesProcessed, this, &ReportManager::processReport);
 }
 
 ReportManager::~ReportManager()
@@ -14,24 +14,156 @@ ReportManager::~ReportManager()
 }
 /**
  * @brief ReportManager::addWeaklyReport
- * @param day
- * @param date
- * @param amount
- * add the weakly report to the database
+ * add weakly report  tot the database
  */
 void ReportManager::addWeaklyReport(const qreal &total)
 {
-    qDebug() <<"Current Total: " << total;
+
+    qDebug() << "Total: " << total;
+    qDebug() << "Total: " << QThread::currentThread();
+
+    QSqlDatabase db = dbManager->getDatabase();
+    if (!db.isOpen()) {
+        qDebug() << "Database is not open!";
+        return;
+    }
+
+    QSqlQuery query(db);
+    QDate currentDate = QDate::currentDate();
+    QString day = currentDate.toString("ddd");
+    QString date = currentDate.toString("yyyy-MM-dd");
+    qreal amount = total;
+
+    // Check if entry exists for the current date
+    query.prepare("SELECT income FROM WeeklyIncome WHERE day = :day");
+    query.bindValue(":day", day);
+    if (query.exec() && query.next()) {
+        // Update existing entry
+        qreal existingAmount = query.value(0).toDouble();
+        amount += existingAmount;
+        query.prepare("UPDATE WeeklyIncome SET income = :income WHERE day = :day");
+        query.bindValue(":income", amount);
+        query.bindValue(":day", day);
+    } else {
+        // Insert new entry
+        query.prepare("INSERT INTO WeeklyIncome (day, income) VALUES (:day, :income)");
+        query.bindValue(":day", day);
+        query.bindValue(":income", amount);
+    }
+    if (!query.exec()) {
+        qDebug() << "Failed to update or insert WeeklyIncome:" << query.lastError().text();
+    }
 }
 /**
  * @brief ReportManager::addMonthlyReport
- * @param month
- * @param amount
- * add the monthly report to the database
+ * @param total
+ * add monthly report to the database
  */
-void ReportManager::addMonthlyReport()
+void ReportManager::addMonthlyReport(const qreal &total)
 {
-    //
-    qDebug() <<"Adding monthly report...";
+    QSqlDatabase db = dbManager->getDatabase();
+    if (!db.isOpen()) {
+        qDebug() << "Database is not open!";
+        return;
+    }
+
+    QSqlQuery query (db);
+    QString month = QDate::currentDate().toString("MMM");
+    qreal amount = total;
+
+    // Check if entry exists for the current month
+    query.prepare("SELECT income FROM MonthlyIncome WHERE month = :month");
+    query.bindValue(":month", month);
+    if (query.exec() && query.next()) {
+        // Update existing entry
+        qreal existingAmount = query.value(0).toDouble();
+        amount += existingAmount;
+        query.prepare("UPDATE MonthlyIncome SET income = :income WHERE month = :month");
+        query.bindValue(":income", amount);
+        query.bindValue(":month", month);
+    } else {
+        // Insert new entry
+        query.prepare("INSERT INTO MonthlyIncome (month, income) VALUES (:month, :income)");
+        query.bindValue(":month", month);
+        query.bindValue(":income", amount);
+    }
+    if (!query.exec()) {
+        qDebug() << "Failed to update or insert MonthlyIncome:" << query.lastError().text();
+    }
+}
+/**
+ * @brief ReportManager::getWeeklyReportData
+ * @return a weekly Data
+ */
+QVariantList ReportManager::getWeeklyReportData() const
+{
+    QVariantList list;
+    QSqlDatabase db = dbManager->getDatabase();
+
+    if (!db.isOpen()) {
+        qDebug() << "Database is not open!";
+        return list;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare("SELECT id, data, day, income FROM WeeklyIncome");
+
+    if (!query.exec()) {
+        qDebug() << "Failed to fetch WeeklyIncome:" << query.lastError().text();
+        return list;
+    }
+
+    while (query.next()) {
+        QJsonObject jsonObject;
+        jsonObject["id"] = query.value(0).toInt();
+        jsonObject["date"] = query.value(1).toString();
+        jsonObject["day"] = query.value(2).toString();
+        jsonObject["income"] = query.value(3).toDouble();
+
+        list.append(jsonObject);
+    }
+
+    return list;
+}
+
+/**
+ * @brief ReportManager::processReport
+ * @param total
+ * process the resport borth monthly and weakly
+ */
+void ReportManager::processReport(const qreal &total)
+{
+   QFuture weeklyFuture = QtConcurrent::run([this, total] {
+        QString threadConnName = QString("ThreadConn-%1").arg(quintptr(QThread::currentThreadId()));
+
+        QSqlDatabase db = dbManager->getDatabase();
+
+        if (!db.isOpen()) {
+            qDebug() << "Database is not open in worker thread! Trying to open.";
+            if (!db.open()) {
+                qDebug() << "Failed to open database in worker thread" << threadConnName << ":" << db.lastError().text();
+                return;
+            }
+        }
+        QSqlQuery query(db);
+        addWeaklyReport(total);
+
+        dbManager->closeDatabase();
+    });
+}
+
+/**
+ * @brief ReportManager::closeDatabase
+ * clean the database connection to avoid memory liks
+ */
+void ReportManager::closeDatabase()
+{
+    QString threadConnName = QString("ThreadConn-%1").arg(quintptr(QThread::currentThreadId()));
+
+    if (QSqlDatabase::contains(threadConnName)) {
+        QSqlDatabase::removeDatabase(threadConnName);
+        qDebug() << "Closed database connection for thread" << threadConnName;
+    }
 }
 
