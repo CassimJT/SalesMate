@@ -134,36 +134,7 @@ QVariantList ReportManager::getWeeklyReportData() const
  */
 void ReportManager::processReport(const qreal &total)
 {
-   QFuture weeklyFuture = QtConcurrent::run([this, total] {
-        QString threadConnName = QString("ThreadConn-%1").arg(quintptr(QThread::currentThreadId()));
-
-        QSqlDatabase db = dbManager->getDatabase();
-
-        if (!db.isOpen()) {
-            qDebug() << "Database is not open in worker thread! Trying to open.";
-            if (!db.open()) {
-                qDebug() << "Failed to open database in worker thread" << threadConnName << ":" << db.lastError().text();
-                return;
-            }
-        }
-        QSqlQuery query(db);
-        addWeaklyReport(total);
-
-        dbManager->closeDatabase();
-    });
+    qDebug() << "Total: " << total;
 }
 
-/**
- * @brief ReportManager::closeDatabase
- * clean the database connection to avoid memory liks
- */
-void ReportManager::closeDatabase()
-{
-    QString threadConnName = QString("ThreadConn-%1").arg(quintptr(QThread::currentThreadId()));
-
-    if (QSqlDatabase::contains(threadConnName)) {
-        QSqlDatabase::removeDatabase(threadConnName);
-        qDebug() << "Closed database connection for thread" << threadConnName;
-    }
-}
 

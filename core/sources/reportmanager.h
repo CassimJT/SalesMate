@@ -30,7 +30,6 @@ private slots:
 signals:
 private:
     DatabaseManager *dbManager = nullptr;
-    void closeDatabase();
 };
 
 #endif // REPORTMANAGER_H

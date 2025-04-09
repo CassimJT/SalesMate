@@ -6,7 +6,6 @@
 #include <qsqldatabase.h>
 #include <qsqlerror.h>
 #include <qsqlquery.h>
-#include <qthread.h>
 #include <qtmetamacros.h>
 #include "incomemodel.h"
 #include "servicemodel.h"
@@ -18,47 +17,32 @@ DatabaseManager::DatabaseManager(QObject *parent)
     proxyModel(new ProductFilterProxyModel(this)),
     incomeModel(QSharedPointer<IncomeModel>::create(this)),
     serviceModel(QSharedPointer<ServiceModel>::create(this))
+
 {
-    // Initialize connection only if it doesn't exist
-    if (!QSqlDatabase::contains(mainConnName)) {
-        db = QSqlDatabase::addDatabase("QSQLITE", mainConnName);
-        db.setDatabaseName("salesmate.db");
-
-        if (!db.open()) {
-            qCritical() << "Failed to open database:" << db.lastError();
-            return;
-        }
-        qDebug() << "Main database connection established";
-    } else {
-        db = QSqlDatabase::database(mainConnName);
-    }
-
-    // Then setup tables
+    //Setting up the Database
     setUpDatabase();
     setUpExpenceTable();
     setUpIncomeTable();
     setUpServiceTable();
-
-    // Finally update view
+    //updating the View
+    //deleteTables();
     updateView();
-
     proxyModel->setSourceModel(this);
     proxyModel->setFilterRole(name);
     proxyModel->setDynamicSortFilter(true);
     proxyModel->invalidate();
+
 }
 
 DatabaseManager::~DatabaseManager()
 {
     qDebug() << "Closing database connection...";
-
-    // Use the named connection instead of default connection
-    QString connectionName = QSqlDatabase::database(mainConnName).connectionName();
-
-    // Close and remove the correct connection
-    QSqlDatabase::database(mainConnName).close();
-    QSqlDatabase::removeDatabase(mainConnName);
-
+    // Get database connection name
+    QString connectionName = QSqlDatabase::database().connectionName();
+    // Close the database connection
+    QSqlDatabase::database().close();
+    // Remove the connection from the database pool
+    QSqlDatabase::removeDatabase(connectionName);
     // Clear dynamically allocated resources
     products.clear();
     productMap.clear();
@@ -70,14 +54,12 @@ DatabaseManager::~DatabaseManager()
  */
 DatabaseManager *DatabaseManager::instance()
 {
-    static QMutex mutex;
-    QMutexLocker locker(&mutex);
-
     if(_instance == nullptr) {
         _instance = new DatabaseManager();
     }
     return _instance;
 }
+
 QVariant DatabaseManager::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
@@ -136,14 +118,14 @@ QVariant DatabaseManager::data(const QModelIndex &index, int role) const
  */
 float DatabaseManager::queryPriceFromDatabase(const QString &sku)
 {
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
-    QSqlQuery query(db);
+    //
+    QSqlQuery query;
     query.prepare("SELECT price FROM products WHERE sku = :sku");
     query.bindValue(":sku", sku);
 
     if (!query.exec()) {
         qDebug() << "Failed to query price from database:" << query.lastError().text();
-        return -1.0f;
+        return -1.0f; // Indicate failure with a negative value
     }
 
     if (query.next()) {
@@ -151,7 +133,7 @@ float DatabaseManager::queryPriceFromDatabase(const QString &sku)
     }
 
     qDebug() << "No product found with SKU:" << sku;
-    return -1.0f;
+    return -1.0f; // Indicate no matching product found
 }
 /**
  * @brief DatabaseManager::addStock
@@ -159,7 +141,6 @@ float DatabaseManager::queryPriceFromDatabase(const QString &sku)
  */
 void DatabaseManager::addProduct(const QString &name, const QString &sku, int quantity, qreal price, const QDate &date)
 {
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
     auto product = QSharedPointer<Product>::create(this);
     product->setName(name);
     product->setSku(sku);
@@ -168,7 +149,7 @@ void DatabaseManager::addProduct(const QString &name, const QString &sku, int qu
     product->setDate(date);
     QString formattedDate = date.toString(Qt::ISODate); //formating Date
 
-    QSqlQuery query(db);
+    QSqlQuery query;
     query.prepare(R"(
         INSERT INTO products (name, sku, quantity, price, date)
         VALUES (:name, :sku, :quantity, :price, :date)
@@ -235,8 +216,8 @@ void DatabaseManager::updateProduct(const QString &name, const QString &sku, int
         //checking if the current quanity is valide
         newQunatity = currentQuantity + quantity; //calcualting new quantity
     }
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
-    QSqlQuery query(db);
+
+    QSqlQuery query;
     query.prepare(R"(UPDATE products
         SET name = :name, quantity = :quantity, price = :price
         WHERE sku = :sku)");
@@ -263,9 +244,7 @@ void DatabaseManager::updateProduct(const QString &name, const QString &sku, int
  */
 void DatabaseManager::removeProduct(const QString &sku)
 {
-
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
-    QSqlQuery query(db);
+    QSqlQuery query;
     query.prepare("DELETE FROM products WHERE sku = :sku");
     query.bindValue(":sku", sku);
 
@@ -285,7 +264,7 @@ void DatabaseManager::removeProduct(const QString &sku)
  */
 void DatabaseManager::processSales(const QVariantList &sales)
 {
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
+    //QSqlDatabase db = QSqlDatabase::database();
 
     if (!db.transaction()) {
         qDebug() << "Failed to start transaction:" << db.lastError().text();
@@ -324,7 +303,7 @@ void DatabaseManager::processSales(const QVariantList &sales)
         }
 
         // Step 3: Update the products table
-        QSqlQuery updateQuery(db);
+        QSqlQuery updateQuery;
         updateQuery.prepare("UPDATE products SET quantity = :newQuantity WHERE sku = :sku");
         updateQuery.bindValue(":newQuantity", newQuantity);
         updateQuery.bindValue(":sku", sku);
@@ -339,7 +318,7 @@ void DatabaseManager::processSales(const QVariantList &sales)
 
 
         // Step 4: Check if an entry exists in netincome
-        QSqlQuery checkQuery(db);
+        QSqlQuery checkQuery;
         checkQuery.prepare("SELECT id, quantity, totalprice FROM netincome WHERE sku = :sku AND date = :date");
         checkQuery.bindValue(":sku", sku);
         checkQuery.bindValue(":date", date);
@@ -359,7 +338,7 @@ void DatabaseManager::processSales(const QVariantList &sales)
             int updatedQuantity = existingQuantity + soldQuantity;
             double updatedTotalPrice = existingTotalPrice + totalPrice;
 
-            QSqlQuery updateIncomeQuery(db);
+            QSqlQuery updateIncomeQuery;
             updateIncomeQuery.prepare("UPDATE netincome SET quantity = :quantity, totalprice = :totalprice WHERE id = :id");
             updateIncomeQuery.bindValue(":quantity", updatedQuantity);
             updateIncomeQuery.bindValue(":totalprice", updatedTotalPrice);
@@ -420,15 +399,16 @@ QHash<int, QByteArray> DatabaseManager::roleNames() const
  */
 void DatabaseManager::setUpDatabase()
 {
-    // Get the existing connection instead of creating a new one
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("salesmate.db");
 
-    if (!db.isOpen()) {
-        qDebug() << "Database connection not open!";
+    if (!db.open()) {
+        qDebug() << "Failed to open the database: " << db.lastError().text();
         return;
     }
+    qDebug() << "Database Opened Successfully:";
 
-    QSqlQuery query(db);
+    QSqlQuery query;
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -441,10 +421,10 @@ void DatabaseManager::setUpDatabase()
     )";
 
     if (!query.exec(createTable)) {
-        qDebug() << "Failed to create products table:" << query.lastError().text();
+        qDebug() << "Failed to create table: " << db.lastError().text();
         return;
     }
-    qDebug() << "Products table created/verified successfully";
+    qDebug() << "Table Created Successfully:";
 }
 
 /**
@@ -456,16 +436,10 @@ void DatabaseManager::setUpDatabase()
  * Populate the products list from the database and update the view
  */
 void DatabaseManager::updateView() {
-    QSqlDatabase db  = QSqlDatabase::database(mainConnName);
-    if (!db.isOpen()) {
-        qWarning() << "Database not open when attempting updateView()";
-        return;
-    }
-
     beginResetModel();
     products.clear();
 
-    QSqlQuery query(db);
+    QSqlQuery query;
     query.prepare("SELECT name, sku, quantity, price,date FROM products");
     while (query.next()) {
         auto product = QSharedPointer<Product>::create(this);
@@ -489,9 +463,8 @@ void DatabaseManager::updateView() {
  */
 int DatabaseManager::quaryQuantity(const QString &sku)
 {
-    QSqlDatabase db  = QSqlDatabase::database(mainConnName);
     int curentQuantity = -1;
-    QSqlQuery query(db);
+    QSqlQuery query;
     query.prepare("SELECT quantity FROM products WHERE sku = :sku");
     query.bindValue(":sku", sku);
     if(query.exec() && query.next()) {
@@ -519,6 +492,43 @@ qreal DatabaseManager::getTotal(const QVariantList &sales) const
 
     return totalSum;
 }
+/**
+ * @brief DatabaseManager::deleteTables
+ * delete the tables in dev mode
+ * to be removed in release mode
+ */
+void DatabaseManager::deleteTables()
+{
+    QSqlQuery query;
+    if(! query.exec("DROP TABLE IF EXISTS products;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "Table Droped ";
+    }
+
+    if(! query.exec("DROP TABLE IF EXISTS expences;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "Table Droped ";
+    }
+
+    if(! query.exec("DROP TABLE IF EXISTS netincome;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "Table Droped ";
+    }
+
+    if(! query.exec("DROP TABLE IF EXISTS service;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "service Droped ";
+    }
+
+}
 
 ProductFilterProxyModel *DatabaseManager::getProxyModel() const
 {
@@ -530,17 +540,12 @@ ProductFilterProxyModel *DatabaseManager::getProxyModel() const
  */
 void DatabaseManager::setUpExpenceTable()
 {
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
-    QSqlQuery query(db);
-
-    /* if(! query.exec("DROP TABLE IF EXISTS expences;")) {
-        qDebug() << "Failed to drop table info: " << query.lastError().text();
+    db = QSqlDatabase::database();
+    if(!db.open()) {
+        qDebug() << "failed to open the database: " << db.lastError().text();
         return;
-    } else {
-        qDebug() << "Table Droped ";
-    }*/
-
-
+    }
+    QSqlQuery query;
     QString createTable = R"(
     CREATE TABLE IF NOT EXISTS expences (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -563,16 +568,12 @@ void DatabaseManager::setUpExpenceTable()
  */
 void DatabaseManager::setUpIncomeTable()
 {
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
-    QSqlQuery query(db);
-
-    /* if(! query.exec("DROP TABLE IF EXISTS expences;")) {
-        qDebug() << "Failed to drop table info: " << query.lastError().text();
+    db = QSqlDatabase::database();
+    if(!db.open()) {
+        qDebug() << "failed to open the database: " << db.lastError().text();
         return;
-    } else {
-        qDebug() << "Table Droped ";
-    }*/
-
+    }
+    QSqlQuery query;
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS netincome (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -599,15 +600,12 @@ void DatabaseManager::setUpIncomeTable()
  */
 void DatabaseManager::setUpServiceTable()
 {
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
-    QSqlQuery query(db);
-    /* if(! query.exec("DROP TABLE IF EXISTS expences;")) {
-        qDebug() << "Failed to drop table info: " << query.lastError().text();
+    db = QSqlDatabase::database();
+    if(!db.open()) {
+        qDebug() << "failed to open the database: " << db.lastError().text();
         return;
-    } else {
-        qDebug() << "Table Droped ";
-    }*/
-
+    }
+    QSqlQuery query;
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS service (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -626,41 +624,6 @@ void DatabaseManager::setUpServiceTable()
 
 }
 /**
- * @brief DatabaseManager::setUpReportRecordTables
- */
-void DatabaseManager::setUpReportRecordTables()
-{
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
-    QSqlQuery query(db);
-
-    // Weekly Income Table
-    QString createWeeklyTable = R"(
-        CREATE TABLE IF NOT EXISTS weeklyIncome (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT  NOT NULL,
-            day TEXT UNIQUE NOT NULL,
-            income INTEGER NOT NULL
-        )
-    )";
-    if (!query.exec(createWeeklyTable)) {
-        qDebug() << "Failed to create WeeklyIncome table:" << query.lastError().text();
-    }
-
-    // Monthly Income Table
-    QString createMonthlyTable = R"(
-        CREATE TABLE IF NOT EXISTS monthlyIncome (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT  NOT NULL,
-            month TEXT UNIQUE NOT NULL,
-            income INTEGER NOT NULL
-        )
-    )";
-    if (!query.exec(createMonthlyTable)) {
-        qDebug() << "Failed to create MonthlyIncome table:" << query.lastError().text();
-    }
-}
-
-/**
  * @brief DatabaseManager::totalInventory
  * @return the total inventory
  */
@@ -677,48 +640,8 @@ qreal DatabaseManager::totalInventory() const
 
 QSqlDatabase DatabaseManager::getDatabase() const
 {
-    if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
-        // Main thread: Use the default connection
-        return QSqlDatabase::database("MainDB");
-    }
-
-    // Worker thread: Create a per-thread connection
-    QString threadConnName = QString("ThreadConn-%1").arg(reinterpret_cast<quintptr>(QThread::currentThreadId()));
-
-    if (!QSqlDatabase::contains(threadConnName)) {
-        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", threadConnName);
-        db.setDatabaseName("salesmate.db");
-        if (!db.open()) {
-            qDebug() << "Failed to open database in thread" << threadConnName << ": " << db.lastError().text();
-        }
-    }
-
-    return QSqlDatabase::database(threadConnName);
+    return db;
 }
-
-
-/**
- * @brief DatabaseManager::closeDatabase
- * clean up the database
- */
-void DatabaseManager::closeDatabase()
-{
-    QString threadConnName = QString("ThreadConn-%1").arg(quintptr(QThread::currentThreadId()));
-
-    if (QSqlDatabase::contains(threadConnName)) {
-        QSqlDatabase db = QSqlDatabase::database(threadConnName, true);
-
-        if (db.isOpen()) {
-            db.close();
-            qDebug() << "Closed database connection for thread" << threadConnName;
-        }
-
-        QSqlDatabase::removeDatabase(threadConnName);  // ✅ Ensure no active queries
-    }
-}
-
-
-
 /**
  * @brief DatabaseManager::queryDatabase
  * @param sku
@@ -727,7 +650,6 @@ void DatabaseManager::closeDatabase()
  */
 Product* DatabaseManager::queryDatabase(const QString &sku)
 {
-    QSqlDatabase db = QSqlDatabase::database(mainConnName);
     // Check the hash first
     if (productMap.contains(sku)) {
         qDebug() << "return from map";
@@ -735,7 +657,7 @@ Product* DatabaseManager::queryDatabase(const QString &sku)
     }
 
     // If not in the hash, query the database
-    QSqlQuery query(db);
+    QSqlQuery query;
     query.prepare("SELECT name, quantity, price FROM products WHERE sku = :sku");
     query.bindValue(":sku", sku);
 

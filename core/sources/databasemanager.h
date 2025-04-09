@@ -14,7 +14,7 @@
 #include <QSharedPointer>
 #include <QVariant>
 #include <QMap>
-#include <QCoreApplication>
+#include <QFile>
 class IncomeModel;
 class ServiceModel;
 
@@ -50,10 +50,8 @@ public:
     void setUpExpenceTable();
     void setUpIncomeTable();
     void setUpServiceTable();
-    void setUpReportRecordTables();
     qreal totalInventory() const;
     QSqlDatabase getDatabase()const;
-    void closeDatabase();
 
 public slots:
     //
@@ -85,7 +83,9 @@ private:
     static DatabaseManager * _instance;
     QSqlDatabase db;
     qreal getTotal(const QVariantList &sales)const;
-    QString mainConnName = "MainDB";
+    const QString connection_name = "MAIN_DB_CONNECTION";
+    void deleteTables();
+    void deleteEntireDatabase();
 
 
 };
