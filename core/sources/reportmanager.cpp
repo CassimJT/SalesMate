@@ -135,9 +135,8 @@ QVariantList ReportManager::getWeeklyReportData() const
 void ReportManager::processReport(const qreal &total)
 {
     QFuture future = QtConcurrent::run([this, total]() {
-        threadDb = QSqlDatabase::addDatabase("QSQLITE");
+        threadDb = QSqlDatabase::addDatabase("QSQLITE","threadDb");
         threadDb.setDatabaseName("salesmate.db");
-
         if (!threadDb.open()) {
             qCritical() << "Failed to open database in worker thread";
             return;

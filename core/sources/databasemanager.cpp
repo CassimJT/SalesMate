@@ -387,7 +387,6 @@ void DatabaseManager::processSales(const QVariantList &sales)
     }
 }
 
-
 QHash<int, QByteArray> DatabaseManager::roleNames() const
 {
     QHash<int, QByteArray> roles;

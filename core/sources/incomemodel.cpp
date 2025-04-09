@@ -8,7 +8,6 @@ IncomeModel::IncomeModel(QObject *parent)
     service(QSharedPointer<ServiceModel>::create())
 {
     updateView();
-   // qDebug() << "TotalCOst of good sold = " <<totalCostOfGoodSold();
 }
 
 IncomeModel::~IncomeModel()
