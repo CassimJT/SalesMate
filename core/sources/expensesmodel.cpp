@@ -81,7 +81,8 @@ void ExpensesModel::addExpence(const QString &source, const QDate &date, qreal c
     expense->setDescription(description);
     //..
     QString formattedDate = date.toString(Qt::ISODate); //formating Date
-    //auto db = DatabaseManager::instance()->getDatabase();
+
+
     QSqlQuery query;
     query.prepare(R"(
         INSERT INTO expences (source, date, cost, description)
@@ -138,9 +139,8 @@ void ExpensesModel::updateView()
 {
     beginResetModel();
     expenses.clear();
-    //auto db = DatabaseManager::instance()->getDatabase();
-    QSqlQuery query;
-    query.prepare("SELECT id, source, date, cost, description FROM expences");
+
+    QSqlQuery query("SELECT id, source, date, cost, description FROM expences");
     while (query.next()) {
         auto expense = QSharedPointer<Expense>::create(this);
         expense->setSource(query.value(1).toString());
