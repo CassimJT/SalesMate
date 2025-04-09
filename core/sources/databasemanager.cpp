@@ -19,13 +19,14 @@ DatabaseManager::DatabaseManager(QObject *parent)
     serviceModel(QSharedPointer<ServiceModel>::create(this))
 
 {
-    //Setting up the Database
+    /**Setting up the Database**/
     setUpDatabase();
     setUpExpenceTable();
     setUpIncomeTable();
     setUpServiceTable();
-    //updating the View
     //deleteTables();
+
+    /**updating the View**/
     updateView();
     proxyModel->setSourceModel(this);
     proxyModel->setFilterRole(name);
@@ -37,12 +38,16 @@ DatabaseManager::DatabaseManager(QObject *parent)
 DatabaseManager::~DatabaseManager()
 {
     qDebug() << "Closing database connection...";
+
     // Get database connection name
     QString connectionName = QSqlDatabase::database().connectionName();
+
     // Close the database connection
     QSqlDatabase::database().close();
+
     // Remove the connection from the database pool
     QSqlDatabase::removeDatabase(connectionName);
+
     // Clear dynamically allocated resources
     products.clear();
     productMap.clear();
@@ -264,7 +269,7 @@ void DatabaseManager::removeProduct(const QString &sku)
  */
 void DatabaseManager::processSales(const QVariantList &sales)
 {
-    //QSqlDatabase db = QSqlDatabase::database();
+    QSqlDatabase db = QSqlDatabase::database();
 
     if (!db.transaction()) {
         qDebug() << "Failed to start transaction:" << db.lastError().text();
@@ -409,6 +414,14 @@ void DatabaseManager::setUpDatabase()
     qDebug() << "Database Opened Successfully:";
 
     QSqlQuery query;
+
+    /*if(! query.exec("DROP TABLE IF EXISTS products;")) {
+        qDebug() << "Failed to drop table info: " << query.lastError().text();
+        return;
+    } else {
+        qDebug() << "Table Droped ";
+    }*/
+
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -439,8 +452,7 @@ void DatabaseManager::updateView() {
     beginResetModel();
     products.clear();
 
-    QSqlQuery query;
-    query.prepare("SELECT name, sku, quantity, price,date FROM products");
+    QSqlQuery query("SELECT name, sku, quantity, price,date FROM products");
     while (query.next()) {
         auto product = QSharedPointer<Product>::create(this);
         product->setName(query.value(0).toString());
@@ -494,8 +506,7 @@ qreal DatabaseManager::getTotal(const QVariantList &sales) const
 }
 /**
  * @brief DatabaseManager::deleteTables
- * delete the tables in dev mode
- * to be removed in release mode
+ * delete all tables
  */
 void DatabaseManager::deleteTables()
 {
@@ -529,6 +540,14 @@ void DatabaseManager::deleteTables()
     }
 
 }
+/**
+ * @brief DatabaseManager::deleteEntireDatabase
+ * delete the database
+ */
+void DatabaseManager::deleteEntireDatabase()
+{
+
+}
 
 ProductFilterProxyModel *DatabaseManager::getProxyModel() const
 {
@@ -540,12 +559,14 @@ ProductFilterProxyModel *DatabaseManager::getProxyModel() const
  */
 void DatabaseManager::setUpExpenceTable()
 {
-    db = QSqlDatabase::database();
+    QSqlDatabase db = QSqlDatabase::database();
     if(!db.open()) {
         qDebug() << "failed to open the database: " << db.lastError().text();
         return;
     }
+    qDebug() << "Database Opened Succefully:";
     QSqlQuery query;
+
     QString createTable = R"(
     CREATE TABLE IF NOT EXISTS expences (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -568,12 +589,15 @@ void DatabaseManager::setUpExpenceTable()
  */
 void DatabaseManager::setUpIncomeTable()
 {
-    db = QSqlDatabase::database();
+    QSqlDatabase db = QSqlDatabase::database();
     if(!db.open()) {
         qDebug() << "failed to open the database: " << db.lastError().text();
         return;
     }
+    qDebug() << "Database Opened Succefully:";
+
     QSqlQuery query;
+
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS netincome (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -600,12 +624,14 @@ void DatabaseManager::setUpIncomeTable()
  */
 void DatabaseManager::setUpServiceTable()
 {
-    db = QSqlDatabase::database();
+    QSqlDatabase db = QSqlDatabase::database();
     if(!db.open()) {
         qDebug() << "failed to open the database: " << db.lastError().text();
         return;
     }
+    qDebug() << "Database Opened Succefully:";
     QSqlQuery query;
+
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS service (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
