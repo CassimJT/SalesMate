@@ -10,6 +10,7 @@
 #include <QThread>
 #include <QVariantList>
 #include <QJsonObject>
+#include <QDebug>
 
 
 class ReportManager : public QObject
@@ -30,6 +31,7 @@ private slots:
 signals:
 private:
     DatabaseManager *dbManager = nullptr;
+    QSqlDatabase threadDb;
 };
 
 #endif // REPORTMANAGER_H

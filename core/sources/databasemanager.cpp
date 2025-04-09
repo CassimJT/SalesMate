@@ -415,13 +415,6 @@ void DatabaseManager::setUpDatabase()
 
     QSqlQuery query;
 
-    /*if(! query.exec("DROP TABLE IF EXISTS products;")) {
-        qDebug() << "Failed to drop table info: " << query.lastError().text();
-        return;
-    } else {
-        qDebug() << "Table Droped ";
-    }*/
-
     QString createTable = R"(
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -546,7 +539,28 @@ void DatabaseManager::deleteTables()
  */
 void DatabaseManager::deleteEntireDatabase()
 {
+    if (db.isOpen()) {
+        db.close();
+    }
 
+    // Get database file path
+    QString dbFile = db.databaseName();
+
+    QSqlDatabase::removeDatabase(db.connectionName());
+
+    QFile file(dbFile);
+    if (file.remove()) {
+        qDebug() << "Database file deleted:" << dbFile;
+    } else {
+        qCritical() << "Failed to delete database:" << file.errorString();
+    }
+
+    // Reinitialize connection to empty database
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(dbFile);
+    if (!db.open()) {
+        qCritical() << "Failed to recreate database";
+    }
 }
 
 ProductFilterProxyModel *DatabaseManager::getProxyModel() const

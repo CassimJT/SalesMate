@@ -15,6 +15,7 @@
 #include <QVariant>
 #include <QMap>
 #include <QFile>
+#include <QThread>
 class IncomeModel;
 class ServiceModel;
 
