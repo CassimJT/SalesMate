@@ -21,7 +21,7 @@ Popup {
     property string rigion: "Northen Rigion"
     property string storeAddress: "P.O Box 1, Mzuzu"
     property date transactionDate: new Date()
-    property string cashier: "Cashier: John"
+    property string cashier: "Cashier: Cassim"
     property var items: [
         { name: "Milk 1L  ", price: 2.50, qty: 2 },
         { name: "Bread", price: 1.80, qty: 1 }

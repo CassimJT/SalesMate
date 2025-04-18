@@ -16,22 +16,36 @@
 class ReportManager : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QVariantList weeklyData READ weeklyData WRITE setWeeklyData NOTIFY weeklyDataChanged FINAL)
+
 public:
     explicit ReportManager(QObject *parent = nullptr);
     ~ReportManager();
 
+    QVariantList list() const;
+    void setList(const QVariantList &newList);
+
+    QVariantList weeklyData() const;
+    void setWeeklyData(const QVariantList &newWeeklyData);
+
 public slots:
     void addWeaklyReport(const qreal &total);
     void addMonthlyReport(const qreal &total);
-    QVariantList getWeeklyReportData() const;
 
 private slots:
     void processReport(const qreal &total);
 
 signals:
+    void weeklyDataChanged();
+
 private:
     DatabaseManager *dbManager = nullptr;
     QSqlDatabase threadDb;
+    QString connection_name;
+    QVariantList m_weeklyData;
+    void createIncomeTables(QSqlDatabase &db);
+    QVariantList getWeeklyReportData();
+
 };
 
 #endif // REPORTMANAGER_H

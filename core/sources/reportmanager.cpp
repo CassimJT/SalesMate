@@ -1,11 +1,12 @@
 #include "reportmanager.h"
 
 ReportManager::ReportManager(QObject *parent)
-    : QObject{parent}
+    : QObject{parent}, connection_name("threadDb")
 {
     //constractor
     dbManager = DatabaseManager::instance();
     connect(dbManager,&DatabaseManager::salesProcessed, this, &ReportManager::processReport);
+    processReport(0);
 }
 
 ReportManager::~ReportManager()
@@ -22,7 +23,7 @@ void ReportManager::addWeaklyReport(const qreal &total)
     qDebug() << "Total: " << total;
     qDebug() << "Total: " << QThread::currentThread();
 
-    QSqlDatabase db = dbManager->getDatabase();
+    QSqlDatabase db = QSqlDatabase::database(connection_name) ;
     if (!db.isOpen()) {
         qDebug() << "Database is not open!";
         return;
@@ -34,7 +35,7 @@ void ReportManager::addWeaklyReport(const qreal &total)
     QString date = currentDate.toString("yyyy-MM-dd");
     qreal amount = total;
 
-    // Check if entry exists for the current date
+    // Checking if entry exists for the current date
     query.prepare("SELECT income FROM WeeklyIncome WHERE day = :day");
     query.bindValue(":day", day);
     if (query.exec() && query.next()) {
@@ -61,7 +62,7 @@ void ReportManager::addWeaklyReport(const qreal &total)
  */
 void ReportManager::addMonthlyReport(const qreal &total)
 {
-    QSqlDatabase db = dbManager->getDatabase();
+    QSqlDatabase db = QSqlDatabase::database(connection_name);
     if (!db.isOpen()) {
         qDebug() << "Database is not open!";
         return;
@@ -71,7 +72,7 @@ void ReportManager::addMonthlyReport(const qreal &total)
     QString month = QDate::currentDate().toString("MMM");
     qreal amount = total;
 
-    // Check if entry exists for the current month
+    // Checking if entry exists for the current month
     query.prepare("SELECT income FROM MonthlyIncome WHERE month = :month");
     query.bindValue(":month", month);
     if (query.exec() && query.next()) {
@@ -95,10 +96,10 @@ void ReportManager::addMonthlyReport(const qreal &total)
  * @brief ReportManager::getWeeklyReportData
  * @return a weekly Data
  */
-QVariantList ReportManager::getWeeklyReportData() const
+QVariantList ReportManager::getWeeklyReportData()
 {
     QVariantList list;
-    QSqlDatabase db = dbManager->getDatabase();
+    QSqlDatabase db = QSqlDatabase::database(connection_name) ;
 
     if (!db.isOpen()) {
         qDebug() << "Database is not open!";
@@ -135,16 +136,67 @@ QVariantList ReportManager::getWeeklyReportData() const
 void ReportManager::processReport(const qreal &total)
 {
     QFuture future = QtConcurrent::run([this, total]() {
-        threadDb = QSqlDatabase::addDatabase("QSQLITE","threadDb");
+        threadDb = QSqlDatabase::addDatabase("QSQLITE",connection_name);
         threadDb.setDatabaseName("salesmate.db");
         if (!threadDb.open()) {
             qCritical() << "Failed to open database in worker thread";
             return;
         }
         qDebug() << "New database connection opened in: " <<QThread::currentThread();
+        createIncomeTables(threadDb);
+        addWeaklyReport(total);
+        QVariantList data = getWeeklyReportData();
+        setWeeklyData(data);
 
     });
 
 }
+
+QVariantList ReportManager::weeklyData() const
+{
+    return m_weeklyData;
+}
+
+void ReportManager::setWeeklyData(const QVariantList &newWeeklyData)
+{
+    if (m_weeklyData == newWeeklyData)
+        return;
+    m_weeklyData = newWeeklyData;
+    emit weeklyDataChanged();
+}
+
+/**
+ * @brief ReportManager::createIncomeTables
+ * creating the weekly and monthly tables if not exist
+ */
+void ReportManager::createIncomeTables(QSqlDatabase &db)
+{
+    QSqlQuery query(db);
+
+    QString createWeekly = R"(
+        CREATE TABLE IF NOT EXISTS WeeklyIncome (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data TEXT DEFAULT CURRENT_DATE,
+            day TEXT UNIQUE,
+            income REAL
+        )
+    )";
+    if (!query.exec(createWeekly)) {
+        qDebug() << "Failed to create WeeklyIncome:" << query.lastError().text();
+    }
+    QString createMonthly = R"(
+        CREATE TABLE IF NOT EXISTS MonthlyIncome (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data TEXT DEFAULT CURRENT_DATE,
+            month TEXT UNIQUE,
+            income REAL
+        )
+    )";
+    if (!query.exec(createMonthly)) {
+        qDebug() << "Failed to create MonthlyIncome:" << query.lastError().text();
+    }
+}
+
+
 
 

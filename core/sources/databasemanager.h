@@ -87,8 +87,6 @@ private:
     const QString connection_name = "MAIN_DB_CONNECTION";
     void deleteTables();
     void deleteEntireDatabase();
-
-
 };
 
 #endif // DATABASEMANAGER_H
