@@ -6,7 +6,7 @@ AndroidSystem::AndroidSystem(QObject *parent)
 //constractor
 #if defined(Q_OS_ANDROID)
     setAnAndroidSystemBarColor();
-    //StartSchedua();
+    StartSchedua();
 #endif
 }
 /**
@@ -66,8 +66,8 @@ void AndroidSystem::StartSchedua()
     QJniObject activity = QNativeInterface::QAndroidApplication::context();
     if (activity.isValid()) {
         QJniObject::callStaticMethod<void>(
-            "com/salesmate/AlarmManagerHelper",
-            "scheduleAlarm",
+            "com/salesmate/WorkManagerHelper",
+            "schedulePeriodicWork",
             "(Landroid/content/Context;)V",
             activity.object<jobject>()
             );
