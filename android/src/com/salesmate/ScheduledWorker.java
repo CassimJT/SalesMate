@@ -16,13 +16,13 @@ public class ScheduledWorker extends Worker {
    @Override
     public Result doWork() {
         Log.d(TAG,"Executing periodic work");
-        /*try{
-            Thread.sleep(TimeUnit.SECONDS.toMillis(30));
-        }catch(InterruptedException e){
+        try{
+            NativeBridge.invoked();
+            return Result.success();
+        }catch(Exception e){
+            Log.d(TAG,"Worker, C++ Call Failed");
             return Result.failure();
-        }*/
-        //work to be done
-        Log.d(TAG,"Working....");
-        return Result.success();
+        }
+
     }
 }

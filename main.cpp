@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     BarcodeEngine barcodeEngine;
-    AndroidSystem sytstem;
+    AndroidSystem *sytstem  = AndroidSystem::instance();
     DatabaseManager *databaseManager = DatabaseManager::instance();
     ExpensesModel expenseModel;
     IncomeModel incomeModel;
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("SalesMate.com");
     QCoreApplication::setApplicationName("SalesMate");
 
-    engine.rootContext()->setContextProperty("Android",&sytstem);
+    engine.rootContext()->setContextProperty("Android",sytstem);
     engine.rootContext()->setContextProperty("databaseManager", databaseManager);
     engine.rootContext()->setContextProperty("productFilterModel", databaseManager->getProxyModel());
     engine.rootContext()->setContextProperty("expenseModel", &expenseModel);

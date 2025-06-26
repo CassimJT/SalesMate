@@ -21,7 +21,7 @@ void ReportManager::addWeaklyReport(const qreal &total)
 {
 
     qDebug() << "Total: " << total;
-    qDebug() << "Total: " << QThread::currentThread();
+    qDebug() << "Thread: " << QThread::currentThread();
 
     QSqlDatabase db = QSqlDatabase::database(connection_name) ;
     if (!db.isOpen()) {
@@ -108,7 +108,7 @@ QVariantList ReportManager::getWeeklyReportData()
 
     QSqlQuery query(db);
 
-    query.prepare("SELECT id, data, day, income FROM WeeklyIncome");
+    query.prepare("SELECT id, date, day, income FROM WeeklyIncome");
 
     if (!query.exec()) {
         qDebug() << "Failed to fetch WeeklyIncome:" << query.lastError().text();
@@ -144,6 +144,7 @@ void ReportManager::processReport(const qreal &total)
         }
         qDebug() << "New database connection opened in: " <<QThread::currentThread();
         createIncomeTables(threadDb);
+        //deleteTables(threadDb);
         addWeaklyReport(total);
         QVariantList data = getWeeklyReportData();
         setWeeklyData(data);
@@ -173,29 +174,62 @@ void ReportManager::createIncomeTables(QSqlDatabase &db)
 {
     QSqlQuery query(db);
 
-    QString createWeekly = R"(
+    const QString createWeekly = R"(
         CREATE TABLE IF NOT EXISTS WeeklyIncome (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            data TEXT DEFAULT CURRENT_DATE,
+            date TEXT DEFAULT (DATE('now')),
             day TEXT UNIQUE,
             income REAL
         )
     )";
+
     if (!query.exec(createWeekly)) {
         qDebug() << "Failed to create WeeklyIncome:" << query.lastError().text();
+    } else {
+
+        qDebug() << "WeeklyIncome Table created";
     }
-    QString createMonthly = R"(
+
+
+    const QString createMonthly = R"(
         CREATE TABLE IF NOT EXISTS MonthlyIncome (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            data TEXT DEFAULT CURRENT_DATE,
+            date TEXT DEFAULT (DATE('now')),
             month TEXT UNIQUE,
             income REAL
         )
     )";
+
     if (!query.exec(createMonthly)) {
         qDebug() << "Failed to create MonthlyIncome:" << query.lastError().text();
+    }else {
+
+        qDebug() << "MonthlyIncome Table created";
     }
 }
+
+/**
+ * @brief DatabaseManager::deleteTables
+ * for deleting tables during building
+ */
+void ReportManager::deleteTables(QSqlDatabase &db)
+{
+
+    QSqlQuery query(db);
+
+    if (!query.exec("DROP TABLE IF EXISTS WeeklyIncome;")) {
+        qDebug() << "Failed to drop WeeklyIncome table:" << query.lastError().text();
+    } else {
+        qDebug() << "WeeklyIncome table dropped.";
+    }
+
+    if (!query.exec("DROP TABLE IF EXISTS MonthlyIncome;")) {
+        qDebug() << "Failed to drop MonthlyIncome table:" << query.lastError().text();
+    } else {
+        qDebug() << "MonthlyIncome table dropped.";
+    }
+}
+
 
 
 

@@ -28,8 +28,7 @@ Page {
             BarSet {
                 id:barset
                 label: "Income"
-                color: "#E91E63"
-                values: updateChart();
+                values: updateChart()
             }
         }
     }
@@ -45,15 +44,15 @@ Page {
     }
     //extracting the values for the barset
     function updateChart() {
-        var dayOrder = ["Ma", "Tu", "We", "Th", "Fri", "Su", "Sa"];
+        var dayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
         var dayMap = {
-            "Ma": 0,
-            "Tu": 0,
-            "We": 0,
-            "Th": 0,
+            "Mon": 0,
+            "Tue": 0,
+            "Wed": 0,
+            "Thu": 0,
             "Fri": 0,
-            "Su": 0,
-            "Sa": 0
+            "Sat": 0,
+            "Sun": 0
         };
         var rawData = ReportManger.weeklyData || [];
         for (var i = 0; i < rawData.length; i++) {
@@ -65,8 +64,11 @@ Page {
         var values = dayOrder.map(function(day) {
             return dayMap[day];
         });
+        console.log("rawData:", JSON.stringify(rawData));
         console.log("Processed values:", values);
-        return values;
+        //barset.replace(values);
+        return values
     }
+
 
 }

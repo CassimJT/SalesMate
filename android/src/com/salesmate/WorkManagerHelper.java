@@ -19,11 +19,14 @@ public class WorkManagerHelper {
             ScheduledWorker.class, //the class contain the do function
             15,//time intervel
             TimeUnit.MINUTES
-        ) .build();
+        ).setInitialDelay(
+            1,
+            TimeUnit.MINUTES)
+            .build();
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "qt_periodic_work",
-            ExistingPeriodicWorkPolicy.KEEP, //REPLCAE THE EXISTING WORK
+            ExistingPeriodicWorkPolicy.REPLACE, //REPLCAE THE EXISTING WORK
             periodicWork
         );
     }
@@ -31,5 +34,6 @@ public class WorkManagerHelper {
     public static void cancelWork(Context context) {
         WorkManager.getInstance(context).cancelUniqueWork("qt_periodic_work");
     }
+
 
 }

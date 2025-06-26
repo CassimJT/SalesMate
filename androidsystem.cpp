@@ -1,13 +1,38 @@
 #include "androidsystem.h"
+extern "C"
+    JNIEXPORT void JNICALL
+    Java_com_salesmate_NativeBridge_invoked(JNIEnv *env, jclass clazz) {
+    LOGD("JNI invoked from AlarmReceiver");
 
+    if (qApp) {
+        QMetaObject::invokeMethod(qApp, []() {
+            AndroidSystem::instance()->invoked();
+        });
+    } else {
+        LOGD("Qt context not ready - cannot process alarm");
+    }
+}
+
+AndroidSystem *AndroidSystem::_instance = nullptr;
 AndroidSystem::AndroidSystem(QObject *parent)
     : QObject{parent}
 {
 //constractor
 #if defined(Q_OS_ANDROID)
     setAnAndroidSystemBarColor();
-    StartSchedua();
+    requestIgnoreBatteryOptimization();
+    startAlarm();
+    //StartSchedua();
+    connect(this, &AndroidSystem::workerInvoked, this, &AndroidSystem::printLog);
 #endif
+}
+
+AndroidSystem *AndroidSystem::instance()
+{
+    if(_instance == nullptr) {
+        _instance = new AndroidSystem();
+    }
+    return _instance;
 }
 /**
  * @brief AndroidSystem::requestCameraPeremision
@@ -28,7 +53,6 @@ void AndroidSystem::requestCameraPeremision()
 
     });
 }
-
 /**
  * @brief AndroidSystem::setAnAndroidSystemBarColor
  * this function changes the android SystemBar color
@@ -90,6 +114,35 @@ void AndroidSystem::requestIgnoreBatteryOptimization()
             );
     }
 #endif
+}
+/**
+ * @brief AndroidSystem::increement
+ * increement m_mun when invoked function is called from workmanager
+ */
+void AndroidSystem::printLog()
+{
+    __android_log_print(ANDROID_LOG_DEBUG, "AlarmHelper", "Hello from AlarmManager!!");
+}
+/**
+ * @brief AndroidSystem::startAlarm
+ * start the alarm for autometed works
+ */
+void AndroidSystem::startAlarm()
+{
+    QJniObject context = QNativeInterface::QAndroidApplication::context();
+    if(context.isValid()) {
+        QJniObject::callStaticMethod<void>(
+            "com/salesmate/AlarmHelper",
+            "scheduleExactAlarm",
+            "(Landroid/content/Context;)V",
+            context.object<jobject>()
+            );
+    }
+}
+
+void AndroidSystem::invoked()
+{
+    emit workerInvoked();
 }
 
 

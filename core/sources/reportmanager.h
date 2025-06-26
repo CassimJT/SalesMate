@@ -45,6 +45,7 @@ private:
     QVariantList m_weeklyData;
     void createIncomeTables(QSqlDatabase &db);
     QVariantList getWeeklyReportData();
+    void deleteTables(QSqlDatabase &db);
 
 };
 

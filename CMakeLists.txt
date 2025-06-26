@@ -128,6 +128,11 @@ qt_add_qml_module(appSalesMate
         android/gradlew.bat
         RESOURCES android/src/com/salesmate/ScheduledWorker.java
         RESOURCES android/src/com/salesmate/WorkManagerHelper.java
+        RESOURCES android/src/com/salesmate/NativeBridge.java
+        RESOURCES android/src/com/salesmate/AlarmHelper.java
+        RESOURCES android/src/com/salesmate/BatteryOptimizationHelper.java
+        RESOURCES android/src/com/salesmate/AlarmReceiver.java
+
 
         # Android Source Code
 

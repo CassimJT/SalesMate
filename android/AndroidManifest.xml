@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.qtproject.example" android:installLocation="auto" android:versionCode="1" android:versionName="SalesMate_1.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.salesmate" android:installLocation="auto" android:versionCode="1" android:versionName="SalesMate_1.0">
     <!-- %%INSERT_PERMISSIONS -->
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+
 
     <!-- %%INSERT_FEATURES -->
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true"/>
@@ -24,10 +23,13 @@
         <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.qtprovider" android:exported="false" android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/qtprovider_paths"/>
         </provider>
-        <receiver android:name=".AlarmBroadcastReceiver" android:enabled="true" android:exported="true">
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
+                <action android:name="com.salesmate.ALARM_TRIGGERED"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="com.salesmate.ALARM_TRIGGER"/>
             </intent-filter>
         </receiver>
 
