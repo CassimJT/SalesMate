@@ -15,6 +15,9 @@ Page {
 
     property real screenWidth: Screen.width
     property real screenHeight: Screen.height
+    property alias paymentField: paymentField
+    property alias changeField: changeField
+    property alias payementDiretionText: payementDiretionText
 
     // Scaling factor for proportional resizing
     property real scalingFactor: Math.min(screenWidth / 360, screenHeight / 640)
@@ -34,6 +37,9 @@ Page {
     //current sale variable
     property string name : ""
     property string sku: ""
+
+    //DirectionalText
+    property bool paymentDirectonTex: false
 
     //a popup to search for a barcode if scannaer not working
     BarcodeSearch {
@@ -235,7 +241,7 @@ Page {
         }
     }
     //receipt
-    Receipt {
+   /* Receipt {
         id: receipt
         onPrintClicked: {
             //print
@@ -258,7 +264,7 @@ Page {
             //share
 
         }
-    }
+    }*/
 
     Connections {
         target: barcodeEngine
@@ -279,7 +285,7 @@ Page {
         }
     }
 
-    Connections {
+    /*Connections {
         target: databaseManager
         onSalesProcessed: function () {
             if (stackView.currentItem && stackView.currentItem.objectName === "Home") {
@@ -287,6 +293,6 @@ Page {
             }
 
         }
-    }
+    }*/
 
 }

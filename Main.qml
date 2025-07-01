@@ -30,7 +30,7 @@ ApplicationWindow {
     header: ToolBar {
         id: toolbar
         visible: root.mainStakView.currentItem !== welcomePage // Compare with the instance
-        height: 70
+        height: 55
         RowLayout {
             anchors.fill: parent
             //menu button

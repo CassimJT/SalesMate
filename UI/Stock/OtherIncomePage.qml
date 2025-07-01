@@ -3,12 +3,16 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../Utils"
 import "../Utils/Utils.js" as Utils
+import "../Receipt"
 import QtCore
-
+import SalesModel
 
 Page {
     id: otherIncome
-    objectName: "Other Income"
+    objectName: "Services"
+    property bool succesStatus: false
+    property alias directionText: directionText
+    signal showReceipt()
 
     Settings {
         id: serviceSetting
@@ -234,6 +238,7 @@ Page {
                             }
                             onClicked: {
                                 saveServices(serviceType.currentText,serviceprice.text,itemeprice.text,itemsku.text)
+
                                 direction.visible = true
                             }
                         }
@@ -341,7 +346,9 @@ Page {
                         amountDirectionalText.visible = true
                         return
                     } else {
+                        SalesModel.addSale(name, total, 1,sku)
                         ServiceModel.addService(sku, date, name, unit_serviceprice, unit_itemprice, description, total)
+                        otherIncome.succesStatus = true
                     }
 
                 }
@@ -491,4 +498,6 @@ Page {
             directionText.visible = true
         }
     }
+
+
 }

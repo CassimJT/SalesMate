@@ -1,15 +1,27 @@
 #include "androidsystem.h"
-extern "C"
-    JNIEXPORT void JNICALL
-    Java_com_salesmate_NativeBridge_invoked(JNIEnv *env, jclass clazz) {
-    LOGD("JNI invoked from AlarmReceiver");
+extern "C" JNIEXPORT void JNICALL
+Java_com_salesmate_NativeBridge_nativeInvoked(JNIEnv* env, jclass clazz) {
+    // 1. Verify Qt environment
+    if (!qApp) {
+        __android_log_print(ANDROID_LOG_ERROR, "NativeBridge",
+                            "Qt application instance not available");
+        return;
+    }
 
-    if (qApp) {
-        QMetaObject::invokeMethod(qApp, []() {
+    // 2. Queue execution if not on main thread
+    if (QThread::currentThread() != qApp->thread()) {
+        QMetaObject::invokeMethod(qApp, [](){
             AndroidSystem::instance()->invoked();
-        });
-    } else {
-        LOGD("Qt context not ready - cannot process alarm");
+        }, Qt::QueuedConnection);
+        return;
+    }
+
+    // 3. Direct execution
+    try {
+        AndroidSystem::instance()->invoked();
+    } catch (const std::exception& e) {
+        __android_log_print(ANDROID_LOG_ERROR, "NativeBridge",
+                            "Exception: %s", e.what());
     }
 }
 
@@ -103,15 +115,17 @@ void AndroidSystem::requestIgnoreBatteryOptimization()
 {
 #if defined(Q_OS_ANDROID)
     qDebug() << "Requesting battery optimization exemption";
-
-    QJniObject activity = QNativeInterface::QAndroidApplication::context();
-    if (activity.isValid()) {
+    QJniObject context = QNativeInterface::QAndroidApplication::context();
+    if (context.isValid()) {
         QJniObject::callStaticMethod<void>(
             "com/salesmate/BatteryOptimizationHelper",
             "requestIgnoreBatteryOptimization",
             "(Landroid/content/Context;)V",
-            activity.object<jobject>()
+            context.object<jobject>()
             );
+        qDebug() << "Battery optimization request initiated";
+    } else {
+        qDebug() << "Failed to get valid context for battery optimization request";
     }
 #endif
 }
@@ -142,6 +156,11 @@ void AndroidSystem::startAlarm()
 
 void AndroidSystem::invoked()
 {
+    if (!qApp) {
+        qDebug() << "Qt application instance not available when invoked";
+        return;
+    }
+    qDebug() << "Emitting workerInvoked signal";
     emit workerInvoked();
 }
 

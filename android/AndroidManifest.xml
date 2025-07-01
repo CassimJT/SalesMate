@@ -1,11 +1,21 @@
 <?xml version="1.0"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.salesmate" android:installLocation="auto" android:versionCode="1" android:versionName="SalesMate_1.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.salesmate" android:installLocation="auto" android:versionCode="1" android:versionName="SalesMate_1.0">
     <!-- %%INSERT_PERMISSIONS -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="com.huawei.permission.external_app_settings.USE_COMPONENT"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTION" tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.GET_RUNNING_SERVICES" tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"
+        tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions"/>
+
 
 
     <!-- %%INSERT_FEATURES -->
@@ -23,15 +33,19 @@
         <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.qtprovider" android:exported="false" android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/qtprovider_paths"/>
         </provider>
-        <receiver
-            android:name=".AlarmReceiver"
-            android:enabled="true"
-            android:exported="true">
+        <receiver android:name=".AlarmReceiver" android:enabled="true" android:exported="true">
             <intent-filter>
                 <action android:name="com.salesmate.ALARM_TRIGGERED"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        <service
+        android:name=".AlarmService"
+        android:exported="false"
+        android:stopWithTask="false"
+        android:foregroundServiceType="specialUse|connectedDevice"
+        android:enabled="true">
+        </service>
 
     </application>
 

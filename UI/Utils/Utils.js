@@ -34,9 +34,9 @@ function getIconSource() {
 
 //reseting the feild
 function resetField() {
-    homePage.itemPrice = 0.0
-    homePage.quantity = 0
-    paymentField.text = ""
+    home.itemPrice = 0.0
+    home.quantity = 0
+    home.paymentField.text = ""
 }
 //a function to append data to a model
 function appendToModel(model, name, price, quantity) {

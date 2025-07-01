@@ -3,104 +3,181 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../Stock"
 import SalesModel
+import "../Receipt"
+import "../Utils"
+import "../Utils/Utils.js" as Utils
 Page {
     id: addItemPage
     objectName: "Home"
+    property int btnPadding: 6
     SwipeView{
         id: swipeView
         anchors.fill:parent
         currentIndex: 0
         //home
         Home {
+            id:home
+        }
+        //service Page
+        OtherIncomePage {
+            id: services
+
         }
         //current Sales
         ShowSalesPage {
         }
+        onCurrentIndexChanged: {
+            services.directionText.visible = false
+        }
     }
     footer: TabBar {
-        currentIndex: swipeView.currentIndex
         id: bar
         width: parent.width
-        //Home
+        height: 60
+        currentIndex: swipeView.currentIndex
+        topPadding: addItemPage.btnPadding
+
+        // POS Tab
         TabButton {
-            Row {
-                spacing: 5
+            ColumnLayout {
                 anchors.centerIn: parent
+                spacing: 4
+                Item {
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: addItemPage.btnPadding
+                }
+
                 Image {
-                    id: addstock
                     source: "qrc:/Asserts/icons/POS.png"
-                    width: 33
-                    height: 33
+                    Layout.preferredWidth: 28
+                    Layout.preferredHeight: 28
                     fillMode: Image.PreserveAspectFit
-                    Layout.alignment: Qt.AlignVCenter
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                    }
+                    Layout.alignment: Qt.AlignHCenter
                 }
+
                 Label {
-                    id:addStockText
-                     text:qsTr("POS")
-                    Layout.alignment: Qt.AlignVCenter
-                    anchors {
-                        verticalCenter: addstock.verticalCenter
-                    }
+                    text: qsTr("POS")
+                    font.pixelSize: 12
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.alignment: Qt.AlignHCenter
                 }
             }
-            onClicked: {
-                swipeView.currentIndex = 0
-                //reload()
-            }
+
+            onClicked: swipeView.currentIndex = 0
         }
-        //currentSale
+
+        // Services Tab
         TabButton {
-            text: qsTr("")
-            Row {
+            ColumnLayout {
                 anchors.centerIn: parent
-                //image
-                AnimatedImage {
-                    id: giff
-                    width: 36
-                    height: width
-                    source: "qrc:/Asserts/icons/animeted-cart.gif"
-                    fillMode:Image.PreserveAspectFit
+                spacing: 4
+                Item {
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: addItemPage.btnPadding
+                }
+
+                Image {
+                    source: "qrc:/Asserts/icons/Service.png"
+                    Layout.preferredWidth: 28
+                    Layout.preferredHeight: 28
+                    fillMode: Image.PreserveAspectFit
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Label {
+                    text: qsTr("Services")
+                    font.pixelSize: 12
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.alignment: Qt.AlignHCenter
+                }
+            }
+
+            onClicked: swipeView.currentIndex = 1
+        }
+
+        // Current Sales Tab
+        TabButton {
+            ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 4
+                Item {
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: addItemPage.btnPadding
+                }
+
+                Item {
+                    width: 28
+                    height: 28
+                    Layout.alignment: Qt.AlignHCenter
+
+                    AnimatedImage {
+                        id: giff
+                        anchors.fill: parent
+                        source: "qrc:/Asserts/icons/animeted-cart.gif"
+                        fillMode: Image.PreserveAspectFit
+                    }
+
                     Rectangle {
                         id: contentRec
                         color: "red"
                         width: 16
-                        height: width
-                        radius: width
-                        anchors {
-                            right: parent.right
-                        }
+                        height: 16
+                        radius: 8
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.margins: -4
+
                         Text {
-                            id: contentTxt
-                            text: SalesModel.modelSize() || 0;
-                            font.pointSize: 9
+                            text: SalesModel.modelSize() || 0
+                            font.pixelSize: 9
+                            color: "white"
                             anchors.centerIn: parent
-                            color: "#ffffff"
                         }
-
                     }
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                    }
-
                 }
+
                 Label {
-                    id:showStockText
-                    text:qsTr("Carrent Sales")
-                    Layout.alignment: Qt.AlignVCenter
-                    anchors {
-                        verticalCenter: giff.verticalCenter
-                    }
+                    text: qsTr("Current Sales")
+                    font.pixelSize: 12
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.alignment: Qt.AlignHCenter
                 }
             }
-            onClicked: {
-                swipeView.currentIndex = 1
+
+            onClicked: swipeView.currentIndex = 2
+        }
+    }
+    //receipt
+    Receipt {
+        id: receipt
+        onPrintClicked: {
+            //print
+        }
+        onCancelClicked: {
+            home.totalSale = 0.0;
+            Utils.resetField();
+            home.payementDiretionText.visible = false;
+            SalesModel.clearModel()
+            home.paymentField.text = ""
+            home.changeField.text = ""
+            receipt.close()
+        }
+        onSaveClicked: {
+            //save
+
+        }
+        onShareClicked: {
+            //share
+
+        }
+    }
+    Connections {
+        target: databaseManager
+        onSalesProcessed: function () {
+            if (stackView.currentItem && stackView.currentItem.objectName === "Home") {
+                receipt.open();
             }
         }
     }
-    function reload() {
-        stackView.replace("HomePage.qml")
-    }
+
 }
