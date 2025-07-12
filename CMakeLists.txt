@@ -86,14 +86,18 @@ qt_add_qml_module(appSalesMate
 
     SOURCES
         # Android System
-        androidsystem.h
-        androidsystem.cpp
+
+
 
         # Barcode Engine
-        barcodeengine.h
-        barcodeengine.cpp
+
+
 
         # System
+        core/sources/androidsystem.h
+        core/sources/androidsystem.cpp
+        core/sources/barcodeengine.h
+        core/sources/barcodeengine.cpp
         core/sources/product.h
         core/sources/product.cpp
         core/sources/databasemanager.h
@@ -133,6 +137,7 @@ qt_add_qml_module(appSalesMate
         RESOURCES android/src/com/salesmate/BatteryOptimizationHelper.java
         RESOURCES android/src/com/salesmate/AlarmReceiver.java
         RESOURCES android/src/com/salesmate/AlarmService.java
+
 
 
         # Android Source Code

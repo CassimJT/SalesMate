@@ -1,10 +1,10 @@
 #include <QGuiApplication>
 #include <QApplication>
 #include <QQmlApplicationEngine>
-#include "androidsystem.h"
+#include "core/sources/androidsystem.h"
 #include <QQmlContext>
 #include <qqml.h>
-#include "barcodeengine.h"
+#include "core/sources/barcodeengine.h"
 #include "core/sources/databasemanager.h"
 #include "core/sources/expensesmodel.h"
 #include "core/sources/incomemodel.h"
