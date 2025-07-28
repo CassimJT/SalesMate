@@ -110,5 +110,46 @@ void Product::setDate(const QDate &newDate)
     m_date = newDate;
     emit dateChanged();
 }
+/**
+ * @brief Product::quantitySold
+ * @return items sold
+ */
+int Product::quantitySold() const
+{
+    return m_quantitySold;
+}
+/**
+ * @brief Product::set_quantitySold
+ * @param new_quantitySold
+ * adding the numbers of items sold
+ */
+void Product::setQuantitySold(int new_quantitySold)
+{
+    if (m_quantitySold == new_quantitySold)
+        return;
+    m_quantitySold = new_quantitySold;
+    emit quantitySoldChanged();
+}
+/**
+ * @brief Product::cp
+ * @return the cost price
+ */
+qreal Product::cp() const
+{
+    return m_cp;
+}
+/**
+ * @brief Product::setCp
+ * @param newCp
+ * set the cost price for the item
+ */
+void Product::setCp(qreal newCp)
+{
+    if (qFuzzyCompare(m_cp, newCp))
+        return;
+    m_cp = newCp;
+    emit cpChanged();
+}
+
 
 

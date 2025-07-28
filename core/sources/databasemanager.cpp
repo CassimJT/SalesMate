@@ -25,6 +25,7 @@ DatabaseManager::DatabaseManager(QObject *parent)
     setUpIncomeTable();
     setUpServiceTable();
     //deleteTables();
+    //deleteEntireDatabase();
 
     /**updating the View**/
     updateView();
@@ -32,6 +33,8 @@ DatabaseManager::DatabaseManager(QObject *parent)
     proxyModel->setFilterRole(name);
     proxyModel->setDynamicSortFilter(true);
     proxyModel->invalidate();
+    QString sku = "8901238910036";
+    quaryQuantitySold(sku);
 
 }
 
@@ -77,6 +80,8 @@ QVariant DatabaseManager::headerData(int section, Qt::Orientation orientation, i
             return QStringLiteral("Quantity");
         case 3:
             return QStringLiteral("Price");
+        case 4:
+            return QStringLiteral("quantitySold");
         default:
             return QVariant();
         }
@@ -111,6 +116,10 @@ QVariant DatabaseManager::data(const QModelIndex &index, int role) const
         return product.price();
     case date:
         return product.date();
+    case quantitysold:
+        return product.quantitySold();
+    case cp:
+        return product.cp(); //cp = item cost price
     default:
         return QVariant();
     }
@@ -144,26 +153,30 @@ float DatabaseManager::queryPriceFromDatabase(const QString &sku)
  * @brief DatabaseManager::addStock
  * @param product
  */
-void DatabaseManager::addProduct(const QString &name, const QString &sku, int quantity, qreal price, const QDate &date)
+void DatabaseManager::addProduct(const QString &name, const QString &sku, int quantity, int quantitysold, qreal price, qreal cp, const QDate &date)
 {
     auto product = QSharedPointer<Product>::create(this);
     product->setName(name);
     product->setSku(sku);
     product->setQuantity(quantity);
+    product->setQuantitySold(quantitysold);
     product->setPrice(price);
+    product->setCp(cp);
     product->setDate(date);
     QString formattedDate = date.toString(Qt::ISODate); //formating Date
 
     QSqlQuery query;
     query.prepare(R"(
-        INSERT INTO products (name, sku, quantity, price, date)
-        VALUES (:name, :sku, :quantity, :price, :date)
+        INSERT INTO products (name, sku, quantity, quantitysold, price,cp, date)
+        VALUES (:name, :sku, :quantity, :quantitysold, :price, :cp, :date)
     )");
     query.bindValue(":name", name);
     query.bindValue(":sku", sku);
     query.bindValue(":quantity", quantity);
+    query.bindValue(":quantitysold", quantitysold);
     query.bindValue(":price", price);
     query.bindValue(":date", formattedDate);
+    query.bindValue(":cp",cp);
     if (!query.exec()) {
         QSqlError error = query.lastError();
         qDebug() << "Failed to add product to database:" << error.text();
@@ -190,7 +203,7 @@ void DatabaseManager::addProduct(const QString &name, const QString &sku, int qu
  * @param price
 * This function will update the existing data in the database
  */
-void DatabaseManager::updateProduct(const QString &name, const QString &sku, int quantity, qreal price)
+void DatabaseManager::updateProduct(const QString &name, const QString &sku, int quantity, qreal price, qreal cp)
 {
     if (!productMap.contains(sku)) {
         qDebug() << "Product with SKU" << sku << "not found.";
@@ -208,7 +221,8 @@ void DatabaseManager::updateProduct(const QString &name, const QString &sku, int
     // checking if no update where made
     if (product->name().trimmed() == name.trimmed() &&
         product->quantity() == quantity &&
-        qAbs(product->price() - price) < 1e-6) {
+        qAbs(product->price() - price) < 1e-6 &&
+        qAbs(product->cp() - cp) < 1e-6) {
         qDebug() << "No update needed. The provided data is identical to the existing product data.";
         emit productAlreadyExist();
         return;
@@ -224,11 +238,12 @@ void DatabaseManager::updateProduct(const QString &name, const QString &sku, int
 
     QSqlQuery query;
     query.prepare(R"(UPDATE products
-        SET name = :name, quantity = :quantity, price = :price
+        SET name = :name, quantity = :quantity, price = :price, cp = :cp
         WHERE sku = :sku)");
     query.bindValue(":name", name);
     query.bindValue(":quantity", newQunatity);
     query.bindValue(":price", price);
+    query.bindValue(":cp",cp);//cp = itemcostPrice
     query.bindValue(":sku", sku);
 
     if (!query.exec()) {
@@ -287,19 +302,21 @@ void DatabaseManager::processSales(const QVariantList &sales)
         double totalPrice = map["totalprice"].toDouble();
         QString description = map["description"].toString();
         double cogs = map["cogs"].toDouble();
-        QString source = map["name"].toString(); // Assuming source is "Sales"
+        QString source = map["name"].toString();
 
         qDebug() << "Processing SKU:" << sku << "Sold Quantity:" << soldQuantity;
 
-        // Step 1: Fetch the current quantity
+        // Use existing query methods
         int currentQuantity = quaryQuantity(sku);
-        if (currentQuantity == -1) {
+        int currentQuantitySold = quaryQuantitySold(sku);
+
+        if (currentQuantity == -1 || currentQuantitySold == -1) {
             qDebug() << "SKU not found in database:" << sku;
             success = false;
             continue;
         }
 
-        // Step 2: Validate stock availability
+        // Validate stock availability
         int newQuantity = currentQuantity - soldQuantity;
         if (newQuantity < 0) {
             qDebug() << "Insufficient stock for SKU:" << sku;
@@ -307,10 +324,14 @@ void DatabaseManager::processSales(const QVariantList &sales)
             continue;
         }
 
-        // Step 3: Update the products table
+        // Calculate new quantity sold
+        int newQuantitySold = currentQuantitySold + soldQuantity;
+
+        // Update both quantity and quantitysold in one query
         QSqlQuery updateQuery;
-        updateQuery.prepare("UPDATE products SET quantity = :newQuantity WHERE sku = :sku");
-        updateQuery.bindValue(":newQuantity", newQuantity);
+        updateQuery.prepare("UPDATE products SET quantity = :quantity, quantitysold = :quantitysold WHERE sku = :sku");
+        updateQuery.bindValue(":quantity", newQuantity);
+        updateQuery.bindValue(":quantitysold", newQuantitySold);
         updateQuery.bindValue(":sku", sku);
 
         if (!updateQuery.exec()) {
@@ -319,10 +340,11 @@ void DatabaseManager::processSales(const QVariantList &sales)
             continue;
         }
 
-        qDebug() << "Updated SKU:" << sku << "New Quantity:" << newQuantity;
+        qDebug() << "Updated SKU:" << sku
+                 << "New Quantity:" << newQuantity
+                 << "New Quantity Sold:" << newQuantitySold;
 
-
-        // Step 4: Check if an entry exists in netincome
+        // Handle netincome updates
         QSqlQuery checkQuery;
         checkQuery.prepare("SELECT id, quantity, totalprice FROM netincome WHERE sku = :sku AND date = :date");
         checkQuery.bindValue(":sku", sku);
@@ -335,38 +357,26 @@ void DatabaseManager::processSales(const QVariantList &sales)
         }
 
         if (checkQuery.next()) {
-            // Entry exists, update it
-            int existingQuantity = checkQuery.value("quantity").toInt();
-            double existingTotalPrice = checkQuery.value("totalprice").toDouble();
-            int id = checkQuery.value("id").toInt();
-
-            int updatedQuantity = existingQuantity + soldQuantity;
-            double updatedTotalPrice = existingTotalPrice + totalPrice;
-
+            // Update existing netincome entry
             QSqlQuery updateIncomeQuery;
-            updateIncomeQuery.prepare("UPDATE netincome SET quantity = :quantity, totalprice = :totalprice WHERE id = :id");
-            updateIncomeQuery.bindValue(":quantity", updatedQuantity);
-            updateIncomeQuery.bindValue(":totalprice", updatedTotalPrice);
-            updateIncomeQuery.bindValue(":id", id);
+            updateIncomeQuery.prepare("UPDATE netincome SET quantity = quantity + :quantity, "
+                                      "totalprice = totalprice + :totalprice WHERE id = :id");
+            updateIncomeQuery.bindValue(":quantity", soldQuantity);
+            updateIncomeQuery.bindValue(":totalprice", totalPrice);
+            updateIncomeQuery.bindValue(":id", checkQuery.value("id").toInt());
 
             if (!updateIncomeQuery.exec()) {
                 qDebug() << "Failed to update netincome:" << updateIncomeQuery.lastError().text();
                 success = false;
-                continue;
             }
-
-            qDebug() << "Updated netincome for SKU:" << sku << "on date:" << date;
-
         } else {
-            // No entry exists, insert a new one
+            // Insert new netincome entry
             QDate _date = QDate::fromString(date, "yyyy-MM-dd");
             incomeModel->addIncome(sku, _date, soldQuantity, unitPrice, totalPrice, description, source, cogs);
-            qDebug() << "Inserted new netincome entry for SKU:" << sku << "on date:" << date;
-
         }
     }
 
-    // Commit or rollback transaction
+    // Finalize transaction
     if (success) {
         if (!db.commit()) {
             qDebug() << "Failed to commit transaction:" << db.lastError().text();
@@ -394,7 +404,9 @@ QHash<int, QByteArray> DatabaseManager::roleNames() const
     roles[sku] = "sku";
     roles[quantity] = "quantity";
     roles[price] = "price";
+    roles[cp] = "cp";
     roles[date] = "date"  ;
+    roles[quantitysold] = "quantitysold";
     return roles;
 }
 /**
@@ -420,7 +432,9 @@ void DatabaseManager::setUpDatabase()
             name TEXT NOT NULL,
             sku TEXT UNIQUE NOT NULL,
             quantity INTEGER NOT NULL,
+            quantitysold INTEGER NOT NULL,
             price REAL NOT NULL,
+            cp REAL NOT NULL,
             date TEXT NOT NULL
         )
     )";
@@ -444,16 +458,18 @@ void DatabaseManager::updateView() {
     beginResetModel();
     products.clear();
 
-    QSqlQuery query("SELECT name, sku, quantity, price,date FROM products");
+   QSqlQuery query("SELECT name, sku, quantity, quantitysold, price,cp, date FROM products");
     while (query.next()) {
         auto product = QSharedPointer<Product>::create(this);
-        product->setName(query.value(0).toString());
-        product->setSku(query.value(1).toString());
-        product->setQuantity(query.value(2).toInt());
-        product->setPrice(query.value(3).toFloat());
-        product->setDate(query.value(4).toDate());
+        product->setName(query.value("name").toString());    // name
+        product->setSku(query.value("sku").toString());      // sku
+        product->setQuantity(query.value("quantity").toInt()); // quantity
+        product->setQuantitySold(query.value("quantitysold").toInt()); // quantitysold
+        product->setPrice(query.value("price").toFloat());   // price
+        product->setCp(query.value("cp").toFloat()); //cp  = cost price
+        product->setDate(query.value("date").toDate());      // date
         products.append(product);
-        productMap.insert(product->sku(), QSharedPointer<Product>(product));
+        productMap.insert(product->sku(), product);
     }
 
     endResetModel();
@@ -478,6 +494,29 @@ int DatabaseManager::quaryQuantity(const QString &sku)
     }
 
     return curentQuantity;
+}
+/**
+ * @brief DatabaseManager::quaryQuantitySold
+ * @param sku
+ * @return current quatitysold
+ */
+int DatabaseManager::quaryQuantitySold(const QString &sku) {
+    int curentQuantitySold = -1;
+    QSqlQuery query;
+    query.prepare("SELECT quantitysold FROM products WHERE sku = :sku");
+    query.bindValue(":sku", sku);
+
+    if (query.exec()) {
+        if (query.next()) {
+            curentQuantitySold = query.value("quantitysold").toInt();
+            qDebug() << "[DEBUG] QuantitySold for SKU" << sku << "=" << curentQuantitySold; // <-- NEW
+        } else {
+            qDebug() << "[DEBUG] SKU not found:" << sku; // <-- NEW
+        }
+    } else {
+        qDebug() << "Database error:" << query.lastError().text();
+    }
+    return curentQuantitySold;
 }
 /**
  * @brief DatabaseManager::getTotal
@@ -507,7 +546,7 @@ void DatabaseManager::deleteTables()
         qDebug() << "Failed to drop table info: " << query.lastError().text();
         return;
     } else {
-        qDebug() << "Table Droped ";
+        qDebug() << "Products Table Droped ";
     }
 
     if(! query.exec("DROP TABLE IF EXISTS expences;")) {
@@ -680,6 +719,63 @@ qreal DatabaseManager::totalInventory() const
 QSqlDatabase DatabaseManager::getDatabase() const
 {
     return db;
+}
+/**
+ * @brief Returns the sum of all product quantities in stock.
+ * @return Total quantity (sum of 'quantity' column)
+ */
+int DatabaseManager::totalQuantity() {
+    QSqlQuery query;
+    if (query.exec("SELECT SUM(quantity) FROM products")) {
+        if (query.next()) {
+            return query.value(0).toInt(); // Returns 0 if table is empty
+        }
+    } else {
+        qDebug() << "Failed to calculate total quantity:" << query.lastError().text();
+    }
+    return 0; // Fallback
+}
+/**
+ * @brief Returns the sum of all products sold (quantitysold column).
+ * @return Total quantity sold (sum of 'quantitysold' column)
+ */
+int DatabaseManager::totalQuantitySold() {
+    QSqlQuery query;
+    if (query.exec("SELECT SUM(quantitysold) FROM products")) {
+        if (query.next()) {
+            return query.value(0).toInt(); // Returns 0 if table is empty
+        }
+    } else {
+        qDebug() << "Failed to calculate total quantity sold:" << query.lastError().text();
+    }
+    return 0; // Fallback
+}
+
+qreal DatabaseManager::totalSoldValue() {
+    QSqlQuery query;
+    if (query.exec("SELECT SUM(price * quantitysold) FROM products")) {
+        if (query.next()) {
+            return query.value(0).toDouble();
+        }
+    } else {
+        qDebug() << "Failed to calculate total sold value:" << query.lastError().text();
+    }
+    return 0.0;
+}
+/**
+ * @brief Calculates the total expected net income (sum of unitprice * quantity for all products).
+ * @return Sum of (price × quantity) across all products.
+ */
+qreal DatabaseManager::expectedNetIncome() {
+    QSqlQuery query;
+    if (query.exec("SELECT SUM(price * (quantity +quantitysold )) FROM products")) {
+        if (query.next()) {
+            return query.value(0).toDouble();
+        }
+    } else {
+        qDebug() << "Failed to calculate total expected net income:" << query.lastError().text();
+    }
+    return 0.0; // Fallback
 }
 /**
  * @brief DatabaseManager::queryDatabase

@@ -137,6 +137,10 @@ qt_add_qml_module(appSalesMate
         RESOURCES android/src/com/salesmate/BatteryOptimizationHelper.java
         RESOURCES android/src/com/salesmate/AlarmReceiver.java
         RESOURCES android/src/com/salesmate/AlarmService.java
+        QML_FILES UI/Utils/CircularProgressBar.qml
+        QML_FILES UI/Utils/SearchBar.qml
+        QML_FILES UI/Satatistics/ItemReportViewDelegate.qml
+        QML_FILES UI/Satatistics/ItemReportViewModel.qml
 
 
 

@@ -14,6 +14,7 @@ Popup {
     property string sku: ""
     property string name: ""
     property string price: ""
+    property string cp: ""
     property string quantity: ""
     property string dataOfCreation: ""
     property bool isReadOnly: true
@@ -91,6 +92,22 @@ Popup {
             Layout.preferredWidth: parent.width
             readOnly: editProduct.isReadOnly;
             text: qsTr(editProduct.name)
+        }
+        //item cost price
+        TextField {
+            id: costPrice
+            placeholderText: "Cost Price"
+            Layout.preferredWidth: parent.width
+            inputMethodHints: Qt.ImhDigitsOnly
+            readOnly: editProduct.isReadOnly;
+            text: qsTr(editProduct.cp)
+            //allowing only numbers
+            onTextChanged: {
+                const validDateRegex = /^[0-9]*$/;
+                if (!validDateRegex.test(text)) {
+                    text = text.slice(0, -1); // Remove invalid character
+                }
+            }
         }
         //price
         TextField {
@@ -239,8 +256,9 @@ Popup {
                 const name = itemName.text
                 const sku = skuField.text
                 const quantity = quantityField.text
-                const price = priceField.text
-                databaseManager.updateProduct(name,sku,quantity,price)
+                const price = parseFloat (priceField.text)
+                const cp = parseFloat(costPrice.text)
+                databaseManager.updateProduct(name,sku,quantity,price,cp)
             }
         }
         RoundButton {

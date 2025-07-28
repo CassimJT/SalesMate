@@ -51,6 +51,19 @@ Page {
                 placeholderText: "Item Name"
                 Layout.preferredWidth: parent.width
             }
+            TextField {
+                id: costPrice
+                placeholderText: "Order Price"
+                Layout.preferredWidth: parent.width
+                inputMethodHints: Qt.ImhDigitsOnly
+                //allowing only numbers
+                onTextChanged: {
+                    const validDateRegex = /^[0-9]*$/;
+                    if (!validDateRegex.test(text)) {
+                        text = text.slice(0, -1); // Remove invalid character
+                    }
+                }
+            }
 
             TextField {
                 id: amountField
@@ -152,7 +165,13 @@ Page {
                         itemName.forceActiveFocus()
                         itemName.placeholderText = "Enter item name";
                         return;
-                    } else if (amountField.text === "") {
+
+                    }else if (costPrice.text === ""){
+                        costPrice.focus = false;
+                        costPrice.forceActiveFocus()
+                        costPrice.placeholderText = "Enter costPrice";
+                        return;
+                    }  else if (amountField.text === "") {
                         amountField.focus = false;
                         amountField.forceActiveFocus()
                         amountField.placeholderText = "Enter amount";
@@ -170,12 +189,14 @@ Page {
                     const sku = barcodeScn.barcode;
                     const quantity = parseInt(quantityField.text);
                     const price = parseFloat(amountField.text);
+                    const cp = parseFloat(costPrice.text);
                     const date = Utils.convertToDate(dateField.text)
+                    const quantitysold = 0;
 
                     // Add entry to the database
-                    console.log("Adding Product:", name, sku, quantity, price, date);
+                    console.log("Adding Product:", name, sku, quantity,quantitysold, price, date);
 
-                    databaseManager.addProduct(name, sku, quantity, price,date);
+                    databaseManager.addProduct(name, sku, quantity, quantitysold, price,cp,date);
                 }
             }
         }

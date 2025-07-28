@@ -80,5 +80,7 @@
         <file>Asserts/icons/share.gif</file>
         <file>Asserts/icons/print.png</file>
         <file>Asserts/icons/Service.png</file>
+        <file>Asserts/icons/a_cart.gif</file>
+        <file>Asserts/icons/profit.png</file>
     </qresource>
 </RCC>

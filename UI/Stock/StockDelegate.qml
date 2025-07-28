@@ -59,8 +59,11 @@ ItemDelegate {
         delegate.editProduct.sku = model.sku;
         delegate.editProduct.name = model.name;
         delegate.editProduct.price = model.price;
+        delegate.editProduct.cp = model.cp
         delegate.editProduct.quantity = model.quantity;
         delegate.editProduct.open()
     }
-
+    Component.onCompleted: {
+        console.log("quantitysold: "+ model.quantitysold)
+    }
 }

@@ -1,4 +1,5 @@
 #include "androidsystem.h"
+#if defined(Q_OS_ANDROID)
 extern "C" JNIEXPORT void JNICALL
 Java_com_salesmate_NativeBridge_nativeInvoked(JNIEnv* env, jclass clazz) {
     // 1. Verify Qt environment
@@ -24,7 +25,7 @@ Java_com_salesmate_NativeBridge_nativeInvoked(JNIEnv* env, jclass clazz) {
                             "Exception: %s", e.what());
     }
 }
-
+#endif
 AndroidSystem *AndroidSystem::_instance = nullptr;
 AndroidSystem::AndroidSystem(QObject *parent)
     : QObject{parent}
@@ -135,7 +136,9 @@ void AndroidSystem::requestIgnoreBatteryOptimization()
  */
 void AndroidSystem::printLog()
 {
+#if defined(Q_OS_ANDROID)
     __android_log_print(ANDROID_LOG_DEBUG, "AlarmHelper", "Hello from AlarmManager!!");
+#endif
 }
 /**
  * @brief AndroidSystem::startAlarm
@@ -143,6 +146,7 @@ void AndroidSystem::printLog()
  */
 void AndroidSystem::startAlarm()
 {
+#if defined(Q_OS_ANDROID)
     QJniObject context = QNativeInterface::QAndroidApplication::context();
     if(context.isValid()) {
         QJniObject::callStaticMethod<void>(
@@ -152,6 +156,7 @@ void AndroidSystem::startAlarm()
             context.object<jobject>()
             );
     }
+#endif
 }
 
 void AndroidSystem::invoked()

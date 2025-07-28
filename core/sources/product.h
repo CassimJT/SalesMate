@@ -12,6 +12,9 @@ class Product : public QObject
     Q_PROPERTY(int quantity READ quantity WRITE setQuantity NOTIFY quantityChanged FINAL)
     Q_PROPERTY(QString sku READ sku WRITE setSku NOTIFY skuChanged FINAL)
     Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged FINAL)
+    Q_PROPERTY(int quantitySold READ quantitySold WRITE setQuantitySold NOTIFY quantitySoldChanged FINAL)
+    Q_PROPERTY(qreal cp READ cp WRITE setCp NOTIFY cpChanged FINAL)
+
     Q_OBJECT
 public:
     explicit Product(QObject *parent = nullptr);
@@ -36,6 +39,14 @@ public:
     QDate date() const;
     void setDate(const QDate &newDate);
 
+
+
+    int quantitySold() const;
+    void setQuantitySold(int new_quantitySold);
+
+    qreal cp() const;
+    void setCp(qreal newCp);
+
 public slots:
               //Slotes
 
@@ -50,12 +61,19 @@ signals:
 
     void dateChanged();
 
+    void quantitySoldChanged();
+
+    void cpChanged();
+
 private:
     QString m_name;
     qreal m_price;
+    qreal m_cp;
     int m_quantity;
+    int m_quantitySold;
     QString m_sku;
     QDate m_date;
+
 
 
 };

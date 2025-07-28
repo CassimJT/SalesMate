@@ -23,8 +23,8 @@ ApplicationWindow {
     }
 
     WelcomePage {
-        id: welcomePage // Declare an instance
-        visible: false // Prevent it from being displayed here
+        id: welcomePage
+        visible: false
     }
 
     header: ToolBar {

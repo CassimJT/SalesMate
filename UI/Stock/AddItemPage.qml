@@ -25,6 +25,7 @@ Page {
         currentIndex: swipeView.currentIndex
         id: bar
         width: parent.width
+        //add stock
         TabButton {
             Row {
                 spacing: 5
@@ -53,6 +54,7 @@ Page {
                 swipeView.currentIndex = 0
             }
         }
+        //All stock
         TabButton {
             text: qsTr("")
             Row {

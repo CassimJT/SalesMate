@@ -27,7 +27,9 @@ class DatabaseManager : public QAbstractListModel
         sku,
         quantity,
         price,
+        cp,
         date,
+        quantitysold
     };
     Q_PROPERTY(ProductFilterProxyModel* productFilterModel READ getProxyModel CONSTANT)
     Q_PROPERTY(qreal totalInventory READ totalInventory NOTIFY totalInventoryChanged)
@@ -53,13 +55,17 @@ public:
     void setUpServiceTable();
     qreal totalInventory() const;
     QSqlDatabase getDatabase()const;
+    Q_INVOKABLE int totalQuantity();
+    Q_INVOKABLE int totalQuantitySold();
+    Q_INVOKABLE qreal totalSoldValue();
+    Q_INVOKABLE qreal expectedNetIncome();
 
 public slots:
     //
     Product *queryDatabase(const QString &sku);
     float queryPriceFromDatabase(const QString &sku);
-    void addProduct(const QString &name, const QString &sku, int quantity, qreal price, const QDate &date);
-    void updateProduct(const QString &name, const QString &sku, int quantity, qreal price);
+    void addProduct(const QString &name, const QString &sku, int quantity,int quantitysold, qreal price, qreal cp, const QDate &date);
+    void updateProduct(const QString &name, const QString &sku, int quantity, qreal price, qreal cp);
     void removeProduct(const QString &sku);
     void processSales(const QVariantList &sales);
 signals:
@@ -79,6 +85,7 @@ private:
     void updateView();
     ProductFilterProxyModel *proxyModel;
     int quaryQuantity(const QString &sku);
+    int quaryQuantitySold(const QString &sku);
     QSharedPointer<IncomeModel> incomeModel;
     QSharedPointer<ServiceModel> serviceModel;
     static DatabaseManager * _instance;
@@ -87,6 +94,7 @@ private:
     const QString connection_name = "MAIN_DB_CONNECTION";
     void deleteTables();
     void deleteEntireDatabase();
+
 };
 
 #endif // DATABASEMANAGER_H

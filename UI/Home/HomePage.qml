@@ -6,6 +6,7 @@ import SalesModel
 import "../Receipt"
 import "../Utils"
 import "../Utils/Utils.js" as Utils
+import QtQuick.Controls.Material
 Page {
     id: addItemPage
     objectName: "Home"
@@ -36,6 +37,7 @@ Page {
         height: 60
         currentIndex: swipeView.currentIndex
         topPadding: addItemPage.btnPadding
+        //Material.background: "#EEEEEE"
 
         // POS Tab
         TabButton {
@@ -113,7 +115,7 @@ Page {
                     AnimatedImage {
                         id: giff
                         anchors.fill: parent
-                        source: "qrc:/Asserts/icons/animeted-cart.gif"
+                        source: "qrc:/Asserts/icons/a_cart.gif"
                         fillMode: Image.PreserveAspectFit
                     }
 
