@@ -179,13 +179,13 @@ Page {
                             anchors.centerIn: parent
                             spacing: 3
                             Label {
-                                text: qsTr("Total COGS")
+                                text: qsTr("Total Cost")
                                 font.bold: true
                                 color: "#333"
                             }
                             Text {
-                                id:cogstxt
-                                text: incomeModel.totalCostOfGoodSold.toLocaleCurrencyString(Qt.locale("en-MW"))
+                                id:cp
+                                text: databaseManager.totalCostPrice().toLocaleCurrencyString(Qt.locale("en-MW"))
                                 font.bold: true
                                 font.pixelSize: 14
                                 color: "#333"
@@ -228,7 +228,7 @@ Page {
             Component.onCompleted: {
                 incomeModel.updateView()
                 netincomtxt.text = incomeModel.totalNetIncome.toLocaleCurrencyString(Qt.locale("en-MW"))
-                cogstxt.text = incomeModel.totalCostOfGoodSold.toLocaleCurrencyString(Qt.locale("en-MW"))
+                cp.text = databaseManager.totalCostPrice().toLocaleCurrencyString(Qt.locale("en-MW"))
             }
         }
     }

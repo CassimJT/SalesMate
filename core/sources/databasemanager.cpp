@@ -763,6 +763,22 @@ qreal DatabaseManager::totalSoldValue() {
     return 0.0;
 }
 /**
+ * @brief DatabaseManager::totalCostPrice
+ * @return the total cost for all product
+ */
+qreal DatabaseManager::totalCostPrice()
+{
+    QSqlQuery query;
+    if (query.exec("SELECT SUM( cp * (quantity +quantitysold )) FROM products")) {
+        if (query.next()) {
+            return query.value(0).toDouble();
+        }
+    } else {
+        qDebug() << "Failed to calculate costPrice:" << query.lastError().text();
+    }
+    return 0.0;
+}
+/**
  * @brief Calculates the total expected net income (sum of unitprice * quantity for all products).
  * @return Sum of (price × quantity) across all products.
  */

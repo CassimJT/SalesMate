@@ -35,7 +35,7 @@ Item {
     property real netIncom: 0
     property real expectedIncom: 0
     property real profit: 0
-    property bool isSigned: flase
+    property bool isSigned: false
     property string sign:isSigned ? "" : "-"
 
 
@@ -130,19 +130,22 @@ Item {
                         spacing: 2
 
                         Text {
-                            text: "Profit"
+                            text: "Net Result"
                             color: "Gray"
                             font.pixelSize: 12
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
-
                         Text {
-                            text: progress.profit.toLocaleCurrencyString(Qt.locale("en-MW")) // Placeholder for profit
-                            color: "#4CAF50" // Green for profit
+                            text: {
+                                var formatted = progress.profit.toLocaleCurrencyString(Qt.locale("en-MW"));
+                                return (progress.profit < 0 && !formatted.includes("-"))
+                                        ? "-" + formatted
+                                        : formatted;
+                            }
+                            color: progress.profit < 0 ? "#F44336" : "#4CAF50"
                             font.pixelSize: 12
                             font.bold: true
                             anchors.horizontalCenter: parent.horizontalCenter
-
                         }
                     }
 

@@ -58,6 +58,7 @@ public:
     Q_INVOKABLE int totalQuantity();
     Q_INVOKABLE int totalQuantitySold();
     Q_INVOKABLE qreal totalSoldValue();
+    Q_INVOKABLE qreal totalCostPrice();
     Q_INVOKABLE qreal expectedNetIncome();
 
 public slots:
