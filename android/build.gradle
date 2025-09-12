@@ -1,7 +1,8 @@
 buildscript {
     repositories {
-        google()
-        mavenCentral()
+         google()
+         mavenCentral()
+         gradlePluginPortal()
     }
 
     dependencies {
@@ -21,7 +22,7 @@ dependencies {
     //noinspection GradleDependency
     implementation 'androidx.core:core:1.13.1'
     // Add AppCompat for themes requiring AppCompat compatibility
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
 
     // Add Material Components for modern themes and UI
     implementation 'com.google.android.material:material:1.10.0'
