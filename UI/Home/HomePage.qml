@@ -34,7 +34,7 @@ Page {
     footer: TabBar {
         id: bar
         width: parent.width
-        height: 60
+        height: 65
         currentIndex: swipeView.currentIndex
         topPadding: addItemPage.btnPadding
         //Material.background: "#EEEEEE"

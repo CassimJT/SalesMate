@@ -10,11 +10,12 @@
 #include "core/sources/incomemodel.h"
 #include "core/sources/servicemodel.h"
 #include "core/sources/reportmanager.h"
+#include <QQuickWindow>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-
+    QQuickWindow::setDefaultAlphaBuffer(true);
     QQmlApplicationEngine engine;
     BarcodeEngine barcodeEngine;
     AndroidSystem *sytstem  = AndroidSystem::instance();
