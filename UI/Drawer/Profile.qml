@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 import "../Utils"
+import "../Profile"
 
 Rectangle {
     id: profile
@@ -50,7 +51,7 @@ Rectangle {
                 id:avata
                 iconInsidebackgroundScaleFactor: 0.85
                 onClicked: {
-                    mainStakView.push("../Profile/ProfileEditPage.qml")
+                    mainStakView.push("../Profile/ProfilePage.qml")
                     drawer.close()
                 }
             }

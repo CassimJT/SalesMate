@@ -4,10 +4,11 @@ import QtQuick.Layouts 1.15
 
 import "../Utils"
 
+
 Page {
     id: profileEditPage
     objectName: "Profile"
-
+    property alias avataDrawer: avataDrawer
     ColumnLayout {
         spacing: 10
         width: parent.width
@@ -107,8 +108,7 @@ Page {
             anchors.centerIn:parent
             onCameraClicked: {
                 console.log("Camera clicked")
-                camera.open()
-                avataDrawer.close()
+                profileLoader.source = "CameraPage.qml"
             }
             onGalaryClicked: {
                 console.log("Galary Clicked")
@@ -118,8 +118,4 @@ Page {
 
     }
 
-    //camera
-    CameraPopup {
-        id: camera
-    }
 }

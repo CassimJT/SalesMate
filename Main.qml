@@ -7,6 +7,7 @@ import Cisociety
 import "./UI/Drawer"
 import "./UI/Welcome"
 import "./UI/Utils/Utils.js" as Utils
+import "./UI/Profile"
 
 ApplicationWindow {
     id: root
@@ -20,6 +21,8 @@ ApplicationWindow {
     property alias drawer: drawer
     property alias barcodeEngine: barcodeEngine
     property var mainStakView
+
+
     BarcodeEngine {
         id: barcodeEngine
     }
