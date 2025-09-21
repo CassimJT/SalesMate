@@ -141,6 +141,8 @@ qt_add_qml_module(appSalesMate
         QML_FILES UI/Utils/SearchBar.qml
         QML_FILES UI/Satatistics/ItemReportViewDelegate.qml
         QML_FILES UI/Satatistics/ItemReportViewModel.qml
+        QML_FILES UI/Profile/CameraPage.qml
+        QML_FILES UI/Profile/ProfilePage.qml
 
 
 

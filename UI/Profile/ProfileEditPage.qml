@@ -4,10 +4,11 @@ import QtQuick.Layouts 1.15
 
 import "../Utils"
 
+
 Page {
     id: profileEditPage
     objectName: "Profile"
-
+    property alias avataDrawer: avataDrawer
     ColumnLayout {
         spacing: 10
         width: parent.width
@@ -33,7 +34,6 @@ Page {
                 avataDrawer.open()
             }
         }
-
         // User Info Row Layout
         RowLayout {
             spacing: 3
@@ -52,7 +52,7 @@ Page {
             // Name Section
             ColumnLayout {
                 spacing: 2
-                Layout.fillWidth: true // Fill the remaining space between the info icon and edit icon
+                Layout.fillWidth: true
 
                 Label {
                     id: title
@@ -67,7 +67,6 @@ Page {
                 }
             }
 
-            // Spacer to push the edit icon to the far right
 
             // Edit Icon
             Image {
@@ -81,7 +80,7 @@ Page {
                     anchors.fill: parent
                     onClicked: {
                         console.log("Edit icon clicked!");
-                        // Add logic to handle name edit click
+                        // ...
                     }
                 }
             }
@@ -107,7 +106,16 @@ Page {
         AvataDrawerTools {
             id:tools
             anchors.centerIn:parent
+            onCameraClicked: {
+                console.log("Camera clicked")
+                profileLoader.source = "CameraPage.qml"
+            }
+            onGalaryClicked: {
+                console.log("Galary Clicked")
+                //...
+            }
         }
 
     }
+
 }

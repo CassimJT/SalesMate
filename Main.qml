@@ -7,6 +7,7 @@ import Cisociety
 import "./UI/Drawer"
 import "./UI/Welcome"
 import "./UI/Utils/Utils.js" as Utils
+import "./UI/Profile"
 
 ApplicationWindow {
     id: root
@@ -14,10 +15,14 @@ ApplicationWindow {
     height: 580
     visible: true
     title: qsTr("SalesMate")
+    flags: Qt.FramelessWindowHint | Qt.Window | Qt.MaximizeUsingFullscreenGeometryHint
+    visibility: window.FullScreen
     Material.primary: Material.Green
     property alias drawer: drawer
     property alias barcodeEngine: barcodeEngine
     property var mainStakView
+
+
     BarcodeEngine {
         id: barcodeEngine
     }
@@ -30,7 +35,7 @@ ApplicationWindow {
     header: ToolBar {
         id: toolbar
         visible: root.mainStakView.currentItem !== welcomePage // Compare with the instance
-        height: 55
+        height: 85
         RowLayout {
             anchors.fill: parent
             //menu button

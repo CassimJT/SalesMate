@@ -3,15 +3,16 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 RowLayout {
-    spacing: 40 // Space between the Camera and Gallery columns
-    anchors.centerIn: parent // Optional, if you want to center the RowLayout in its parent
+    spacing: 40
+    anchors.centerIn: parent
+    signal cameraClicked()
+    signal galaryClicked()
 
     // Camera Section
     Column {
-        Layout.alignment: Qt.AlignCenter // Center align the Column in the RowLayout
-        spacing: 10 // Space between the icon and label
+        Layout.alignment: Qt.AlignCenter
+        spacing: 10
 
-        // Circular background for the Camera icon
         Rectangle {
             width: 60
             height: 60
@@ -28,6 +29,13 @@ RowLayout {
                 source: "qrc:/Asserts/icons/icons8-camera-green.png"
                 fillMode: Image.PreserveAspectFit
             }
+            //mouse area
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    cameraClicked()
+                }
+            }
         }
 
         Label {
@@ -40,10 +48,9 @@ RowLayout {
 
     // Gallery Section
     Column {
-        Layout.alignment: Qt.AlignCenter // Center align the Column in the RowLayout
-        spacing: 10 // Space between the icon and label
+        Layout.alignment: Qt.AlignCenter
+        spacing: 10
 
-        // Circular background for the Gallery icon
         Rectangle {
             width: 60
             height: 60
@@ -59,6 +66,13 @@ RowLayout {
                 height: width
                 source: "qrc:/Asserts/icons/icons8-gallery-100.png"
                 fillMode: Image.PreserveAspectFit
+            }
+            //mouse area
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    galaryClicked();
+                }
             }
         }
 
