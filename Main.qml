@@ -209,5 +209,32 @@ ApplicationWindow {
             root.mainStakView = mainStakViewLoader.item
         }
     }
+    //App exit dialog
+    Dialog {
+        id: confirmExitDialog
+        title: "Closing SalesMate"
+        Label {
+            anchors.centerIn: parent
+            text: qsTr("Are you sure you want to exit?")
+        }
+        standardButtons: Dialog.Yes | Dialog.No
+        anchors.centerIn: parent
+        onAccepted:  {
+            Qt.quit()
+        }
+    }
+
+    onClosing: (close)=>{
+                    close.accepted = false
+                   if(root.mainStakView.depth > 1) {                     
+                       root.mainStakView.pop()
+                   } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Stocks"){
+                       mainStakViewLoader.source = "./UI/Home/MainSatckView.qml"
+                   } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Notification"){
+                       mainStakViewLoader.source = "./UI/Stock/AddItemPage.qml"
+                   }else {
+                       confirmExitDialog.open()
+                   }
+               }
 
 }

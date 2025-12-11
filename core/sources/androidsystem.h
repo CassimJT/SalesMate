@@ -5,7 +5,7 @@
 #include <QJsonObject>
 #include <QCoreApplication>
 #if defined(Q_OS_ANDROID)
-#include <QtCore/private/qandroidextras_p.h>
+#include <QtCore>
 #include <jni.h>
 #include <android/log.h>
 #define LOG_TAG "NativeWorker"
