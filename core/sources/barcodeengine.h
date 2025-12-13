@@ -18,6 +18,7 @@
 #include <QVideoFrameFormat>
 
 
+
 class BarcodeEngine : public QObject
 {
     Q_PROPERTY(QString barcode READ getBarcode WRITE setBarcode NOTIFY barcodeChanged FINAL)

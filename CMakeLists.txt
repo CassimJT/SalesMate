@@ -176,7 +176,16 @@ target_sources(appSalesMate PRIVATE
     android/src/com/salesmate/AlarmReceiver.java
     android/src/com/salesmate/AlarmService.java
 )
+if(ANDROID)
+    message(STATUS ">>> Linking OpenCV for Android <<<")
+    set(OpenCV_DIR "/media/csociety/Backup/CISociety/Libs/OpenCV-android-sdk/sdk/native/jni")
+    find_package(OpenCV REQUIRED)
 
+    target_include_directories(appSalesMate PRIVATE ${OpenCV_INCLUDE_DIRS})
+    target_link_libraries(appSalesMate PRIVATE ${OpenCV_LIBS})
+
+
+endif()
 # ----------------------------------------
 # Linking order
 # ----------------------------------------
@@ -189,6 +198,7 @@ target_link_libraries(appSalesMate
         Qt6::Charts
         Qt6::Concurrent
         ZXing::ZXing
+
 )
 
 # ----------------------------------------
