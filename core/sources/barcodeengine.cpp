@@ -102,7 +102,7 @@ void BarcodeEngine::processImage(QImage preview)
         );
 
     // Step 7: Set decoding hints
-    ZXing::DecodeHints hints;
+    ZXing::ReaderOptions hints;
     hints.setTryHarder(true); // Disable TryHarder for faster decoding
     hints.setFormats(ZXing::BarcodeFormat::EAN13 | ZXing::BarcodeFormat::EAN8 | ZXing::BarcodeFormat::UPCA);
 
@@ -211,7 +211,105 @@ QImage BarcodeEngine::sharpenImage(const QImage &img)
  */
 QImage BarcodeEngine::convertFrameToQImage(const QVideoFrame &frame)
 {
-    //
+    QVideoFrame f(frame);  // shallow copy, safe since we only read
+    if (!f.map(QVideoFrame::ReadOnly))
+        return QImage();
+
+    QVideoFrameFormat fmt = f.surfaceFormat();
+    int w = fmt.frameWidth();
+    int h = fmt.frameHeight();
+    QVideoFrameFormat::PixelFormat pixelFormat = fmt.pixelFormat();
+
+    cv::Mat rgb(h, w, CV_8UC3);
+
+    if (pixelFormat == QVideoFrameFormat::Format_NV12) {
+        // Plane 0: Y (h x w)
+        // Plane 1: UV interleaved (h/2 x w)
+        cv::Mat y(h, w, CV_8UC1, f.bits(0), f.bytesPerLine(0));
+        cv::Mat uv(h / 2, w, CV_8UC2, f.bits(1), f.bytesPerLine(1));  // UV as UYVY-like but actually UVUV...
+        std::vector<cv::Mat> planes = {y, uv};
+        cv::cvtColorTwoPlane(y, uv, rgb, cv::COLOR_YUV2RGB_NV12);
+    }
+    else if (pixelFormat == QVideoFrameFormat::Format_YUV420P) {
+        // Plane 0: Y
+        // Plane 1: U
+        // Plane 2: V
+        cv::Mat y(h, w, CV_8UC1, f.bits(0), f.bytesPerLine(0));
+        cv::Mat u(h / 2, w / 2, CV_8UC1, f.bits(1), f.bytesPerLine(1));
+        cv::Mat v(h / 2, w / 2, CV_8UC1, f.bits(2), f.bytesPerLine(2));
+        std::vector<cv::Mat> planes = {y, u, v};
+        cv::cvtColor(planes, rgb, cv::COLOR_YUV2RGB_IYUV);  // or cv::COLOR_YUV2RGB_I420
+    }
+    else if (pixelFormat == QVideoFrameFormat::Format_BGRA8888) {
+        cv::Mat bgra(h, w, CV_8UC4, f.bits(0), f.bytesPerLine(0));
+        cv::cvtColor(bgra, rgb, cv::COLOR_BGRA2RGB);
+    }
+    else {
+        f.unmap();
+        return QImage();  // unsupported format
+    }
+
+    f.unmap();
+
+    // Convert cv::Mat (RGB) to QImage without copying data (zero-copy where possible)
+    return QImage(rgb.data, rgb.cols, rgb.rows, rgb.step, QImage::Format_RGB888).copy();
+}
+/**
+ * @brief BarcodeEngine::matToQImage
+ * @param mat
+ * @return an image from cv::mat
+ */
+QImage BarcodeEngine::matToQImage(const cv::Mat &mat)
+{
+    switch (mat.type()) {
+    case CV_8UC3: {
+        QImage img(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+        return img.rgbSwapped(); // BGR -> RGB
+    }
+    case CV_8UC4: {
+        return QImage(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_ARGB32);
+    }
+    case CV_8UC1: {
+        return QImage(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_Grayscale8);
+    }
+    default:
+        qWarning() << "Unsupported cv::Mat format for conversion:" << mat.type();
+        return QImage();
+    }
+}
+/**
+ * @brief BarcodeEngine::qImageToMat
+ * @param image
+ * @return cv::mat from QImage
+ */
+cv::Mat BarcodeEngine::qImageToMat(const QImage &image)
+{
+    switch (image.format()) {
+    case QImage::Format_RGB888: {
+        cv::Mat mat(image.height(), image.width(), CV_8UC3,
+                    const_cast<uchar*>(image.bits()), image.bytesPerLine());
+        cv::Mat matBGR;
+        cv::cvtColor(mat, matBGR, cv::COLOR_RGB2BGR);
+        return matBGR;
+    }
+    case QImage::Format_ARGB32:
+    case QImage::Format_ARGB32_Premultiplied:
+    case QImage::Format_RGB32: {
+        cv::Mat mat(image.height(), image.width(), CV_8UC4,
+                    const_cast<uchar*>(image.bits()), image.bytesPerLine());
+        cv::Mat matBGR;
+        cv::cvtColor(mat, matBGR, cv::COLOR_BGRA2BGR); // Drop alpha
+        return matBGR;
+    }
+    case QImage::Format_Grayscale8: {
+        cv::Mat mat(image.height(), image.width(), CV_8UC1,
+                    const_cast<uchar*>(image.bits()), image.bytesPerLine());
+        return mat.clone();
+    }
+    default:
+        qWarning() << "Unsupported QImage format for conversion:" << image.format();
+        return cv::Mat();
+    }
 }
 
 
