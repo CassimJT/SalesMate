@@ -18,6 +18,7 @@
 #include <qimage.h>
 #include <QVideoFrameFormat>
 #include <opencv2/opencv.hpp>
+#include <QtConcurrent>
 
 
 class BarcodeEngine : public QObject
@@ -65,6 +66,8 @@ private:
     QImage matToQImage(const cv::Mat &mat);
 
     cv::Mat qImageToMat(const QImage &image);
+
+    bool m_processing = false;
 };
 
 #endif // BARCODEENGINE_H

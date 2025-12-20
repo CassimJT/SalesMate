@@ -36,7 +36,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("incomeModel", &incomeModel);
     engine.rootContext()->setContextProperty("ServiceModel", &serviceModel);
     engine.rootContext()->setContextProperty("ReportManger", &reportManger);
-    qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
+    engine.rootContext()->setContextProperty("BarcodeEngine", &barcodeEngine);
+    // qmlRegisterType <BarcodeEngine>("Cisociety",1,0,"BarcodeEngine");
     qmlRegisterSingletonType(QUrl("qrc:/UI/Stock/SalesModel.qml"), "SalesModel", 1, 0, "SalesModel");
 
     QObject::connect(

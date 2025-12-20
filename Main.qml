@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Window
 import QtQuick.Layouts
-import Cisociety
 import "./UI/Drawer"
 import "./UI/Welcome"
 import "./UI/Utils/Utils.js" as Utils
@@ -19,13 +18,7 @@ ApplicationWindow {
     visibility: window.FullScreen
     Material.primary: Material.Green
     property alias drawer: drawer
-    property alias barcodeEngine: barcodeEngine
     property var mainStakView
-
-
-    BarcodeEngine {
-        id: barcodeEngine
-    }
 
     WelcomePage {
         id: welcomePage

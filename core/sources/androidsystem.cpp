@@ -32,7 +32,7 @@ AndroidSystem::AndroidSystem(QObject *parent)
 {
 //constractor
 #if defined(Q_OS_ANDROID)
-    setAnAndroidSystemBarColor();
+    //setAnAndroidSystemBarColor();
     requestIgnoreBatteryOptimization();
     startAlarm();
     //StartSchedua();

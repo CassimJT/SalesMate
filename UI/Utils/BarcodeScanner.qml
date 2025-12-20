@@ -30,12 +30,12 @@ Item {
         camera: Camera {
             id: camera
             focusMode: Camera.FocusModeAuto
-            zoomFactor: 1.3
+            zoomFactor: 1.2
         }
         imageCapture: ImageCapture {
             id: imagecapture
             onImageCaptured: function (imageId, preview) {
-                barcodeEngine.processImage(preview)
+                // barcodeEngine.processImage(preview)
             }
         }
         videoOutput: output
@@ -96,11 +96,12 @@ Item {
                     if (scannerTools.scannerClicked) {
                         console.log("Starting camera...");
                         camera.start();
-                        frameTimer.start();
+                        BarcodeEngine.setVideoSink(output.videoSink)
+
                     } else {
                         console.log("Stopping camera...");
                         camera.stop();
-                        frameTimer.stop();
+
                     }
                 }
                 onTorchActivated: {
@@ -125,6 +126,7 @@ Item {
                     rightMargin: 20
                 }
             }
+
         }
 
         Image {
@@ -154,7 +156,7 @@ Item {
     }
 
     Connections {
-        target: barcodeEngine
+        target: BarcodeEngine
         onBarcodeChanged: function () {
             frameTimer.stop();
             camera.stop();
@@ -162,7 +164,7 @@ Item {
             output.visible = false;
             code.visible = true;
             m_parent.showRecycle = true;
-            m_parent.barcode = barcodeEngine.barcode;
+            m_parent.barcode = BarcodeEngine.barcode;
             scannerTools.scannerClicked = false;
         }
     }
@@ -174,7 +176,7 @@ Item {
         repeat: true
         onTriggered: {
             if (camera.active) {
-                imagecapture.capture();
+                // imagecapture.capture();
             }
         }
     }

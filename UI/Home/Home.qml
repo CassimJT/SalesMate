@@ -200,13 +200,13 @@ Page {
                     barcodeScanner.output.visible = true
                     if(!barcodeScanner.camera.active){
                         barcodeScanner.camera.start()
-                        barcodeScanner.frameTimer.restart()
+                        BarcodeEngine.setVideoSink(barcodeScanner.output.videoSink)
                         barcodeScanner.showRecycle = false
                         //reset all filed
                         Utils.resetField()
                     }else{
                         ///
-                        barcodeScanner.frameTimer.restart() //restart the timer
+                        barcodeScanner.camera.start()
                     }
                 }
             }
@@ -240,37 +240,14 @@ Page {
             }
         }
     }
-    //receipt
-   /* Receipt {
-        id: receipt
-        onPrintClicked: {
-            //print
-        }
-        onCancelClicked: {
-            homePage.totalSale = 0.0;
-            Utils.resetField();
-            payementDiretionText.visible = false;
-            SalesModel.clearModel()
-            paymentField.text = ""
-            changeField.text = ""
-            receipt.close()
-        }
-        onSaveClicked: {
-            //save
 
-        }
-
-        onShareClicked: {
-            //share
-
-        }
-    }*/
 
     Connections {
-        target: barcodeEngine
-        onBarcodeChanged: {
+        target: BarcodeEngine
+        onBarcodeChanged: function() {
+            barcodeScanner.camera.stop()
             console.log("Signal Triggered..");
-            homePage.sku = barcodeEngine.barcode;
+            homePage.sku = BarcodeEngine.barcode;
             const product = databaseManager.queryDatabase(sku);
             if (product) {
                 console.log("Price:", product.price);
@@ -284,15 +261,5 @@ Page {
             }
         }
     }
-
-    /*Connections {
-        target: databaseManager
-        onSalesProcessed: function () {
-            if (stackView.currentItem && stackView.currentItem.objectName === "Home") {
-                receipt.open();
-            }
-
-        }
-    }*/
 
 }

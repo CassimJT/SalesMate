@@ -9,13 +9,12 @@
 #include <qvideosink.h>
 
 BarcodeEngine::BarcodeEngine(QObject *parent)
-    : QObject{parent}
-    ,videoSink(new QVideoSink(this))
+    : QObject{parent},
+    barcode(""),
+    videoSink(new QVideoSink(this))
 
 {
     //the costractor
-    barcode = "";
-
 }
 
 /**
@@ -23,23 +22,53 @@ BarcodeEngine::BarcodeEngine(QObject *parent)
  * @param frames
  * this methode is ersponsible for processing the the videos frames
  */
-void BarcodeEngine::processVideoFrames(const QVideoFrame &frames)
+void BarcodeEngine::processVideoFrames(const QVideoFrame &frame)
 {
-    //
-    QVideoFrame video_frame = frames;
-    frameCounter++;
-    if(frameCounter % (frameToSkip + 1) != 0) {
+    qDebug() << "processVideoFrames called";
+
+    if (!frame.isValid()) return;
+
+    static bool processing = false;
+    if (processing) {
+        qDebug() << "Skipping frame - still processing previous";
         return;
     }
-    //chacking if the frames are valide
-    if (frames.isValid()) {
-        if(video_frame.map(QVideoFrame::ReadOnly)) {
-            //convet the frma to gray scale
-        }
+    processing = true;
 
-    } else {
-        qDebug() << "Frames not Valide";
+    static int totalFrames = 0;
+    totalFrames++;
+    int currentFrameNumber = totalFrames;
+
+    QVideoFrame frameCopy = frame;
+    if (!frameCopy.map(QVideoFrame::ReadOnly)) {
+        processing = false;
+        return;
     }
+
+    QtConcurrent::run([this, frameCopy, currentFrameNumber]() mutable {
+        QImage image = convertFrameToQImage(frameCopy);
+        frameCopy.unmap();  // safe even if crashed earlier
+
+        qDebug() << "[BG Thread] Frame #" << currentFrameNumber
+                 << "converted:" << (image.isNull() ? "FAILED" : "SUCCESS")
+                 << image.width() << "x" << image.height();
+
+        // Always reset processing, even on failure
+        QMetaObject::invokeMethod(this, [this, image, currentFrameNumber]() mutable {
+            if (!image.isNull()) {
+                qDebug() << "[Main Thread] Frame #" << currentFrameNumber
+                         << "ready - size:" << image.width() << "x" << image.height();
+
+                this->processImage(std::move(image));
+            } else {
+                qDebug() << "[Main Thread] Frame #" << currentFrameNumber << "conversion failed";
+            }
+
+            processing = false;
+        }, Qt::QueuedConnection);
+    });
+
+    qDebug() << "processVideoFrames finished (task scheduled)";
 }
 /**
  * @brief BarcodeEngine::setVideoSink
@@ -52,6 +81,7 @@ void BarcodeEngine::setVideoSink(QVideoSink *sink)
         videoSink = sink;
         connect(videoSink, &QVideoSink::videoFrameChanged, this, &BarcodeEngine::processVideoFrames);
     }
+
 }
 /**
  * @brief BarcodeEngine::processImage
@@ -67,7 +97,7 @@ void BarcodeEngine::processImage(QImage preview)
     const qreal parentWidth = preview.width();
     const qreal parentHeight = preview.height();
     const qreal barCodeWidth = parentWidth * 0.9;
-    const qreal barcodeHeight = 142;
+    const qreal barcodeHeight = 250;
 
     QRect cropRect;
     int cropWidth = (barCodeWidth / parentWidth * preview.width());
@@ -91,9 +121,7 @@ void BarcodeEngine::processImage(QImage preview)
         preview = preview.convertToFormat(QImage::Format_Grayscale8);
     }
 
-    // Step 5: Apply thresholding (optional)
-   // preview = preview.convertToFormat(QImage::Format_Mono);
-    // Step 6: Wrap QImage data into ZXing::ImageView
+    // Step 5: Wrap QImage data into ZXing::ImageView
     ZXing::ImageView imageView(
         preview.bits(),
         preview.width(),
@@ -101,13 +129,13 @@ void BarcodeEngine::processImage(QImage preview)
         ZXing::ImageFormat::Lum // Grayscale format
         );
 
-    // Step 7: Set decoding hints
+    // Step 6: Set decoding hints
     ZXing::ReaderOptions hints;
     hints.setTryHarder(true); // Disable TryHarder for faster decoding
     hints.setFormats(ZXing::BarcodeFormat::EAN13 | ZXing::BarcodeFormat::EAN8 | ZXing::BarcodeFormat::UPCA);
 
     // Step 7: Decode the barcode
-    ZXing::Result result = ZXing::ReadBarcode(imageView, hints);
+    ZXing::Barcode result = ZXing::ReadBarcode(imageView, hints);
 
     // Step 8: Handle the result
     if (result.isValid()) {
@@ -178,7 +206,7 @@ QImage BarcodeEngine::adjustBrightnessAndContrast(const QImage &img)
  */
 QImage BarcodeEngine::sharpenImage(const QImage &img)
 {
-    // Ensure grayscale format
+    //grayscale format
     QImage gray = img.convertToFormat(QImage::Format_Grayscale8);
 
     QImage sharpened(gray.size(), QImage::Format_Grayscale8);
@@ -188,7 +216,7 @@ QImage BarcodeEngine::sharpenImage(const QImage &img)
     int height = gray.height();
     int bytesPerLine = gray.bytesPerLine();
 
-    // Apply Laplacian filter
+    //Laplacian filter
     for (int y = 1; y < height - 1; ++y) {
         for (int x = 1; x < width - 1; ++x) {
             int center = src[y * bytesPerLine + x];
@@ -211,48 +239,66 @@ QImage BarcodeEngine::sharpenImage(const QImage &img)
  */
 QImage BarcodeEngine::convertFrameToQImage(const QVideoFrame &frame)
 {
-    QVideoFrame f(frame);  // shallow copy, safe since we only read
-    if (!f.map(QVideoFrame::ReadOnly))
+    QVideoFrame f(frame);
+    if (!f.map(QVideoFrame::ReadOnly)) {
+        qDebug() << "Failed to map frame for conversion";
         return QImage();
-
-    QVideoFrameFormat fmt = f.surfaceFormat();
-    int w = fmt.frameWidth();
-    int h = fmt.frameHeight();
-    QVideoFrameFormat::PixelFormat pixelFormat = fmt.pixelFormat();
-
-    cv::Mat rgb(h, w, CV_8UC3);
-
-    if (pixelFormat == QVideoFrameFormat::Format_NV12) {
-        // Plane 0: Y (h x w)
-        // Plane 1: UV interleaved (h/2 x w)
-        cv::Mat y(h, w, CV_8UC1, f.bits(0), f.bytesPerLine(0));
-        cv::Mat uv(h / 2, w, CV_8UC2, f.bits(1), f.bytesPerLine(1));  // UV as UYVY-like but actually UVUV...
-        std::vector<cv::Mat> planes = {y, uv};
-        cv::cvtColorTwoPlane(y, uv, rgb, cv::COLOR_YUV2RGB_NV12);
     }
-    else if (pixelFormat == QVideoFrameFormat::Format_YUV420P) {
-        // Plane 0: Y
-        // Plane 1: U
-        // Plane 2: V
-        cv::Mat y(h, w, CV_8UC1, f.bits(0), f.bytesPerLine(0));
-        cv::Mat u(h / 2, w / 2, CV_8UC1, f.bits(1), f.bytesPerLine(1));
-        cv::Mat v(h / 2, w / 2, CV_8UC1, f.bits(2), f.bytesPerLine(2));
-        std::vector<cv::Mat> planes = {y, u, v};
-        cv::cvtColor(planes, rgb, cv::COLOR_YUV2RGB_IYUV);  // or cv::COLOR_YUV2RGB_I420
-    }
-    else if (pixelFormat == QVideoFrameFormat::Format_BGRA8888) {
-        cv::Mat bgra(h, w, CV_8UC4, f.bits(0), f.bytesPerLine(0));
-        cv::cvtColor(bgra, rgb, cv::COLOR_BGRA2RGB);
-    }
-    else {
+
+    int w = f.width();   // 1920 (landscape from sensor)
+    int h = f.height();  // 1080
+
+    QVideoFrameFormat::PixelFormat pixelFormat = f.surfaceFormat().pixelFormat();
+
+    if (pixelFormat != QVideoFrameFormat::Format_NV21) {
+        qDebug() << "Unsupported format for manual conversion:" << pixelFormat;
         f.unmap();
-        return QImage();  // unsupported format
+        return QImage();
+    }
+
+    const uchar* yData = f.bits(0);
+    const uchar* vuData = f.bits(1);
+    int yStride = f.bytesPerLine(0);
+    int vuStride = f.bytesPerLine(1);
+
+    // Create landscape RGB image first
+    QImage landscape(w, h, QImage::Format_RGB888);
+    uchar* rgbData = landscape.bits();
+    int rgbStride = landscape.bytesPerLine();
+
+    // Manual NV21 to RGB888 conversion (BT.601 standard)
+    for (int y = 0; y < h; ++y) {
+        const uchar* yLine = yData + y * yStride;
+        const uchar* vuLine = vuData + (y / 2) * vuStride;
+        uchar* rgbLine = rgbData + y * rgbStride;
+
+        for (int x = 0; x < w; ++x) {
+            int xVu = (x / 2) * 2;  // VU pair index
+
+            uint8_t Y = yLine[x];
+            uint8_t V = vuLine[xVu];
+            uint8_t U = vuLine[xVu + 1];
+
+            // YUV to RGB conversion formulas (BT.601)
+            int r = qBound(0, Y + ((351 * (V - 128)) >> 8), 255);
+            int g = qBound(0, Y - ((179 * (V - 128) + 89 * (U - 128)) >> 8), 255);
+            int b = qBound(0, Y + ((444 * (U - 128)) >> 8), 255);
+
+            rgbLine[3 * x + 0] = static_cast<uchar>(r);
+            rgbLine[3 * x + 1] = static_cast<uchar>(g);
+            rgbLine[3 * x + 2] = static_cast<uchar>(b);
+        }
     }
 
     f.unmap();
 
-    // Convert cv::Mat (RGB) to QImage without copying data (zero-copy where possible)
-    return QImage(rgb.data, rgb.cols, rgb.rows, rgb.step, QImage::Format_RGB888).copy();
+    // Critical fix: Rotate 90° clockwise to match portrait preview on screen
+    QImage portrait = landscape.transformed(QTransform().rotate(90));
+
+    qDebug() << "Manual NV21 → RGB + 90° rotation completed:"
+             << w << "x" << h << "→" << portrait.width() << "x" << portrait.height();
+
+    return portrait;
 }
 /**
  * @brief BarcodeEngine::matToQImage
