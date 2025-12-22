@@ -487,13 +487,13 @@ Page {
     }
     Connections {
         target: ServiceModel
-        onTotalServiceChanged:function () {
+        function onTotalServiceChanged () {
             resertField() // Clearing the fields
             directionText.directionalText = "Saved!!"
             directionText.colorTxt = "green"
             directionText.visible = true
         }
-        onError:function(){
+        function onError(){
             directionText.directionalText = "Error: Not saved!!"
             directionText.visible = true
         }

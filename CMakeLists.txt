@@ -61,18 +61,18 @@ qt_add_qml_module(appSalesMate
         UI/Welcome/WelcomePage.qml
 
         # Auth
-        UI/Auth/SignInPage.qml
-        UI/Auth/SignUpPage.qml
+
+
 
         # About
-        UI/About/AboutAppPage.qml
+        UI/About/AboutSalesmate.qml
         UI/About/AboutUsPage.qml
 
         # Stock
         UI/Stock/AddItemPage.qml
         UI/Stock/ShowStock.qml
         UI/Stock/AddExpensePage.qml
-        UI/Stock/OtherIncomePage.qml
+        UI/Stock/ServicesPage.qml
         UI/Stock/ShowSalesPage.qml
         UI/Stock/AddStock.qml
         UI/Stock/SearchBar.qml
@@ -105,7 +105,7 @@ qt_add_qml_module(appSalesMate
         UI/Utils/ProductEditPopup.qml
         UI/Utils/AddNewService.qml
         UI/Utils/CircularProgressBar.qml
-        UI/Utils/SearchBar.qml
+        UI/Utils/SearchBar_d.qml
 
         # Search Barcode
         UI/SearchBarcode/SearchBarcodeDelegate.qml
@@ -152,6 +152,16 @@ qt_add_qml_module(appSalesMate
         core/sources/servicemodel.h
         core/sources/reportmanager.cpp
         core/sources/reportmanager.h
+        QML_FILES UI/Welcome/WelcomeScreen.qml
+        QML_FILES UI/Welcome/NumberVerificationScreen.qml
+        QML_FILES UI/Welcome/BusinessVerificationScreen.qml
+        QML_FILES UI/Welcome/OTPScreen.qml
+        QML_FILES UI/Welcome/WorkerLoginScreen.qml
+        QML_FILES UI/Welcome/RoleSelectionScreen.qml
+        QML_FILES UI/Welcome/OwnerLoginScreen.qml
+        QML_FILES UI/Utils/CountrySelector.qml
+        QML_FILES UI/Modles/CountryModel.qml
+        QML_FILES UI/Settings/SettingsPage.qml
 )
 
 # ----------------------------------------

@@ -84,5 +84,22 @@
         <file>Asserts/icons/profit.png</file>
         <file>Asserts/icons/switch-camera-100.png</file>
         <file>Asserts/icons/back-100.png</file>
+        <file>Asserts/icons/xxxhdpi.png</file>
+        <file>Asserts/icons/iback.svg</file>
+        <file>Asserts/Welcome/new.svg</file>
+        <file>Asserts/Welcome/landlord.svg</file>
+        <file>Asserts/Welcome/cashier.svg</file>
+        <file>Asserts/Welcome/next.svg</file>
+        <file>Asserts/flags/zw.png</file>
+        <file>Asserts/flags/zm.png</file>
+        <file>Asserts/flags/za.png</file>
+        <file>Asserts/flags/tz.png</file>
+        <file>Asserts/flags/mz.png</file>
+        <file>Asserts/flags/mw.png</file>
+        <file>Asserts/Welcome/visible.svg</file>
+        <file>Asserts/Welcome/invisible.svg</file>
+        <file>Asserts/icons/settings.png</file>
+        <file>UI/Settings/SalesmateSettings.qml</file>
+        <file>Asserts/stock/item.svg</file>
     </qresource>
 </RCC>

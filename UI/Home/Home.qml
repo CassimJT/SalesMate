@@ -244,7 +244,7 @@ Page {
 
     Connections {
         target: BarcodeEngine
-        onBarcodeChanged: function() {
+        function onBarcodeChanged() {
             barcodeScanner.camera.stop()
             console.log("Signal Triggered..");
             homePage.sku = BarcodeEngine.barcode;

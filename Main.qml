@@ -14,20 +14,22 @@ ApplicationWindow {
     height: 580
     visible: true
     title: qsTr("SalesMate")
-    flags: Qt.FramelessWindowHint | Qt.Window | Qt.MaximizeUsingFullscreenGeometryHint
+    flags: Qt.FramelessWindowHint | Qt.Window  | Qt.ExpandedClientAreaHint
     visibility: window.FullScreen
     Material.primary: Material.Green
     property alias drawer: drawer
     property var mainStakView
 
-    WelcomePage {
-        id: welcomePage
-        visible: false
+    Component {
+        id: welcomeComponent
+        WelcomePage {}
     }
+
+
 
     header: ToolBar {
         id: toolbar
-        visible: root.mainStakView.currentItem !== welcomePage // Compare with the instance
+        visible: mainStakViewLoader.item && mainStakViewLoader.item.objectName  !== "WelcomePage" // Compare with the instance
         height: 85
         RowLayout {
             anchors.fill: parent
@@ -61,7 +63,7 @@ ApplicationWindow {
             //pageTitle
             Label {
                 text: {
-                    if (root.mainStakView.currentItem && root.mainStakView.currentItem.objectName) {
+                    if (root.mainStakView && root.mainStakView.currentItem && root.mainStakView.currentItem.objectName) {
                         return root.mainStakView.currentItem.objectName;
                     } else if (mainStakViewLoader.item && mainStakViewLoader.item.objectName) {
                         return mainStakViewLoader.item.objectName;
@@ -196,7 +198,7 @@ ApplicationWindow {
         property bool userIsSigned: true
         property bool isVerified: (userIsSigned && root.mainStakView && root.mainStakView.depth === 0)
         anchors.fill: parent
-        source: userIsSigned ? "./UI/Home/MainSatckView.qml" : welcomePage
+        source: userIsSigned ? "./UI/Home/MainSatckView.qml" : "./UI/Welcome/WelcomePage.qml"
         onLoaded: {
             // Ensure the root.mainStakView references the loaded component
             root.mainStakView = mainStakViewLoader.item
@@ -218,14 +220,16 @@ ApplicationWindow {
     }
 
     onClosing: (close)=>{
-                    close.accepted = false
-                   if(root.mainStakView.depth > 1) {                     
+                   close.accepted = false
+                   if(mainStakViewLoader.userIsSigned && root.mainStakView && root.mainStakView.depth > 1) {
                        root.mainStakView.pop()
                    } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Stocks"){
                        mainStakViewLoader.source = "./UI/Home/MainSatckView.qml"
                    } else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Notification"){
                        mainStakViewLoader.source = "./UI/Stock/AddItemPage.qml"
-                   }else {
+                   }else if(mainStakViewLoader.item && mainStakViewLoader.item.objectName === "WelcomePage"){
+                       confirmExitDialog.open()
+                   } else {
                        confirmExitDialog.open()
                    }
                }

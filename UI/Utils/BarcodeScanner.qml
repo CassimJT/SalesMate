@@ -20,6 +20,8 @@ Item {
     property alias output: output
     property alias frameTimer: frameTimer
     property string barcode: ""
+    property bool isCameraActive: false
+    property alias code: code
 
     signal searchBtnClciked()
 
@@ -48,12 +50,23 @@ Item {
         radius: 5
         color: m_parent.barCodAreaColor
 
-        Label {
+        Rectangle {
             id: code
-            anchors.centerIn: parent
-            text: m_parent.barcode
+            width: parent.width * 0.7
+            height: 50
+            color: "#E91E63"
+            opacity: 0.7
             visible: false
+            radius: 5
+            anchors.centerIn: parent
+            Label {
+                anchors.centerIn: parent
+                text: m_parent.barcode
+                color: "#FFFFFF"
+            }
+
         }
+
 
         VideoOutput {
             id: output
@@ -157,7 +170,7 @@ Item {
 
     Connections {
         target: BarcodeEngine
-        onBarcodeChanged: function () {
+        function onBarcodeChanged () {
             frameTimer.stop();
             camera.stop();
             barcodeSound.play();
@@ -166,6 +179,7 @@ Item {
             m_parent.showRecycle = true;
             m_parent.barcode = BarcodeEngine.barcode;
             scannerTools.scannerClicked = false;
+            m_parent.isCameraActive = true
         }
     }
 

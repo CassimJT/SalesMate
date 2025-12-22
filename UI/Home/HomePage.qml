@@ -20,7 +20,7 @@ Page {
             id:home
         }
         //service Page
-        OtherIncomePage {
+        ServicesPage {
             id: services
 
         }
@@ -175,7 +175,7 @@ Page {
     }
     Connections {
         target: databaseManager
-        onSalesProcessed: function () {
+       function onSalesProcessed() {
             if (stackView.currentItem && stackView.currentItem.objectName === "Home") {
                 receipt.open();
             }

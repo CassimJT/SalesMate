@@ -20,7 +20,7 @@ function convertToDate(dateString) {
 //get icon source
 
 function getIconSource() {
-    if (root.mainStakView.depth > 1) {
+    if ( root.mainStakView && root.mainStakView.depth > 1) {
         return "qrc:/Asserts/icons/styled-back.png";
     } else if (mainStakViewLoader.item && mainStakViewLoader.item.objectName === "Stocks") {
         return "qrc:/Asserts/icons/styled-back.png";

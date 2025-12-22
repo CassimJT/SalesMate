@@ -17,6 +17,8 @@ Page {
     property int totalHeightFor3Item: Math.round(screenHeight) - totalHeightFor4Item
     property bool isTablet: screenHeight > 800 || screenWidth > 600
     property real buttonHeight: isTablet ? totalHeightFor3Item * 0.07 : totalHeightFor3Item * 0.10
+    property bool isScanMode: false
+
 
     Flickable {
         id: flickable
@@ -42,8 +44,8 @@ Page {
                 Layout.fillWidth: true
                 barCodeWidth: parent.width
                 barcodeHight: page.totalHeightFor3Item * 0.30
-                scanneriIconSource: "qrc:/Asserts/icons/barcode-scan.png"
-                torshIconSource: "qrc:/Asserts/icons/touch.png"
+                scanneriIconSource: "qrc:/Asserts/icons/barcode-scan-green.png"
+                torshIconSource: "qrc:/Asserts/icons/touch-green.png"
             }
 
             TextField {
@@ -155,50 +157,76 @@ Page {
             CustomButton {
                 id: save
                 Layout.fillWidth: true
+                btnIconSrc: isScanMode ? "qrc:/Asserts/icons/barcode-scan.png":"qrc:/Asserts/icons/save.png"
                 btnColor: "#4CAF50"
-                btnRadius: 5
+                btnRadius: 6
                 btnHeight: page.buttonHeight
-                btnText: "Save"
-                onBtnClicked: {
-                    if (itemName.text === "") {
-                        itemName.focus = false;
-                        itemName.forceActiveFocus()
-                        itemName.placeholderText = "Enter item name";
-                        return;
+                btnText: isScanMode ? "Scan" : "Save"
 
-                    }else if (costPrice.text === ""){
-                        costPrice.focus = false;
-                        costPrice.forceActiveFocus()
-                        costPrice.placeholderText = "Enter costPrice";
-                        return;
-                    }  else if (amountField.text === "") {
-                        amountField.focus = false;
-                        amountField.forceActiveFocus()
-                        amountField.placeholderText = "Enter amount";
-                        return;
-                    } else if (quantityField.text === "") {
-                        quantityField.focus = false;
-                        quantityField.forceActiveFocus()
-                        quantityField.placeholderText = "Enter quantity";
-                        return;
-                    } else if(barcodeScn.barcode === "") {
-                        return;
+                onBtnClicked: {
+
+                    // ────────────── SCAN MODE ──────────────
+                    if (!isScanMode) {
+                        // ────────────── VALIDATION ──────────────
+                        if (itemName.text.trim() === "") {
+                            itemName.forceActiveFocus()
+                            itemName.placeholderText = "Enter item name"
+                            return
+                        }
+
+                        if (costPrice.text.trim() === "") {
+                            costPrice.forceActiveFocus()
+                            costPrice.placeholderText = "Enter cost price"
+                            return
+                        }
+
+                        if (amountField.text.trim() === "") {
+                            amountField.forceActiveFocus()
+                            amountField.placeholderText = "Enter amount"
+                            return
+                        }
+
+                        if (quantityField.text.trim() === "") {
+                            quantityField.forceActiveFocus()
+                            quantityField.placeholderText = "Enter quantity"
+                            return
+                        }
+
+                        if (barcodeScn.barcode === "") {
+                            console.log("No barcode scanned")
+                            return
+                        }
+
+                        // ────────────── SAVE ──────────────
+                        const name = itemName.text
+                        const sku = barcodeScn.barcode
+                        const quantity = parseInt(quantityField.text)
+                        const quantitysold = 0
+                        const price = parseFloat(amountField.text)
+                        const cp = parseFloat(costPrice.text)
+                        const date = Utils.convertToDate(dateField.text)
+
+                        console.log("Adding Product:", name, sku, quantity, quantitysold, price, date)
+
+                        databaseManager.addProduct(
+                                    name,
+                                    sku,
+                                    quantity,
+                                    quantitysold,
+                                    price,
+                                    cp,
+                                    date
+                                    )
+
+                    }else {
+                        barcodeScn.camera.start()
+                        BarcodeEngine.setVideoSink(barcodeScn.output.videoSink)
+                        page.isScanMode = false
                     }
 
-                    const name = itemName.text;
-                    const sku = barcodeScn.barcode;
-                    const quantity = parseInt(quantityField.text);
-                    const price = parseFloat(amountField.text);
-                    const cp = parseFloat(costPrice.text);
-                    const date = Utils.convertToDate(dateField.text)
-                    const quantitysold = 0;
-
-                    // Add entry to the database
-                    console.log("Adding Product:", name, sku, quantity,quantitysold, price, date);
-
-                    databaseManager.addProduct(name, sku, quantity, quantitysold, price,cp,date);
                 }
             }
+
         }
     }
     function reset() {
@@ -210,7 +238,8 @@ Page {
         barcodeScn.camera.stop()
         barcodeScn.camera.start()
         barcodeScn.output.visible = true
-        barcodeScn.frameTimer.restart()
+        barcodeScn.isCameraActive = false
+
     }
     //information Popup when success
     InfoPopup {
@@ -235,16 +264,40 @@ Page {
             error.close();
         }
     }
+    //Floating button
+    Button {
+        id: next
+        icon.source: "qrc:/Asserts/stock/item.svg"
+        text: qsTr("Next")
+        visible: barcodeScn.isCameraActive
+        opacity: 0.7
+        x: parent.width - width - 24
+        y: (parent.height - height) * 0.61
+        font.pixelSize: 12
+        Material.background: Material.accent
+
+        DragHandler {
+            target: next
+            grabPermissions: PointerHandler.CanTakeOverFromAnything
+        }
+
+        onClicked: {
+            reset()
+        }
+    }
     //when a new product is added succsesfuly
     Connections {
         target: databaseManager
-        onNewProductAdded: function (){
+        function onNewProductAdded() {
             successPopup.open()
             barcodeScn.barcode  = ""
         }
-        onProductExists: function () {
+        function onProductExists() {
             error.open()
             barcodeScn.barcode  = ""
         }
+    }
+    Component.onCompleted: {
+        page.isScanMode = true
     }
 }

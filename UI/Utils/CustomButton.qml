@@ -10,7 +10,9 @@ Rectangle {
     property color btnClickedColor: "#32CD32" // Color when clicked
     property string btnIconSrc: ""
     property string btnText: ""
+    property bool isAnabled: true
     signal btnClicked
+
 
     width: btnWidth
     height: btnHeight
@@ -40,8 +42,8 @@ Rectangle {
             id: btnIcon
             visible: customButton.btnIconSrc !== ""
             source: customButton.btnIconSrc
-            width: customButton.btnHeight * 0.6
-            height: customButton.btnHeight * 0.6
+            width: customButton.btnHeight * 0.5
+            height: customButton.btnHeight * 0.5
             fillMode: Image.PreserveAspectFit
         }
 

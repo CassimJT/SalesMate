@@ -55,7 +55,7 @@ ItemDelegate {
 
         // Check parent objectName safely
         if (popupReference.parent && popupReference.parent.objectName === "Home") {
-            barcodeEngine.setBarcode(model.sku);
+            BarcodeEngine.setBarcode(model.sku);
         } else {
             popupReference.selectedSku = model.sku;
             popupReference._itemPrice = model.price;

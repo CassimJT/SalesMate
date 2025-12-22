@@ -285,16 +285,16 @@ Popup {
     }
     Connections {
         target: databaseManager
-        onProductAlreadyExist :{
+       function onProductAlreadyExist() {
             console.log("Product aleady exist")
             info.text = "No Changes to update!!"
         }
-        onProductUpdated: {
+        function onProductUpdated() {
             console.log("Update succes!!")
             info.text = "Update succes!!"
         }
         //emited when the product is succefuly removed
-        onProductRemoved:{
+        function onProductRemoved() {
             successPopup.open()
         }
     }
