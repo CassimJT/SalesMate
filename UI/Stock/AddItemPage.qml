@@ -25,6 +25,8 @@ Page {
         currentIndex: swipeView.currentIndex
         id: bar
         width: parent.width
+        height: 65
+        Material.elevation: 1
         //add stock
         TabButton {
             Row {

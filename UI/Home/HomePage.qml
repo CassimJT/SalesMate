@@ -37,7 +37,7 @@ Page {
         height: 65
         currentIndex: swipeView.currentIndex
         topPadding: addItemPage.btnPadding
-        //Material.background: "#EEEEEE"
+        Material.elevation: 1
 
         // POS Tab
         TabButton {

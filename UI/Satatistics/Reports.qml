@@ -12,7 +12,7 @@ Page {
     property real profit: databaseManager.totalSoldValue() - databaseManager.totalCostPrice()
 
     property alias details: details
-    SearchBar{
+    SearchBar_d{
         id: searchBar
 
         anchors {

@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("BarcodeEngine", &barcodeEngine);
 
     qmlRegisterSingletonType(QUrl("qrc:/UI/Stock/SalesModel.qml"), "SalesModel", 1, 0, "SalesModel");
-    qmlRegisterSingletonType(QUrl("qrc:/UI/Settings/SalesmateSettings.qml"), "SalesmateSettings", 1, 0, "SalesmateSettings");
+
 
     QObject::connect(
         &engine,

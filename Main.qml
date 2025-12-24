@@ -7,6 +7,8 @@ import "./UI/Drawer"
 import "./UI/Welcome"
 import "./UI/Utils/Utils.js" as Utils
 import "./UI/Profile"
+import SalesMate 1.0
+
 
 ApplicationWindow {
     id: root
@@ -25,12 +27,11 @@ ApplicationWindow {
         WelcomePage {}
     }
 
-
-
     header: ToolBar {
         id: toolbar
         visible: mainStakViewLoader.item && mainStakViewLoader.item.objectName  !== "WelcomePage" // Compare with the instance
         height: 85
+        Material.elevation: 3
         RowLayout {
             anchors.fill: parent
             //menu button
@@ -195,7 +196,7 @@ ApplicationWindow {
     //the main stark
     Loader {
         id: mainStakViewLoader
-        property bool userIsSigned: true
+        property bool userIsSigned: SalesmateSettings.isUserSigned
         property bool isVerified: (userIsSigned && root.mainStakView && root.mainStakView.depth === 0)
         anchors.fill: parent
         source: userIsSigned ? "./UI/Home/MainSatckView.qml" : "./UI/Welcome/WelcomePage.qml"

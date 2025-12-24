@@ -99,7 +99,6 @@
         <file>Asserts/Welcome/visible.svg</file>
         <file>Asserts/Welcome/invisible.svg</file>
         <file>Asserts/icons/settings.png</file>
-        <file>UI/Settings/SalesmateSettings.qml</file>
         <file>Asserts/stock/item.svg</file>
     </qresource>
 </RCC>

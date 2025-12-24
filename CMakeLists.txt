@@ -4,6 +4,7 @@ project(SalesMate VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
+set(qml_singletons UI/Settings/SalesmateSettings.qml)
 
 # ----------------------------------------
 # ZXing setup
@@ -23,25 +24,28 @@ qt_standard_project_setup(REQUIRES 6.8)
 # Executable definition
 # ----------------------------------------
 qt_add_executable(appSalesMate
-    main.cpp
-    rsources.qrc
+        main.cpp
+        rsources.qrc
 )
 
 # ----------------------------------------
 # Android package directory
 # ----------------------------------------
 set_property(TARGET appSalesMate APPEND PROPERTY
-    QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
+        QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
 )
-
+#--------Singletofile
+set_source_files_properties(${qml_singletons} PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 # ----------------------------------------
 # QML & C++ sources
 # ----------------------------------------
 qt_add_qml_module(appSalesMate
-    URI SalesMate
-    VERSION 1.0
+        URI SalesMate
+        VERSION 1.0
+        RESOURCE_PREFIX "/qt/qml/"
+        NO_GENERATE_EXTRA_QMLDIRS
 
-    QML_FILES
+        QML_FILES
         Main.qml
 
         # Drawer
@@ -127,7 +131,7 @@ qt_add_qml_module(appSalesMate
         UI/Receipt/Receipt.qml
         UI/Receipt/ReceiptText.qml
 
-    SOURCES
+        SOURCES
         core/sources/androidsystem.cpp
         core/sources/androidsystem.h
         core/sources/barcodeengine.cpp
@@ -162,37 +166,38 @@ qt_add_qml_module(appSalesMate
         QML_FILES UI/Utils/CountrySelector.qml
         QML_FILES UI/Modles/CountryModel.qml
         QML_FILES UI/Settings/SettingsPage.qml
+        QML_FILES UI/Settings/SalesmateSettings.qml
 )
 
 # ----------------------------------------
 # Android-specific sources
 # ----------------------------------------
 target_sources(appSalesMate PRIVATE
-    android/AndroidManifest.xml
-    android/build.gradle
-    android/res/values/libs.xml
-    android/res/xml/qtprovider_paths.xml
-    android/gradle/wrapper/gradle-wrapper.jar
-    android/gradle/wrapper/gradle-wrapper.properties
-    android/gradle.properties
-    android/gradlew
-    android/gradlew.bat
+        android/AndroidManifest.xml
+        android/build.gradle
+        android/res/values/libs.xml
+        android/res/xml/qtprovider_paths.xml
+        android/gradle/wrapper/gradle-wrapper.jar
+        android/gradle/wrapper/gradle-wrapper.properties
+        android/gradle.properties
+        android/gradlew
+        android/gradlew.bat
 
-    android/src/com/salesmate/ScheduledWorker.java
-    android/src/com/salesmate/WorkManagerHelper.java
-    android/src/com/salesmate/NativeBridge.java
-    android/src/com/salesmate/AlarmHelper.java
-    android/src/com/salesmate/BatteryOptimizationHelper.java
-    android/src/com/salesmate/AlarmReceiver.java
-    android/src/com/salesmate/AlarmService.java
+        android/src/com/salesmate/ScheduledWorker.java
+        android/src/com/salesmate/WorkManagerHelper.java
+        android/src/com/salesmate/NativeBridge.java
+        android/src/com/salesmate/AlarmHelper.java
+        android/src/com/salesmate/BatteryOptimizationHelper.java
+        android/src/com/salesmate/AlarmReceiver.java
+        android/src/com/salesmate/AlarmService.java
 )
 if(ANDROID)
-    message(STATUS ">>> Linking OpenCV for Android <<<")
-    set(OpenCV_DIR "/media/csociety/Backup/CISociety/Libs/OpenCV-android-sdk/sdk/native/jni")
-    find_package(OpenCV REQUIRED)
+        message(STATUS ">>> Linking OpenCV for Android <<<")
+        set(OpenCV_DIR "/media/csociety/Backup/CISociety/Libs/OpenCV-android-sdk/sdk/native/jni")
+        find_package(OpenCV REQUIRED)
 
-    target_include_directories(appSalesMate PRIVATE ${OpenCV_INCLUDE_DIRS})
-    target_link_libraries(appSalesMate PRIVATE ${OpenCV_LIBS})
+        target_include_directories(appSalesMate PRIVATE ${OpenCV_INCLUDE_DIRS})
+        target_link_libraries(appSalesMate PRIVATE ${OpenCV_LIBS})
 
 
 endif()
@@ -200,7 +205,7 @@ endif()
 # Linking order
 # ----------------------------------------
 target_link_libraries(appSalesMate
-    PRIVATE
+        PRIVATE
         Qt6::Core
         Qt6::Quick
         Qt6::Multimedia
@@ -215,10 +220,10 @@ target_link_libraries(appSalesMate
 # Target properties
 # ----------------------------------------
 set_target_properties(appSalesMate PROPERTIES
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        MACOSX_BUNDLE TRUE
+        WIN32_EXECUTABLE TRUE
+        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
 
 # ----------------------------------------
@@ -226,7 +231,7 @@ set_target_properties(appSalesMate PROPERTIES
 # ----------------------------------------
 include(GNUInstallDirs)
 install(TARGETS appSalesMate
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE DESTINATION .
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
