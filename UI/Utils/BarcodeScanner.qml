@@ -87,6 +87,7 @@ Item {
                         //reload()
                         //reinitializeCamera();
                         reset()
+                        m_parent.isCameraActive = true
                     }
                 }
             }

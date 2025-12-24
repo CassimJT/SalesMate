@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../Modles"
 
 Page {
     id: settingsPage
@@ -23,22 +24,65 @@ Page {
                 Layout.alignment: Qt.AlignHCenter
 
                 ColumnLayout {
-                    spacing: 12
+                    spacing: 8
                     width: parent.width   // Simple and reliable
 
                     TextField {
                         Layout.fillWidth: true
                         placeholderText: "Business Name"
                     }
-                    ComboBox {
-                        Layout.fillWidth: true
-                        model: ["MWK", "USD", "ZAR"]
+                    Label{
+                        text: qsTr("Currency")
                     }
+
                     ComboBox {
+                        id: currrencySymbo
                         Layout.fillWidth: true
-                        model: ["Before amount", "After amount"]
+                        editable: true
+                        textRole: "currency"
+                        popup.width: parent.width * 0.6
+                        popup.x: width - popup.width
+                        model: CurrencyModel{}
+
+                        delegate: ItemDelegate {
+                            width: parent.width
+                            RowLayout {
+                                anchors {
+                                    left: parent.left
+                                    leftMargin: 15
+                                }
+
+                                spacing: 8
+
+                                Image {
+                                    source: model.flag
+                                    Layout.preferredWidth: 26
+                                    Layout.preferredHeight: 26
+                                    fillMode: Image.PreserveAspectFit
+                                }
+
+                                Text {
+                                    text: model.currency
+                                }
+                            }
+                        }
+                    }
+                    TextField {
+                        id:city
+                        Layout.fillWidth: true
+                        placeholderText: "District / city"
+                    }
+
+                    TextField {
+                        id:adress
+                        Layout.fillWidth: true
+                        placeholderText: "Adress / location"
                     }
                 }
+            }
+            MenuSeparator {
+                Layout.preferredWidth: parent.width * 0.90
+                Layout.alignment: Qt.AlignHCenter
             }
 
             GroupBox {
@@ -52,25 +96,10 @@ Page {
                     width: parent.width
 
                     Switch { text: "Prices include tax" }
-                    SpinBox { Layout.fillWidth: true; from: 0; to: 100 }
-                    Switch { text: "Allow discounts" }
+                    Switch { text: "Auto-print / auto-generate receipt" }
                 }
             }
 
-            GroupBox {
-                title: "Payment Settings"
-                Layout.preferredWidth: parent.width * 0.90
-                Layout.fillWidth: false
-                Layout.alignment: Qt.AlignHCenter
-
-                ColumnLayout {
-                    spacing: 5
-                    width: parent.width
-                    CheckBox { text: "Cash" }
-                    CheckBox { text: "Mobile Money" }
-                    CheckBox { text: "Bank Transfer" }
-                }
-            }
         }
     }
 }

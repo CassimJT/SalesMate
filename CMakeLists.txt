@@ -18,6 +18,10 @@ add_subdirectory(core/zxing-cpp EXCLUDE_FROM_ALL)
 # Qt setup
 # ----------------------------------------
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Multimedia Sql Charts Concurrent)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 qt_standard_project_setup(REQUIRES 6.8)
 
 # ----------------------------------------
@@ -167,6 +171,10 @@ qt_add_qml_module(appSalesMate
         QML_FILES UI/Modles/CountryModel.qml
         QML_FILES UI/Settings/SettingsPage.qml
         QML_FILES UI/Settings/SalesmateSettings.qml
+        SOURCES core/sources/settingsmanager.h core/sources/settingsmanager.cpp
+        SOURCES core/sources/notificationmanager.h core/sources/notificationmanager.cpp
+        SOURCES core/sources/cloudsynchmanager.h core/sources/cloudsynchmanager.cpp
+        QML_FILES UI/Modles/CurrencyModel.qml
 )
 
 # ----------------------------------------
@@ -215,6 +223,10 @@ target_link_libraries(appSalesMate
         ZXing::ZXing
 
 )
+target_link_libraries(appSalesMate PRIVATE Qt6::Core)
+target_link_libraries(appSalesMate PRIVATE Qt6::Core)
+target_link_libraries(appSalesMate PRIVATE Qt6::Core)
+target_link_libraries(appSalesMate PRIVATE Qt6::Core)
 
 # ----------------------------------------
 # Target properties

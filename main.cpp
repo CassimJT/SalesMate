@@ -11,6 +11,7 @@
 #include "core/sources/servicemodel.h"
 #include "core/sources/reportmanager.h"
 #include <QQuickWindow>
+#include "core/sources/settingsmanager.h"
 
 #if defined(Q_OS_ANDROID)
 #include <jni.h>
@@ -24,6 +25,11 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QQuickWindow::setDefaultAlphaBuffer(true);
 
+    //Qsettings information
+    QCoreApplication::setOrganizationName("Salesmate");
+    QCoreApplication::setOrganizationDomain("Salesmate.com");
+    QCoreApplication::setApplicationName("Salesmate");
+
     QQmlApplicationEngine engine;
 
     BarcodeEngine barcodeEngine;
@@ -33,10 +39,7 @@ int main(int argc, char *argv[])
     IncomeModel incomeModel;
     ServiceModel serviceModel;
     ReportManager reportManger;
-
-    QCoreApplication::setOrganizationName("SalesMate");
-    QCoreApplication::setOrganizationDomain("SalesMate.com");
-    QCoreApplication::setApplicationName("SalesMate");
+    SettingsManager settings;
 
     engine.rootContext()->setContextProperty("Android", sytstem);
     engine.rootContext()->setContextProperty("databaseManager", databaseManager);
@@ -48,6 +51,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("BarcodeEngine", &barcodeEngine);
 
     qmlRegisterSingletonType(QUrl("qrc:/UI/Stock/SalesModel.qml"), "SalesModel", 1, 0, "SalesModel");
+    qmlRegisterSingletonInstance("App.Settings", 1, 0, "Settings", &settings);
 
 
     QObject::connect(
